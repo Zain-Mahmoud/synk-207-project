@@ -1,0 +1,44 @@
+Blueprint Assignment  For Task_Habit Tracker.pdf
+########################
+# OS / general
+########################
+.DS_Store
+Thumbs.db
+.discord/
+
+########################
+# Java build outputs
+########################
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+
+# Generic
+out/
+bin/
+*.class
+*.log
+
+########################
+# IDEs / editors
+########################
+
+# VS Code
+.vscode/
+
+# IntelliJ /
+.idea/
+*.iml
+
+########################
+# Env 
+########################
+
+# Other local configs (so we don't leak the API keys :sob:
+*.local.*
+*.env
+.env
+.env.*
