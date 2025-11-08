@@ -1,4 +1,4 @@
-package view;
+package main.java.view;
 
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;

@@ -1,4 +1,4 @@
-package view;
+package main.java.view;
 
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
