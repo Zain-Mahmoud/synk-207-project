@@ -12,7 +12,22 @@
 .idea/
 .idea
 
-.idea/copilot.data.migration.agent.xml
-.idea/copilot.data.migration.ask.xml
-.idea/copilot.data.migration.ask2agent.xml
-.idea/copilot.data.migration.edit.xml
+
+src/main/java/SECRET
+.SECRET
+
+# Gradle build output
+/.gradle/
+/build/
+src/main/java/resources/credentials.json
+/Blueprint Assignment  For Task_Habit Tracker.pdf
+/src/main/resources/credentials.json
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+/settings.gradle.kts
+/tokens/StoredCredential
+/TODO.md
+
+.gradle
+*.xml
+/.idea
