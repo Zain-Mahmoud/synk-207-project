@@ -39,7 +39,7 @@ public class AppBuilder {
 
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("../../../users.csv", userFactory);
+    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject(".`users.csv", userFactory);
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
