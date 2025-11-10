@@ -12,7 +12,16 @@ public class CreateTaskInputData {
     private int priority;
 
 
-    public CreateTaskInputData(String taskName){
-
+    public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority){
+        this.taskName = taskName;
+        this.deadline = deadline;
+        this.taskGroup = taskGroup;
+        this.status = status;
+        this.priority = priority;
     }
+
+    String getTaskName() {return taskName; }
+
+    boolean getstatus() {return status; }
+
 }
