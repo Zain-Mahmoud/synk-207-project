@@ -1,4 +1,4 @@
-package main.java.data_access;
+package data_access;
 
 /**
  * TaskHabitDataAccessObject (LOCALLY)
@@ -19,6 +19,6 @@ package main.java.data_access;
  * - Typical methods: addTask/addHabit, updateTask/updateHabit,
  *   deleteTask/deleteHabit, findTasksByDate, and methods to manage streaks.
  */
-public class TaskHabitDataAccessObject {
+public class TaskHabitDataAccessObject implements TaskRepository {
     
 }

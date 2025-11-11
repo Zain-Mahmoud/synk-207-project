@@ -1,5 +1,7 @@
 package data_access;
 
+import java.util.Calendar;
+
 /**
  * GoogleCalendarDataAccessObject (API CALL)
  *
@@ -22,19 +24,6 @@ package data_access;
  *   and fetchEventsForDateRange. Mapping onto HTTP requests and responses we get POST, GET, PUT, DELETE.
  */
 
-// ---------------------------------------------------------------
-// public class GoogleCalendarDataAccessObject {
-//     // Implementation details for Google Calendar API interactions
-    
-//     /*
-//         * Set up your environment.
-//         * Set up the sample.
-//         * Run the sample.
-//         */
-
-    
-// }
-// ---------------------------------------------------------------
 
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -62,7 +51,7 @@ import java.util.Collections;
 import java.util.List;
 
 /* class to demonstrate use of Calendar events list API THIS IS A QUICK START */
-public class GoogleCalendarDataAccessObject {
+public class GoogleCalendarDataAccessObject implements GoogleCalendarGateway {
   /**
    * Application name.
    */
