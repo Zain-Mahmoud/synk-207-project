@@ -17,8 +17,17 @@ java {
 }
 
 application {
-    // Assuming the main class will be created under package org.example
-    mainClass.set("org.example.CalendarQuickstart")
+    // Run the Google Calendar data access object e.g. Specificy The path
+    mainClass.set("data_access.GoogleCalendarDataAccessObject")
+}
+
+// Make sure credentials.json under src/resources is on the classpath
+sourceSets {
+    named("main") {
+        resources {
+            srcDir("src/resources")
+        }
+    }
 }
 
 dependencies {
