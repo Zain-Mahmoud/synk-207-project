@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
  */
 public class CreateTaskInputData {
 
-    private String taskName;
-    private LocalDateTime deadline;
-    private String taskGroup;
-    private boolean status;
-    private int priority;
+    private final String taskName;
+    private final LocalDateTime deadline;
+    private final String taskGroup;
+    private final boolean status;
+    private final int priority;
 
 
     public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority){
@@ -20,8 +20,11 @@ public class CreateTaskInputData {
         this.priority = priority;
     }
 
-    String getTaskName() {return taskName; }
+    String getTaskName() {return taskName;}
+    LocalDateTime getDeadline() {return deadline;}
+    String getTaskGroup() {return taskGroup;}
+    boolean getstatus() {return status;}
+    int getPriority() {return priority;}
 
-    boolean getstatus() {return status; }
 
 }
