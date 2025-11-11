@@ -21,6 +21,6 @@ package data_access;
  *   simple CRUD-like (basically create, read, update, delete) methods such as createEvent, updateEvent, deleteEvent,
  *   and fetchEventsForDateRange. Mapping onto HTTP requests and responses we get POST, GET, PUT, DELETE.
  */
-public class GoogleCalendarDataAccessObject {
+public class GoogleCalendarDataAccessObject implements CalendarGateway {
     // Implementation details for Google Calendar API interactions
 }

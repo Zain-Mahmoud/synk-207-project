@@ -19,6 +19,6 @@ package data_access;
  * - Typical methods: addTask/addHabit, updateTask/updateHabit,
  *   deleteTask/deleteHabit, findTasksByDate, and methods to manage streaks.
  */
-public class TaskHabitDataAccessObject {
+public class TaskHabitDataAccessObject implements TaskGateway {
     
 }
