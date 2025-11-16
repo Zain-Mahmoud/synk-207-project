@@ -1,4 +1,5 @@
 package data_access;
+import use_case.gateways.TaskGateway;
 
 /**
  * TaskHabitDataAccessObject (LOCALLY)
