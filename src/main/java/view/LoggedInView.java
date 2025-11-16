@@ -84,7 +84,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     int row = e.getFirstRow();
                     int col = e.getColumn();
 
-                    Object newValue = taskModel.getValueAt(row, col);
+                    String taskName = taskModel.getValueAt(row, 0).toString();
+
                 }
         });
 
@@ -93,9 +94,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     int row = e.getFirstRow();
                     int col = e.getColumn();
 
-                    Object newValue = habitModel.getValueAt(row, col);
+                    String habitName = habitModel.getValueAt(row, 0).toString();
+
                 }
-            });
+        });
 
             private void documentListenerHelper() {
                 final LoggedInState currentState = loggedInViewModel.getState();
