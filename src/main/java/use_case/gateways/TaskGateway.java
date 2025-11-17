@@ -38,4 +38,6 @@ public interface TaskGateway {
 	 * @return true when the task was removed; false when no matching task existed.
 	 */
 	boolean deleteTask(String userId, Task task);
+
+    boolean updateTask(String userId, Task task);
 }

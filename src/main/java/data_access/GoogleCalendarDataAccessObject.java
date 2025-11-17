@@ -1,5 +1,7 @@
 package data_access;
 
+import com.google.api.client.json.Json;
+import entities.User;
 import use_case.gateways.CalendarGateway;
 
 /*
@@ -23,7 +25,6 @@ import use_case.gateways.CalendarGateway;
  *   simple CRUD-like (basically create, read, update, delete) methods such as createEvent, updateEvent, deleteEvent,
  *   and fetchEventsForDateRange. Mapping onto HTTP requests and responses we get POST, GET, PUT, DELETE.
  */
-
 
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -52,57 +53,64 @@ import java.util.List;
 
 /* class to demonstrate use of Calendar events list API THIS IS A QUICK START */
 public class GoogleCalendarDataAccessObject {
-  /**
-   * Application name.
-   */
-  private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
-  /**
-   * Global instance of the JSON factory.
-   */
-  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-  /**
-   * Directory to store authorization tokens for this application.
-   */
-  private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-  /**
-   * Global instance of the scopes required by this quickstart.
-   * If modifying these scopes, delete your previously saved tokens/ folder.
-   */
-  private static final List<String> SCOPES =
-      Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
-  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+}
 
-  /**
-   * Creates an authorized Credential object.
-   *
-   * @param HTTP_TRANSPORT The network HTTP Transport.
-   * @return An authorized Credential object.
-   * @throws IOException If the credentials.json file cannot be found.
-   */
-  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
-      throws IOException {
-    // Load client secrets.
-    InputStream in = GoogleCalendarDataAccessObject.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-    if (in == null) {
-      throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-    }
-    GoogleClientSecrets clientSecrets =
-        GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+class getUserCalendar {
+    /**
+     * Application name.
+     */
+    private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+    /**
+     * Global instance of the JSON factory.
+     */
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    /**
+     * Directory to store authorization tokens for this application.
+     */
+    private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    // Build flow and trigger user authorization request.
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-        .setAccessType("offline")
-        .build();
-    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    //returns an authorized Credential object.
-    return credential;
-  }
+    /**
+     * Global instance of the scopes required by this quickstart.
+     * If modifying these scopes, delete your previously saved tokens/ folder.
+     */
+    private static final List<String> SCOPES =
+            Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
+    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-  public static void main(String... args) throws IOException, GeneralSecurityException {
+    /**
+     * Creates an authorized Credential object.
+     *
+     * @param HTTP_TRANSPORT The network HTTP Transport.
+     * @return An authorized Credential object.
+     * @throws IOException If the credentials.json file cannot be found.
+     */
+    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+            throws IOException {
+        // Load client secrets.
+        InputStream in = GoogleCalendarDataAccessObject.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        if (in == null) {
+            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+        }
+        GoogleClientSecrets clientSecrets =
+                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setAccessType("offline")
+                .build();
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        //returns an authorized Credential object.
+        return credential;
+}
+
+
+
+
+public static void main(String... args) throws IOException, GeneralSecurityException {
     // Build a new authorized API client service.
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Calendar service =
