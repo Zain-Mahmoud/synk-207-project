@@ -1,8 +1,19 @@
 package app;
 
+import java.awt.CardLayout;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import data_access.FileUserDataAccessObject;
+import data_access.TaskHabitDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.leaderboard.ViewLeaderboardController;
+import interface_adapter.leaderboard.ViewLeaderboardPresenter;
+import interface_adapter.leaderboard.ViewLeaderboardViewModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
@@ -21,14 +32,14 @@ import use_case.login.LoginOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
+import use_case.view_leaderboard.ViewLeaderboardInteractor;
+import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
+import view.LeaderboardView;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -39,7 +50,8 @@ public class AppBuilder {
 
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject(".`users.csv", userFactory);
+    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
+    final TaskHabitDataAccessObject taskHabitDataAccessObject;
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -47,9 +59,12 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+    private LeaderboardView leaderboardView;
+    private ViewLeaderboardViewModel viewLeaderboardViewModel;
 
     public AppBuilder() throws IOException {
         cardPanel.setLayout(cardLayout);
+        taskHabitDataAccessObject = new TaskHabitDataAccessObject("habits.csv");
     }
 
     public AppBuilder addSignupView() {
@@ -69,7 +84,15 @@ public class AppBuilder {
     public AppBuilder addLoggedInView() {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
+        loggedInView.setViewManagerModel(viewManagerModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addLeaderboardView() {
+        viewLeaderboardViewModel = new ViewLeaderboardViewModel();
+        leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
+        cardPanel.add(leaderboardView, leaderboardView.getViewName());
         return this;
     }
 
@@ -107,6 +130,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addViewLeaderboardUseCase() {
+        final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(viewLeaderboardViewModel);
+        final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
+                taskHabitDataAccessObject, viewLeaderboardOutputBoundary);
+
+        ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
+        leaderboardView.setViewLeaderboardController(viewLeaderboardController);
+        return this;
+    }
+
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -118,6 +151,5 @@ public class AppBuilder {
 
         return application;
     }
-
-
 }
+
