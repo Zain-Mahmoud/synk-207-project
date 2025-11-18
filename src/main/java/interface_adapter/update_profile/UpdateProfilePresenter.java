@@ -22,25 +22,25 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
     @Override
     public void prepareSuccessView(UpdateProfileOutputData response) {
         // On success, switch back to main menu view.
-        final UpdateProfileState updateState = updateProfileViewModel.getState();
-        updateState.setUid(response.getUid());
-        updateState.setUsername(response.getUsername());
-        updateState.setAvatarPath(response.getAvatarPath());
-        updateState.setUsernameError(null);
-        updateState.setAvatarError(null);
-        updateState.setSuccessMessage("Profile updated successfully.");
+        final UpdateProfileState state = updateProfileViewModel.getState();
+        state.setUid(response.getUid());
+        state.setUsername(response.getUsername());
+        state.setAvatarPath(response.getAvatarPath());
+        state.setUsernameError(null);
+        state.setAvatarError(null);
+        state.setSuccessMessage("Profile updated successfully.");
 
-        updateProfileViewModel.setState(updateState);
+        updateProfileViewModel.setState(state);
         updateProfileViewModel.firePropertyChanged();
     }
 
     @Override
     public void prepareFailView(String error) {
-        final UpdateProfileState updateState = updateProfileViewModel.getState();
-        updateState.setUsernameError(error);
-        updateState.setSuccessMessage(null);
+        final UpdateProfileState state = updateProfileViewModel.getState();
+        state.setUsernameError(error);
+        state.setSuccessMessage(null);
 
-        updateProfileViewModel.setState(updateState);
+        updateProfileViewModel.setState(state);
         updateProfileViewModel.firePropertyChanged();
     }
 }

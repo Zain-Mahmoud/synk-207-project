@@ -15,7 +15,7 @@ public class UpdateProfileViewModel extends ViewModel<UpdateProfileState> {
     public static final String CANCEL_BUTTON_LABEL = "Cancel";
 
     public UpdateProfileViewModel() {
-        super("update profile");
+        super("updateprofile");
         setState(new UpdateProfileState());
     }
 }

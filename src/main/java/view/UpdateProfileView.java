@@ -19,9 +19,7 @@ import java.beans.PropertyChangeListener;
 public class UpdateProfileView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "update profile";
-
     private final UpdateProfileViewModel updateProfileViewModel;
-
     private UpdateProfileController updateProfileController = null;
 
     private String currentUid;

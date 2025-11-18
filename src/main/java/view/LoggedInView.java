@@ -30,6 +30,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton logOut;
     private final JButton viewLeaderboard;
 
+    private final JButton updateProfile;
+
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
 
@@ -56,11 +58,22 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         viewLeaderboard = new JButton("View Leaderboard");
         buttons.add(viewLeaderboard);
 
+        updateProfile = new JButton("Update Profile");
+        buttons.add(updateProfile);
+
         logOut.addActionListener(this);
         
         viewLeaderboard.addActionListener(evt -> {
             if (evt.getSource().equals(viewLeaderboard) && viewManagerModel != null) {
                 viewManagerModel.setState("leaderboard");
+                viewManagerModel.firePropertyChanged();
+            }
+
+        });
+
+        updateProfile.addActionListener(evt -> {
+            if (evt.getSource().equals(updateProfile) && viewManagerModel != null) {
+                viewManagerModel.setState("updateprofile");
                 viewManagerModel.firePropertyChanged();
             }
         });
