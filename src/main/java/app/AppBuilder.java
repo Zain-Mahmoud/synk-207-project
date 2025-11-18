@@ -147,26 +147,26 @@ public class AppBuilder {
     public AppBuilder addViewTasksAndHabitsUseCase() {
         final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary =
                 new ViewTasksAndHabitsPresenter(viewManagerModel,
-                viewTasksAndHabitsViewModel);
+                        viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor =
                 new ViewTasksAndHabitsInteractor(
-                userDataAccessObject, viewTasksAndHabitsOutputBoundary);
+                        userDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor);
         viewTasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
+    }
 
-        public JFrame build () {
-            final JFrame application = new JFrame("User Login Example");
-            application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    public JFrame build () {
+        final JFrame application = new JFrame("User Login Example");
+        application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-            application.add(cardPanel);
+        application.add(cardPanel);
 
-            viewManagerModel.setState(signupView.getViewName());
-            viewManagerModel.firePropertyChanged();
+        viewManagerModel.setState(signupView.getViewName());
+        viewManagerModel.firePropertyChanged();
 
-            return application;
+        return application;
         }
     }
-}
 
