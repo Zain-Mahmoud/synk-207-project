@@ -23,6 +23,9 @@ import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.update_profile.UpdateProfileController;
+import interface_adapter.update_profile.UpdateProfilePresenter;
+import interface_adapter.update_profile.UpdateProfileViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -32,14 +35,13 @@ import use_case.login.LoginOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.update_profile.UpdateProfileBoundary;
+import use_case.update_profile.UpdateProfileInteractor;
+import use_case.update_profile.UpdateProfileOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
-import view.LeaderboardView;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
+import view.*;
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -61,6 +63,9 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
+    private UpdateProfileViewModel updateProfileViewModel;
+    private UpdateProfileView updateProfileView;
+
     //private UpdateProfileView updateProfileView;
 
     public AppBuilder() throws IOException {
@@ -138,6 +143,19 @@ public class AppBuilder {
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
+        return this;
+    }
+
+    public AppBuilder addUpdateProfileUseCase() {
+        final UpdateProfileOutputBoundary updateProfileutputBoundary =
+                new UpdateProfilePresenter(viewManagerModel, updateProfileViewModel);
+
+        final UpdateProfileBoundary updateProfileInteractor =
+                new UpdateProfileInteractor(userDataAccessObject, updateProfileutputBoundary);
+
+        UpdateProfileController updateProfileController = new UpdateProfileController(updateProfileInteractor);
+        updateProfileView.setUpdateProfileController(updateProfileController);
+
         return this;
     }
 

@@ -6,14 +6,20 @@ package entities;
 public class User {
 
     private final String uid;
-    private final String username;
-    private final String AvatarPath;
-    private final String password;
+    private String username;
+    private String avatarpath;
+    private String password;
 
-    public User(String uid, String username, String AvatarPath, String password) {
+    public User(String uid, String username, String avatarpath, String password) {
         this.uid = uid;
         this.username = username;
-        this.AvatarPath = AvatarPath;
+        this.avatarpath = avatarpath;
+        this.password = password;
+    }
+
+    public User(String username, String password) {
+        this("0", "Bob", "NA", "");
+        this.username = username;
         this.password = password;
     }
 
@@ -24,11 +30,18 @@ public class User {
     }
 
     public String getAvatarPath() {
-        return AvatarPath;
+        return avatarpath;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setAvatarPath(String url) {
+        this.avatarpath = url;
+    }
 }
