@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
@@ -22,10 +23,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final LoggedInViewModel loggedInViewModel;
     private final JLabel passwordErrorField = new JLabel();
     private ChangePasswordController changePasswordController = null;
+    private ViewManagerModel viewManagerModel;
 
     private final JLabel username;
 
     private final JButton logOut;
+    private final JButton viewLeaderboard;
 
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
@@ -50,7 +53,17 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         changePassword = new JButton("Change Password");
         buttons.add(changePassword);
 
+        viewLeaderboard = new JButton("View Leaderboard");
+        buttons.add(viewLeaderboard);
+
         logOut.addActionListener(this);
+        
+        viewLeaderboard.addActionListener(evt -> {
+            if (evt.getSource().equals(viewLeaderboard) && viewManagerModel != null) {
+                viewManagerModel.setState("leaderboard");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -128,5 +141,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     public void setChangePasswordController(ChangePasswordController changePasswordController) {
         this.changePasswordController = changePasswordController;
+    }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
     }
 }
