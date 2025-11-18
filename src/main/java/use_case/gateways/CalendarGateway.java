@@ -1,27 +1,15 @@
 package use_case.gateways;
 
-import entities.Task;
+// CRUD GET (read), PUT (create and update), POST (create - if we don't have `id` or `uuid`), and DELETE (delete)
 
 public interface CalendarGateway {
-    String getCalendarById(String userID);
-
-    String getCalendarByUsername(String username);
-
-    String getCalendarByEmail(String email);
-
-    /*
-    Event Management Methods
-     */
-
-    /**
-     * @return the event ID of the created event
-     *
-     */
-    String createEvent(String userId, Task task);
 
 
-    boolean deleteEvent(String userId, String eventID);
+    public void getInstance();
+    public void createEvent();
+    public void updateEvent();
+    public void deleteEvent();
+    public void fetchEventsForDateRange();
 
-    //
-    boolean updateEvent(String userId, String eventID, Task updated);
+
 }
