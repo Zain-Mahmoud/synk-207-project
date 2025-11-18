@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
  * The Input Data for the CreateTask Use Case.
  */
 public class CreateTaskInputData {
-
+    private final String username;
     private final String taskName;
     private final LocalDateTime deadline;
     private final String taskGroup;
@@ -12,7 +12,8 @@ public class CreateTaskInputData {
     private final int priority;
 
 
-    public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority){
+    public CreateTaskInputData(String username, String taskName, LocalDateTime deadline, String taskGroup, boolean status, int priority){
+        this.username = username;
         this.taskName = taskName;
         this.deadline = deadline;
         this.taskGroup = taskGroup;
@@ -20,6 +21,7 @@ public class CreateTaskInputData {
         this.priority = priority;
     }
 
+    String getUsername() {return username;}
     String getTaskName() {return taskName;}
     LocalDateTime getDeadline() {return deadline;}
     String getTaskGroup() {return taskGroup;}
