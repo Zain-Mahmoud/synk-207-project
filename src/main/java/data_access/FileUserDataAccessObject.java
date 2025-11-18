@@ -5,6 +5,7 @@ import entities.UserFactory;
 import use_case.change_password.ChangePasswordUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
+import use_case.update_profile.UpdateProfileUserDataAccessInterface;
 
 import java.io.*;
 import java.util.HashMap;
@@ -16,7 +17,8 @@ import java.util.Map;
  */
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                                                  LoginUserDataAccessInterface,
-                                                 ChangePasswordUserDataAccessInterface {
+                                                 ChangePasswordUserDataAccessInterface,
+                                                 UpdateProfileUserDataAccessInterface {
 
     private static final String HEADER = "username,password";
 
@@ -63,7 +65,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
             for (User user : accounts.values()) {
                 final String line = String.format("%s,%s",
-                        user.getName(), user.getPassword());
+                        user.getUsername(), user.getPassword());
                 writer.write(line);
                 writer.newLine();
             }
@@ -77,8 +79,28 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
+    public boolean existsByUid(String uid) {
+        return accounts.containsKey(uid);
+    }
+
+    @Override
+    public User getByUid(String uid) {
+        return accounts.get(uid);
+    }
+
+    @Override
+    public boolean isUsernameTaken(String username) {
+        for (User u : accounts.values()) {
+            if (u.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void save(User user) {
-        accounts.put(user.getName(), user);
+        accounts.put(user.getUsername(), user);
         this.save();
     }
 
@@ -95,7 +117,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     @Override
     public void changePassword(User user) {
         // Replace the User object in the map
-        accounts.put(user.getName(), user);
+        accounts.put(user.getUsername(), user);
         save();
     }
 }

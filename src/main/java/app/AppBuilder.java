@@ -61,6 +61,7 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
+    //private UpdateProfileView updateProfileView;
 
     public AppBuilder() throws IOException {
         cardPanel.setLayout(cardLayout);

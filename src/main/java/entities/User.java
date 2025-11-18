@@ -5,16 +5,26 @@ package entities;
  */
 public class User {
 
-    private final String name;
+    private final String uid;
+    private final String username;
+    private final String AvatarPath;
     private final String password;
 
-    public User(String name, String password) {
-        this.name = name;
+    public User(String uid, String username, String AvatarPath, String password) {
+        this.uid = uid;
+        this.username = username;
+        this.AvatarPath = AvatarPath;
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getUid() {return uid; };
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAvatarPath() {
+        return AvatarPath;
     }
 
     public String getPassword() {

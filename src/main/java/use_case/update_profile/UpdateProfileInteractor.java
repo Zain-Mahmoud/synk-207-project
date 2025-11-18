@@ -7,10 +7,10 @@ import entities.User;
  */
 public class UpdateProfileInteractor implements UpdateProfileBoundary {
 
-    private final UpdateProfileUserDataAccess userDataAccess;
+    private final UpdateProfileUserDataAccessInterface userDataAccess;
     private final UpdateProfileOutputBoundary presenter;
 
-    public UpdateProfileInteractor(UpdateProfileUserDataAccess userDataAccess,
+    public UpdateProfileInteractor(UpdateProfileUserDataAccessInterface userDataAccess,
                                    UpdateProfileOutputBoundary presenter) {
         this.userDataAccess = userDataAccess;
         this.presenter = presenter;
@@ -32,8 +32,8 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
         if (newUsername != null && !newUsername.isBlank()) {
             String trimmed = newUsername.trim();
 
-            if (trimmed.length() < 2 || trimmed.length() > 20) {
-                presenter.prepareFailView("Username must be 2–20 characters.");
+            if (trimmed.isEmpty() || trimmed.length() > 12) {
+                presenter.prepareFailView("Username must be 1–12 characters.");
                 return;
             }
 
