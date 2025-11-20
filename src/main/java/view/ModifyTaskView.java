@@ -1,6 +1,10 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import interface_adapter.modify_task.*;
 
@@ -37,6 +41,101 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         JLabel taskDeadlineLabel = new JLabel("Task deadline");
         JLabel taskStatusLabel = new JLabel("Task status");
         JLabel taskPriorityLabel = new JLabel("Task priority");
+
+        newTaskName.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void documentStateHelper() {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setNewTaskName(newTaskName.getText());
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+        });
+        newTaskDeadline.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void documentStateHelper() {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setDeadline(newTaskDeadline.getText());
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+        });
+
+        newTaskPriority.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void documentStateHelper() {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setPriority(Integer.parseInt(newTaskPriority.getText()));
+            }
+            public void documentStateHelper(int num) {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setPriority(-1);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentStateHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentStateHelper(-1);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                try{
+                    Integer.parseInt(newTaskPriority.getText());
+                    documentStateHelper();
+                } catch (NumberFormatException exc){
+                    documentStateHelper(-1);
+                }
+            }
+        });
+
+        taskCompleted.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setStatus(true);
+            }
+        });
+
+        taskNotCompleted.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setStatus(false);
+            }
+        });
+
+
 
         JPanel taskStatus = new JPanel();
         JPanel taskPriority = new JPanel();
@@ -79,7 +178,9 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         });
 
         save.addActionListener(evt -> {
-
+            if (evt.getSource().equals(save)){
+                modifyTaskController.switchToTaskListView();
+            }
         });
     }
 

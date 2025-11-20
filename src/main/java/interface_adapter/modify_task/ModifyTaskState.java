@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class ModifyTaskState {
     private String newTaskName = "";
     private int priority = 0;
-    private LocalDateTime deadline = LocalDateTime.now();
+    private String deadline = "";
     private boolean status = false;
 
 
@@ -26,11 +26,11 @@ public class ModifyTaskState {
         this.priority = priority;
     }
 
-    public LocalDateTime getDeadline() {
+    public String getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(LocalDateTime deadline) {
+    public void setDeadline(String deadline) {
         this.deadline = deadline;
     }
 
