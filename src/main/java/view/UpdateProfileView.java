@@ -25,8 +25,6 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private String currentUid;
 
-//    private final JLabel usernamelabel = new JLabel(ViewLeaderboardViewModel.TITLE_LABEL);
-
     private final JTextField usernameInputField = new JTextField(15);
     private final JLabel usernameErrorField = new JLabel();
     private final JLabel successMessageField = new JLabel();
