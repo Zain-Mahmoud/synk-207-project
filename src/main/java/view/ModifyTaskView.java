@@ -6,6 +6,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.ViewModel;
 import interface_adapter.modify_task.*;
 
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 
 public class ModifyTaskView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "modify task";
@@ -179,6 +181,9 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         save.addActionListener(evt -> {
             if (evt.getSource().equals(save)){
+                ModifyTaskState currentState = modifyTaskViewModel.getState();
+                modifyTaskController.execute(currentState.getNewTaskName(), currentState.getPriority(),
+                        LocalDateTime.now(), currentState.getStatus());
                 modifyTaskController.switchToTaskListView();
             }
         });

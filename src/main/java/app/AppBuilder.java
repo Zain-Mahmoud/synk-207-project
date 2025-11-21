@@ -155,7 +155,7 @@ public class AppBuilder {
         final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel, modifyTaskViewModel, loginViewModel);
         final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary, taskHabitDataAccessObject);
 
-        ModifyTaskController modifyTaskController = new ModifyTaskController(modifyTaskInteractor);
+        ModifyTaskController modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
         modifyTaskView.setModifyTaskController(modifyTaskController);
         return this;
     }

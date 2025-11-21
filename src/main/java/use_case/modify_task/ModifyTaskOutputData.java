@@ -9,8 +9,8 @@ public class ModifyTaskOutputData{
     private final LocalDateTime newDeadline;
     private final boolean newTaskStatus;
     private final int newTaskPriority;
-    public ModifyTaskOutputData(String newTaskName, LocalDateTime newDeadline, boolean newTaskStatus, int newTaskPriority,
-                                boolean useCaseFailed) {
+
+    public ModifyTaskOutputData(String newTaskName, LocalDateTime newDeadline, boolean newTaskStatus, int newTaskPriority) {
         this.newTaskName = newTaskName;
         this.newDeadline = newDeadline;
         this.newTaskStatus = newTaskStatus;

@@ -1,7 +1,6 @@
 package use_case.modify_task;
 
 import entities.Task;
-import entities.User;
 
 public interface ModifyTaskUserDataAccessInterface {
     /***
@@ -9,7 +8,7 @@ public interface ModifyTaskUserDataAccessInterface {
      * @param userID
      * @param modifiedTask
      */
-    public void saveTask(String userID, Task modifiedTask);
+    void saveTask(String userID, Task modifiedTask);
 
 
 }

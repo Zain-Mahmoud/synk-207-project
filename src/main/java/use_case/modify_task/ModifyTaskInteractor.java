@@ -2,7 +2,6 @@ package use_case.modify_task;
 
 import entities.Task;
 import entities.TaskBuilder;
-
 import java.time.LocalDateTime;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
@@ -28,8 +27,9 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                 .setPriority(newTaskPriority)
                 .setStatus(newTaskStatus).build();
         userDataAccessObject.saveTask(userID, modifiedTask);
+
         final ModifyTaskOutputData outputData = new ModifyTaskOutputData(newTaskName, newDeadline, newTaskStatus,
-                newTaskPriority, newTaskStatus);
+                newTaskPriority);
         modifyPresenter.prepareSuccessView(outputData);
 
     }

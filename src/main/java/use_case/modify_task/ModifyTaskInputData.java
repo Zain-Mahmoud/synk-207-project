@@ -9,12 +9,12 @@ public class ModifyTaskInputData {
     private final LocalDateTime newDeadline;
     private final Boolean newTaskStatus;
 
-    public ModifyTaskInputData(String newTaskName, int newPriority, LocalDateTime newDeadline, Boolean newTaskStatus, String userName) {
+    public ModifyTaskInputData(String newTaskName, int newPriority, LocalDateTime newDeadline, Boolean newTaskStatus, String userID) {
         this.newTaskName = newTaskName;
         this.newPriority = newPriority;
         this.newDeadline = newDeadline;
         this.newTaskStatus = newTaskStatus;
-        this.userID = userName;
+        this.userID = userID;
     }
 
     public int getNewPriority() {
