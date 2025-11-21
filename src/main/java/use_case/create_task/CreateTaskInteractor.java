@@ -23,7 +23,6 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
         String taskGroup = InputData.getTaskGroup();
         boolean status = InputData.getstatus();
         int priority = InputData.getPriority();
-        String description = InputData.getDescription();
 
         Task newTask = new TaskBuilder()
                 .setTaskName(taskName)
@@ -31,7 +30,6 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
                 .setTaskGroup(taskGroup)
                 .setStatus(status)
                 .setPriority(priority)
-                .setDescription(description)
                 .build();
     }
 }
