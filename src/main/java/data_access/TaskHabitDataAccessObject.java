@@ -1,4 +1,4 @@
-// package data_access;
+package data_access;// package data_access;
 
 import entities.Task;
 import entities.TaskBuilder;
@@ -22,7 +22,7 @@ import java.util.Map;
  * Prototype in-memory persistence layer backed by a simple HashMap of user id to tasks.
  * Create, Update, Remove, Read (Fetch) :
  */
-public static class TaskHabitDataAccessObject implements TaskGateway {
+public class TaskHabitDataAccessObject implements TaskGateway {
 
     private static final String HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -106,7 +106,7 @@ public static class TaskHabitDataAccessObject implements TaskGateway {
                         .setTaskName(taskName)
                         .setDescription(description)
                         // WE NEED A START TIME FIELD IN THE BUILDER
-                       //.setStartTime(startTime)
+                        //.setStartTime(startTime)
                         .setDeadline(deadline)
                         .setTaskGroup(taskGroup)
                         .setStatus(status)
@@ -195,33 +195,4 @@ public static class TaskHabitDataAccessObject implements TaskGateway {
         }
         return false;
     }
-
-    /**
-     * @param userId
-     * @param task
-     * @return
-     */
-
-    // Just testing Not implemented exception, I remember there was an easy way to do it in Java,
-    // but I forgor
-    @Override
-    public boolean updateTask(String userId, Task task) {
-        try {
-            throw new ExecutionControl.NotImplementedException("TODO");
-        } catch (ExecutionControl.NotImplementedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}
-
-// THIS IS TO TEST IT
-
-
-void main() {
-    TaskHabitDataAccessObject dao = new TaskHabitDataAccessObject();
-
-    dao.addTask("1", new TaskBuilder().setTaskName("Task 1").build());
-
-
-    System.out.println(dao.fetchTasks("1"));
 }

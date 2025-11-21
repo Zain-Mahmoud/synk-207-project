@@ -14,5 +14,5 @@ public interface TaskGateway {
 
     boolean deleteTask(String userId, Task task);
 
-    boolean updateTask(String userId, Task task);
+
 }

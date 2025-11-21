@@ -1,4 +1,4 @@
-// package data_access;
+package data_access;// package data_access;
 
 // I commented because im using java 24 modules and these are not required to be imported in module-info.java
 import com.google.api.client.auth.oauth2.Credential;
@@ -248,34 +248,4 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     }
 
 }
-
-
-/* -----------------------------------------------------------------------
-       TEMPORARY MANUAL TEST ENTRY POINT (USE THIS TO TEST THE CODE OR JUST RUN A SIM)
-       ----------------------------------------------------------------------- */
-    public void main(String[] args) {
-        String providedUserId = "user1";
-
-        try {
-            // providedUserId = promptForUserId();
-            GoogleCalendarDataAccessObject dao = new GoogleCalendarDataAccessObject(providedUserId);
-            List<Event> events = dao.getEvents(providedUserId);
-
-            if (events.isEmpty()) {
-                System.out.println("No upcoming events were found.");
-            } else {
-                System.out.println("Upcoming events:");
-                for (Event event : events) {
-                    DateTime startTime = event.getStart().getDateTime();
-                    if (startTime == null) {
-                        startTime = event.getStart().getDate();
-                    }
-                    System.out.println("- " + event.getSummary() + " at " + startTime);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to authenticate or fetch events: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
