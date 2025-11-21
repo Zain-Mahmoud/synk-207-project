@@ -217,7 +217,7 @@ public static class TaskHabitDataAccessObject implements TaskGateway {
 // THIS IS TO TEST IT
 
 
-static void main() {
+void main() {
     TaskHabitDataAccessObject dao = new TaskHabitDataAccessObject();
 
     dao.addTask("1", new TaskBuilder().setTaskName("Task 1").build());

@@ -1,6 +1,6 @@
 package entities;
 
-public interface Event {
+public interface Completable {
     void complete();
 
     boolean isCompleted();

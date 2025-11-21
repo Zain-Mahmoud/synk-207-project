@@ -1,5 +1,6 @@
-//package data_access;
+// package data_access;
 
+// I commented because im using java 24 modules and these are not required to be imported in module-info.java
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -30,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public static class GoogleCalendarDataAccessObject implements CalendarGateway {
+public class GoogleCalendarDataAccessObject implements CalendarGateway {
 
     private static final String APPLICATION_NAME = "CSC-207-SYNK";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -252,7 +253,7 @@ public static class GoogleCalendarDataAccessObject implements CalendarGateway {
 /* -----------------------------------------------------------------------
        TEMPORARY MANUAL TEST ENTRY POINT (USE THIS TO TEST THE CODE OR JUST RUN A SIM)
        ----------------------------------------------------------------------- */
-    public static void main(String[] args) {
+    public void main(String[] args) {
         String providedUserId = "user1";
 
         try {
