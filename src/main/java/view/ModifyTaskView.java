@@ -173,7 +173,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
             if (evt.getSource().equals(save)){
                 ModifyTaskState currentState = modifyTaskViewModel.getState();
                 // TODO add old information to execute parameter list before new information is set
-                modifyTaskController.execute("", -1, "1/2/3", true, currentState.getNewTaskName(), currentState.getPriority(),
+                modifyTaskController.execute("", -1, "2025-09-12T00:00:00", true, currentState.getNewTaskName(), currentState.getPriority(),
                         currentState.getDeadline(), currentState.getStatus());
                 modifyTaskController.switchToTaskListView();
             }

@@ -1,7 +1,6 @@
 package use_case.modify_task;
 
 import entities.Task;
-import use_case.gateways.TaskGateway;
 
 public interface ModifyTaskUserDataAccessInterface {
     /***

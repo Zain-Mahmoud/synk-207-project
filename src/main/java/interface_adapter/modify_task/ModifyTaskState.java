@@ -6,6 +6,7 @@ public class ModifyTaskState {
     private String priority = "";
     private String deadline = "";
     private boolean status = false;
+    private String taskError;
 
 
     public String getNewTaskName() {
@@ -38,5 +39,13 @@ public class ModifyTaskState {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getTaskError() {
+        return taskError;
+    }
+
+    public void setTaskError(String taskError) {
+        this.taskError = taskError;
     }
 }

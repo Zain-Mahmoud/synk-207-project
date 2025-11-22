@@ -4,7 +4,7 @@ import entities.Habit;
 import entities.HabitBuilder;
 import entities.Task;
 import entities.TaskBuilder;
-import use_case.gateways.TaskGateway;
+import use_case.gateways.TaskHabitGateway;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,7 +23,7 @@ import java.util.Map;
  * Persistence layer for both Tasks and Habits backed by CSV files.
  * Create, Update, Remove, Read (Fetch) operations for both tasks and habits.
  */
-public class TaskHabitDataAccessObject implements TaskGateway {
+public class TaskHabitDataAccessObject implements TaskHabitGateway {
 
     private static final String TASK_HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
     private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";

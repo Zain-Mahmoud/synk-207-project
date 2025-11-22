@@ -1,16 +1,15 @@
 package interface_adapter.modify_habit;
 
-import java.time.LocalDateTime;
-
 public class ModifyHabitState {
     private String habitName = "";
-    private LocalDateTime startDateTime = null;
-    private LocalDateTime frequency = null;
+    private String startDateTime = "";
+    private String frequency = "";
     private String habitGroup = "";
-    private int streakCount = 0;
-    private int priority = 0;
+    private String streakCount = "";
+    private String priority = "";
     private boolean status = false;
     private String description = "";
+    private String habitError;
 
     public String getHabitName() {
         return habitName;
@@ -20,19 +19,19 @@ public class ModifyHabitState {
         this.habitName = habitName;
     }
 
-    public LocalDateTime getStartDateTime() {
+    public String getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
+    public void setStartDateTime(String startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public LocalDateTime getFrequency() {
+    public String getFrequency() {
         return frequency;
     }
 
-    public void setFrequency(LocalDateTime frequency) {
+    public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
 
@@ -44,19 +43,19 @@ public class ModifyHabitState {
         this.habitGroup = habitGroup;
     }
 
-    public int getStreakCount() {
+    public String getStreakCount() {
         return streakCount;
     }
 
-    public void setStreakCount(int streakCount) {
+    public void setStreakCount(String streakCount) {
         this.streakCount = streakCount;
     }
 
-    public int getPriority() {
+    public String getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(String priority) {
         this.priority = priority;
     }
 
@@ -74,5 +73,13 @@ public class ModifyHabitState {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setHabitError(String habitError) {
+        this.habitError = habitError;
+    }
+
+    public String getHabitError() {
+        return habitError;
     }
 }

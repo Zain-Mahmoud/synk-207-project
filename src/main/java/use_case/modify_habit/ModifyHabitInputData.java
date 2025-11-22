@@ -1,29 +1,83 @@
 package use_case.modify_habit;
 
-import java.time.LocalDateTime;
-
 public class ModifyHabitInputData {
     private final String userID;
+    
+    // Old habit information
+    private final String oldHabitName;
+    private final String oldPriority;
+    private final Boolean oldHabitStatus;
+    private final String oldStartDateTime;
+    private final String oldStreakCount;
+    private final String oldHabitGroup;
+    private final String oldFrequency;
+    
+    // New habit information
     private final String newHabitName;
-    private final int newPriority;
-    private final LocalDateTime newStartDateTime;
+    private final String newPriority;
     private final Boolean newHabitStatus;
-    private final int newStreakCount;
+    private final String newStartDateTime;
+    private final String newStreakCount;
     private final String newHabitGroup;
-    private final LocalDateTime frequency;
+    private final String newFrequency;
 
-    public ModifyHabitInputData(String newHabitName, int newPriority, Boolean newHabitStatus, String userID, LocalDateTime newStartDateTime, int newStreakCount, String newHabitGroup, LocalDateTime frequency) {
+    public ModifyHabitInputData(String oldHabitName, String oldPriority, Boolean oldHabitStatus, 
+                                 String oldStartDateTime, String oldStreakCount, String oldHabitGroup, String oldFrequency,
+                                 String newHabitName, String newPriority, Boolean newHabitStatus, 
+                                 String newStartDateTime, String newStreakCount, String newHabitGroup, String newFrequency,
+                                 String userID) {
+        // Old values
+        this.oldHabitName = oldHabitName;
+        this.oldPriority = oldPriority;
+        this.oldHabitStatus = oldHabitStatus;
+        this.oldStartDateTime = oldStartDateTime;
+        this.oldStreakCount = oldStreakCount;
+        this.oldHabitGroup = oldHabitGroup;
+        this.oldFrequency = oldFrequency;
+        
+        // New values
         this.newHabitName = newHabitName;
         this.newPriority = newPriority;
         this.newHabitStatus = newHabitStatus;
-        this.userID = userID;
         this.newStartDateTime = newStartDateTime;
         this.newStreakCount = newStreakCount;
         this.newHabitGroup = newHabitGroup;
-        this.frequency = frequency;
+        this.newFrequency = newFrequency;
+        
+        this.userID = userID;
     }
 
-    public int getNewPriority() {
+    // Getters for old habit information
+    public String getOldHabitName() {
+        return oldHabitName;
+    }
+
+    public String getOldPriority() {
+        return oldPriority;
+    }
+
+    public Boolean getOldHabitStatus() {
+        return oldHabitStatus;
+    }
+
+    public String getOldStartDateTime() {
+        return oldStartDateTime;
+    }
+
+    public String getOldStreakCount() {
+        return oldStreakCount;
+    }
+
+    public String getOldHabitGroup() {
+        return oldHabitGroup;
+    }
+
+    public String getOldFrequency() {
+        return oldFrequency;
+    }
+
+    // Getters for new habit information
+    public String getNewPriority() {
         return newPriority;
     }
 
@@ -35,11 +89,11 @@ public class ModifyHabitInputData {
         return newHabitStatus;
     }
 
-    public String getUserID() {
-        return this.userID;
+    public String getNewStartDateTime() {
+        return newStartDateTime;
     }
 
-    public int getNewStreakCount() {
+    public String getNewStreakCount() {
         return newStreakCount;
     }
 
@@ -47,11 +101,11 @@ public class ModifyHabitInputData {
         return newHabitGroup;
     }
 
-    public LocalDateTime getFrequency() {
-        return frequency;
+    public String getNewFrequency() {
+        return newFrequency;
     }
 
-    public LocalDateTime getNewStartDateTime() {
-        return newStartDateTime;
+    public String getUserID() {
+        return this.userID;
     }
 }

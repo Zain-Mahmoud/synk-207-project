@@ -2,15 +2,15 @@ package use_case.modify_task;
 
 import entities.Task;
 import entities.TaskBuilder;
-import use_case.gateways.TaskGateway;
+import use_case.gateways.TaskHabitGateway;
 
 import java.time.LocalDateTime;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyPresenter;
-    private final TaskGateway userDataAccessObject;
+    private final TaskHabitGateway userDataAccessObject;
 
-    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyPresenter, TaskGateway userDataAccessObject) {
+    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyPresenter, TaskHabitGateway userDataAccessObject) {
         this.modifyPresenter = modifyPresenter;
         this.userDataAccessObject = userDataAccessObject;
     }
@@ -28,11 +28,6 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
         String newDeadline = modifyInputData.getNewDeadline();
         String userID = modifyInputData.getUserID();
 
-        final Task oldTask = new TaskBuilder()
-                .setTaskName(oldTaskName)
-                .setDeadline(LocalDateTime.parse(oldDeadline))
-                .setPriority(oldTaskPriority)
-                .setStatus(oldTaskStatus).build();
         try{
             LocalDateTime newDeadlineFormatted = LocalDateTime.parse(newDeadline);
             int newPriorityFormatted = Integer.parseInt(newTaskPriority);
@@ -41,6 +36,12 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                     .setDeadline(newDeadlineFormatted)
                     .setPriority(newPriorityFormatted)
                     .setStatus(newTaskStatus).build();
+
+            final Task oldTask = new TaskBuilder()
+                    .setTaskName(oldTaskName)
+                    .setDeadline(LocalDateTime.parse(oldDeadline))
+                    .setPriority(oldTaskPriority)
+                    .setStatus(oldTaskStatus).build();
 
             userDataAccessObject.deleteTask(userID, oldTask);
             userDataAccessObject.addTask(userID, modifiedTask);

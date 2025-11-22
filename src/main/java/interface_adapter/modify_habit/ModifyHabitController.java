@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ModifyHabitController {
     private final ModifyHabitInputBoundary modifyHabitUseCaseInteractor;
     private final LoggedInViewModel loggedInViewModel;
-    // TODO obtain previous task information from Arya's task list view model
+
     public ModifyHabitController(ModifyHabitInputBoundary modifyHabitInteractor, LoggedInViewModel loggedInViewModel) {
         this.modifyHabitUseCaseInteractor = modifyHabitInteractor;
         this.loggedInViewModel = loggedInViewModel;
@@ -19,6 +19,13 @@ public class ModifyHabitController {
 
     /***
      * Executes modify habit use case
+     * @param oldHabitName
+     * @param oldPriority
+     * @param oldStatus
+     * @param oldStartDateTime
+     * @param oldStreakCount
+     * @param oldHabitGroup
+     * @param oldHabitFrequency
      * @param newHabitName
      * @param newPriority
      * @param newStatus
@@ -27,12 +34,19 @@ public class ModifyHabitController {
      * @param newHabitGroup
      * @param newHabitFrequency
      */
-    public void execute(String newHabitName, int newPriority, boolean newStatus, 
-                        LocalDateTime newStartDateTime, int newStreakCount, 
-                        String newHabitGroup, LocalDateTime newHabitFrequency){
+    public void execute(String oldHabitName, String oldPriority, boolean oldStatus, 
+                        String oldStartDateTime, String oldStreakCount, 
+                        String oldHabitGroup, String oldHabitFrequency,
+                        String newHabitName, String newPriority, boolean newStatus, 
+                        String newStartDateTime, String newStreakCount, 
+                        String newHabitGroup, String newHabitFrequency){
 
         String username = loggedInViewModel.getState().getUsername();
-        ModifyHabitInputData modifyHabitInputData = new ModifyHabitInputData(newHabitName, newPriority, newStatus, username, newStartDateTime, newStreakCount, newHabitGroup, newHabitFrequency);
+        ModifyHabitInputData modifyHabitInputData = new ModifyHabitInputData(
+                oldHabitName, oldPriority, oldStatus, oldStartDateTime, oldStreakCount, oldHabitGroup, oldHabitFrequency,
+                newHabitName, newPriority, newStatus, newStartDateTime, newStreakCount, newHabitGroup, newHabitFrequency,
+                username
+        );
 
         this.modifyHabitUseCaseInteractor.execute(modifyHabitInputData);
 

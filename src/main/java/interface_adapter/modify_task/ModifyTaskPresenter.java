@@ -29,7 +29,9 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
 
     @Override
     public void prepareFailView(String errorMessage) {
-
+        final ModifyTaskState modifyTaskState = modifyTaskViewModel.getState();
+        modifyTaskState.setTaskError(errorMessage);
+        modifyTaskViewModel.firePropertyChanged();
     }
 
     public void switchToTaskListView(){
