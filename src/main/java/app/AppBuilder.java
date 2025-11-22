@@ -44,6 +44,10 @@ import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
 import view.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -69,6 +73,8 @@ public class AppBuilder {
 
     public AppBuilder() throws IOException {
         cardPanel.setLayout(cardLayout);
+        Path habitsPath = Paths.get("habits.csv");
+        taskHabitDataAccessObject = new TaskHabitDataAccessObject(habitsPath);
     }
 
     public AppBuilder addSignupView() {

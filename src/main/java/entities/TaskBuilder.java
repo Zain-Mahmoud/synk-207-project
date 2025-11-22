@@ -8,6 +8,7 @@ public class TaskBuilder {
     private String taskGroup;
     private boolean status = false;
     private int priority = 0;
+    private String description;
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
@@ -34,11 +35,16 @@ public class TaskBuilder {
         return this;
     }
 
+    public TaskBuilder setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
     public Task build() {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalStateException("taskName must not be null or empty");
         }
-        return new Task(taskName, deadline, taskGroup, status, priority);
+        return new Task(taskName, deadline, taskGroup, status, priority, description);
     }
 
 
