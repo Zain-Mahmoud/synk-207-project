@@ -2,15 +2,15 @@ package use_case.modify_habit;
 
 import entities.Habit;
 import entities.HabitBuilder;
-import use_case.gateways.TaskHabitGateway;
+import use_case.gateways.HabitGateway;
 
 import java.time.LocalDateTime;
 
 public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
     private final ModifyHabitOutputBoundary modifyHabitPresenter;
-    private final TaskHabitGateway userDataAccessObject;
+    private final HabitGateway userDataAccessObject;
 
-    public ModifyHabitInteractor(ModifyHabitOutputBoundary modifyHabitPresenter, TaskHabitGateway userDataAccessObject) {
+    public ModifyHabitInteractor(ModifyHabitOutputBoundary modifyHabitPresenter, HabitGateway userDataAccessObject) {
         this.modifyHabitPresenter = modifyHabitPresenter;
         this.userDataAccessObject = userDataAccessObject;
     }
