@@ -1,4 +1,4 @@
-package interface_adapter.modify_habit;
+package interface_adapter.modify_task;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginViewModel;
@@ -22,7 +22,7 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
     }
 
     @Override
-    public void prepareSuccessView(ModifyTaskOutputData outputData) {
+    public void prepareSuccessView() {
         // on success, switch to task list view
         // TODO switch to Arya's use case's view when ready
     }

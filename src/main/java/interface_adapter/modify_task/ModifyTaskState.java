@@ -1,9 +1,9 @@
-package interface_adapter.modify_habit;
+package interface_adapter.modify_task;
 
 
 public class ModifyTaskState {
     private String newTaskName = "";
-    private int priority = 0;
+    private String priority = "";
     private String deadline = "";
     private boolean status = false;
 
@@ -16,11 +16,11 @@ public class ModifyTaskState {
         this.newTaskName = newTaskName;
     }
 
-    public int getPriority() {
+    public String getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(String priority) {
         this.priority = priority;
     }
 

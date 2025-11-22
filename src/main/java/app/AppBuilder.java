@@ -11,8 +11,6 @@ import data_access.FileUserDataAccessObject;
 import data_access.TaskHabitDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
-import interface_adapter.leaderboard.ViewLeaderboardController;
-import interface_adapter.leaderboard.ViewLeaderboardPresenter;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInPresenter;
@@ -20,10 +18,9 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.modify_task.ModifyHabitController;
-import interface_adapter.modify_task.ModifyHabitPresenter;
-import interface_adapter.modify_task.ModifyHabitViewModel;
-import interface_adapter.modify_habit.*;
+import interface_adapter.modify_task.ModifyTaskController;
+import interface_adapter.modify_task.ModifyTaskPresenter;
+import interface_adapter.modify_task.ModifyTaskViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -39,12 +36,8 @@ import use_case.modify_task.ModifyTaskOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
-import use_case.view_leaderboard.ViewLeaderboardInteractor;
-import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
 import view.*;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -58,7 +51,7 @@ public class AppBuilder {
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    final TaskHabitDataAccessObject taskHabitDataAccessObject = new TaskHabitDataAccessObject(Paths.get("habits.csv"));
+    final TaskHabitDataAccessObject taskDataAccessObject = new TaskHabitDataAccessObject();
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -67,7 +60,7 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
-    private ModifyHabitViewModel modifyHabitViewModel;
+    private ModifyTaskViewModel modifyTaskViewModel;
     private ModifyTaskView modifyTaskView;
 
     public AppBuilder() throws IOException {
@@ -105,8 +98,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addModifyTaskView(){
-        modifyHabitViewModel = new ModifyHabitViewModel();
-        modifyTaskView = new ModifyTaskView(modifyHabitViewModel);
+        modifyTaskViewModel = new ModifyTaskViewModel();
+        modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
         cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
         return this;
     }
@@ -156,11 +149,11 @@ public class AppBuilder {
 //    }
 
     public AppBuilder addModifyTaskUseCase(){
-        final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyHabitPresenter(viewManagerModel, modifyHabitViewModel, loginViewModel);
-        final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary, taskHabitDataAccessObject);
+        final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel, modifyTaskViewModel, loginViewModel);
+        final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary, taskDataAccessObject);
 
-        ModifyHabitController modifyHabitController = new ModifyHabitController(modifyTaskInteractor, loggedInViewModel);
-        modifyTaskView.setModifyTaskController(modifyHabitController);
+        ModifyTaskController modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
+        modifyTaskView.setModifyTaskController(modifyTaskController);
         return this;
     }
 

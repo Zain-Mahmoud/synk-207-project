@@ -2,36 +2,61 @@ package use_case.modify_task;
 
 import entities.Task;
 import entities.TaskBuilder;
+import use_case.gateways.TaskGateway;
+
 import java.time.LocalDateTime;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyPresenter;
-    private final ModifyTaskUserDataAccessInterface userDataAccessObject;
+    private final TaskGateway userDataAccessObject;
 
-    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyPresenter, ModifyTaskUserDataAccessInterface userDataAccessObject) {
+    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyPresenter, TaskGateway userDataAccessObject) {
         this.modifyPresenter = modifyPresenter;
         this.userDataAccessObject = userDataAccessObject;
     }
 
     public void execute(ModifyTaskInputData modifyInputData) {
 
+        String oldTaskName = modifyInputData.getOldTaskName();
+        int oldTaskPriority = modifyInputData.getOldPriority();
+        boolean oldTaskStatus = modifyInputData.getOldTaskStatus();
+        String oldDeadline = modifyInputData.getOldDeadline();
+        
         String newTaskName = modifyInputData.getNewTaskName();
-        int newTaskPriority = modifyInputData.getNewPriority();
+        String newTaskPriority = modifyInputData.getNewPriority();
         boolean newTaskStatus = modifyInputData.getNewTaskStatus();
-        LocalDateTime newDeadline = modifyInputData.getNewDeadline();
+        String newDeadline = modifyInputData.getNewDeadline();
         String userID = modifyInputData.getUserID();
 
-        final Task modifiedTask = new TaskBuilder()
-                .setTaskName(newTaskName)
-                .setDeadline(newDeadline)
-                .setPriority(newTaskPriority)
-                .setStatus(newTaskStatus).build();
-        userDataAccessObject.deleteTask(userID, )
-        userDataAccessObject.addTask(userID, modifiedTask);
+        final Task oldTask = new TaskBuilder()
+                .setTaskName(oldTaskName)
+                .setDeadline(LocalDateTime.parse(oldDeadline))
+                .setPriority(oldTaskPriority)
+                .setStatus(oldTaskStatus).build();
+        try{
+            LocalDateTime newDeadlineFormatted = LocalDateTime.parse(newDeadline);
+            int newPriorityFormatted = Integer.parseInt(newTaskPriority);
+            final Task modifiedTask = new TaskBuilder()
+                    .setTaskName(newTaskName)
+                    .setDeadline(newDeadlineFormatted)
+                    .setPriority(newPriorityFormatted)
+                    .setStatus(newTaskStatus).build();
 
-        final ModifyTaskOutputData outputData = new ModifyTaskOutputData(newTaskName, newDeadline, newTaskStatus,
-                newTaskPriority);
-        modifyPresenter.prepareSuccessView(outputData);
+            userDataAccessObject.deleteTask(userID, oldTask);
+            userDataAccessObject.addTask(userID, modifiedTask);
+
+
+            modifyPresenter.prepareSuccessView();
+        } catch (java.time.format.DateTimeParseException d) {
+            modifyPresenter.prepareFailView("Invalid Deadline");
+        } catch (NumberFormatException n) {
+            modifyPresenter.prepareFailView("Invalid Priority");
+        }
+
+
+        
+
+
 
     }
 

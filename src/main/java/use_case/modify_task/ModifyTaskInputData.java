@@ -1,15 +1,25 @@
 package use_case.modify_task;
 
-import java.time.LocalDateTime;
+
 
 public class ModifyTaskInputData {
     private final String userID;
+    private final String oldTaskName;
+    private final int oldPriority;
+    private final String oldDeadline;
+    private final Boolean oldTaskStatus;
     private final String newTaskName;
-    private final int newPriority;
-    private final LocalDateTime newDeadline;
+    private final String newPriority;
+    private final String newDeadline;
     private final Boolean newTaskStatus;
 
-    public ModifyTaskInputData(String newTaskName, int newPriority, LocalDateTime newDeadline, Boolean newTaskStatus, String userID) {
+    public ModifyTaskInputData(String oldTaskName, int oldPriority, String oldDeadline, Boolean oldTaskStatus,
+                                String newTaskName, String newPriority, String newDeadline, Boolean newTaskStatus,
+                                String userID) {
+        this.oldTaskName = oldTaskName;
+        this.oldPriority = oldPriority;
+        this.oldDeadline = oldDeadline;
+        this.oldTaskStatus = oldTaskStatus;
         this.newTaskName = newTaskName;
         this.newPriority = newPriority;
         this.newDeadline = newDeadline;
@@ -17,7 +27,23 @@ public class ModifyTaskInputData {
         this.userID = userID;
     }
 
-    public int getNewPriority() {
+    public String getOldTaskName() {
+        return oldTaskName;
+    }
+
+    public int getOldPriority() {
+        return oldPriority;
+    }
+
+    public String getOldDeadline() {
+        return oldDeadline;
+    }
+
+    public Boolean getOldTaskStatus() {
+        return oldTaskStatus;
+    }
+
+    public String getNewPriority() {
         return newPriority;
     }
 
@@ -25,7 +51,7 @@ public class ModifyTaskInputData {
         return newTaskName;
     }
 
-    public LocalDateTime getNewDeadline() {
+    public String getNewDeadline() {
         return newDeadline;
     }
 

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 public class ModifyTaskView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "modify task";
-    private final ModifyHabitViewModel modifyHabitViewModel;
+    private final ModifyTaskViewModel modifyTaskViewModel;
 
     private final JTextField newTaskName = new JTextField();
     private final JTextField newTaskDeadline = new JTextField();
@@ -26,14 +26,14 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
     private final ButtonGroup newTaskStatus = new ButtonGroup();
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final JFormattedTextField newTaskPriority = new JFormattedTextField(numberFormat);
-    private ModifyHabitController modifyHabitController = null;
+    private ModifyTaskController modifyTaskController = null;
 
     private final JButton save = new JButton("save");
     private final JButton cancel = new JButton("cancel");
 
-    public ModifyTaskView(ModifyHabitViewModel modifyHabitViewModel) {
-        this.modifyHabitViewModel = modifyHabitViewModel;
-        this.modifyHabitViewModel.addPropertyChangeListener(this);
+    public ModifyTaskView(ModifyTaskViewModel modifyTaskViewModel) {
+        this.modifyTaskViewModel = modifyTaskViewModel;
+        this.modifyTaskViewModel.addPropertyChangeListener(this);
 
         newTaskStatus.add(taskCompleted);
         newTaskStatus.add(taskNotCompleted);
@@ -46,7 +46,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         newTaskName.getDocument().addDocumentListener(new DocumentListener() {
 
             public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
                 currentState.setNewTaskName(newTaskName.getText());
             }
 
@@ -68,7 +68,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         newTaskDeadline.getDocument().addDocumentListener(new DocumentListener() {
 
             public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
                 currentState.setDeadline(newTaskDeadline.getText());
             }
 
@@ -91,12 +91,8 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         newTaskPriority.getDocument().addDocumentListener(new DocumentListener() {
 
             public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setPriority(Integer.parseInt(newTaskPriority.getText()));
-            }
-            public void documentStateHelper(int num) {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setPriority(-1);
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
+                currentState.setPriority(newTaskPriority.getText());
             }
 
             @Override
@@ -106,24 +102,19 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                documentStateHelper(-1);
+                documentStateHelper();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                try{
-                    Integer.parseInt(newTaskPriority.getText());
-                    documentStateHelper();
-                } catch (NumberFormatException exc){
-                    documentStateHelper(-1);
-                }
+                documentStateHelper();
             }
         });
 
         taskCompleted.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
                 currentState.setStatus(true);
             }
         });
@@ -131,7 +122,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         taskNotCompleted.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
+                final ModifyTaskState currentState = modifyTaskViewModel.getState();
                 currentState.setStatus(false);
             }
         });
@@ -174,16 +165,17 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         cancel.addActionListener(evt -> {
             if (evt.getSource().equals(cancel)){
-                modifyHabitController.switchToTaskListView();
+                modifyTaskController.switchToTaskListView();
             }
         });
 
         save.addActionListener(evt -> {
             if (evt.getSource().equals(save)){
-                ModifyHabitState currentState = modifyHabitViewModel.getState();
-                modifyHabitController.execute(currentState.getNewTaskName(), currentState.getPriority(),
-                        LocalDateTime.now(), currentState.getStatus());
-                modifyHabitController.switchToTaskListView();
+                ModifyTaskState currentState = modifyTaskViewModel.getState();
+                // TODO add old information to execute parameter list before new information is set
+                modifyTaskController.execute("", -1, "1/2/3", true, currentState.getNewTaskName(), currentState.getPriority(),
+                        currentState.getDeadline(), currentState.getStatus());
+                modifyTaskController.switchToTaskListView();
             }
         });
     }
@@ -203,8 +195,8 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
     }
 
 
-    public void setModifyTaskController(ModifyHabitController modifyHabitController) {
-        this.modifyHabitController = modifyHabitController;
+    public void setModifyTaskController(ModifyTaskController modifyTaskController) {
+        this.modifyTaskController = modifyTaskController;
     }
 
 

@@ -16,7 +16,7 @@ public class Main {
                 .addLoginUseCase()
                 .addModifyTaskUseCase()
                 .addChangePasswordUseCase()
-                .addViewLeaderboardUseCase()
+//                .addViewLeaderboardUseCase()
                 .build();
 
         application.pack();
