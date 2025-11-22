@@ -1,36 +1,97 @@
 package entities;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 public class Habit implements Completable {
     private String habitName;
-    private String description;
+    private LocalDateTime startDateTime;
+    private LocalDateTime frequency;
+    private String habitGroup;
+    private int streakCount;
+    private int priority;
     private boolean status;
+    private String description;
+    private String description;
 
-    public Habit(String habitName, String description) {
+    Habit(String habitName,
+          LocalDateTime startDateTime,
+          LocalDateTime frequency,
+          String habitGroup,
+          int streakCount,
+          int priority,
+          boolean status) {
         this.habitName = habitName;
-        this.description = description;
-        this.status = false; // Habits are incomplete by default
+        this.startDateTime = startDateTime;
+        this.frequency = frequency;
+        this.habitGroup = habitGroup;
+        this.streakCount = streakCount;
+        this.priority = priority;
+        this.status = status;
+        this.description = this.habitName + " started on " + this.startDateTime.toString();
     }
 
     @Override
-    public void complete() {
-        this.status = true;
-    }
+    public void complete() { this.status = true; }
 
     @Override
-    public boolean isCompleted() {
-        return status;
-    }
+    public boolean isCompleted() { return status; }
 
+    @Override
     public String getName() {
-        return habitName;
+        return this.habitName;
     }
 
+    @Override
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
-    public void setHabitName(String habitName) {
-        this.habitName = habitName;
+
+    public void incrementStreak() { this.streakCount++; }
+
+
+    public void setHabitName(String habitName) { this.habitName = habitName; }
+
+    public LocalDateTime getStartDateTime() { return this.startDateTime; }
+    public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
+
+    public LocalDateTime getFrequency() { return this.frequency; }
+    public void setFrequency(LocalDateTime frequency) { this.frequency = frequency; }
+
+    public String getHabitGroup() { return this.habitGroup; }
+    public void setHabitGroup(String habitGroup) { this.habitGroup = habitGroup; }
+
+    public int getStreakCount() { return this.streakCount; }
+    public void setStreakCount(int streakCount) { this.streakCount = streakCount; }
+
+    public int getPriority() { return this.priority; }
+    public void setPriority(int priority) { this.priority = priority; }
+
+    // Implement by default, same convention from other entity.
+    // Not necessary, logically being covered by isCompleted.
+    public boolean getStatus() { return this.status; }
+    public void setStatus( boolean status) { this.status = status; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Habit)) return false;
+        Habit habit = (Habit) o;
+        return Objects.equals(habit.habitName, habitName) && Objects.equals(habit.startDateTime, startDateTime);
+    }
+
+    @Override
+    public String toString() {
+        return "Habit{" +
+                "habitName='" + habitName + '\'' +
+                ", startDateTime=" + startDateTime +
+                ", frequency=" + frequency +
+                ", habitGroup='" + habitGroup + '\'' +
+                ", streakCount=" + streakCount +
+                ", priority=" + priority +
+                ", status=" + status +
+                '}';
     }
 
     public void setDescription(String description) {

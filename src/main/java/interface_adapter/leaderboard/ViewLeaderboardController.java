@@ -17,7 +17,7 @@ public class ViewLeaderboardController {
      * Executes the View Leaderboard Use Case.
      */
     public void execute() {
-        ViewLeaderboardInputData inputData = new use_case.view_leaderboard.ViewLeaderboardInputData();
+        ViewLeaderboardInputData inputData = new ViewLeaderboardInputData();
         viewLeaderboardInteractor.execute(inputData);
     }
 }
