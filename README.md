@@ -1,2 +1,1 @@
-# synk-207-project
-Synk 207 project
+This branch is to implement the Data Access Layer

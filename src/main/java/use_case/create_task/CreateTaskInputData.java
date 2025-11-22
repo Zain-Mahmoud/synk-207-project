@@ -10,14 +10,16 @@ public class CreateTaskInputData {
     private final String taskGroup;
     private final boolean status;
     private final int priority;
+    private final String description;
 
 
-    public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority){
+    public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority, String description){
         this.taskName = taskName;
         this.deadline = deadline;
         this.taskGroup = taskGroup;
         this.status = status;
         this.priority = priority;
+        this.description = description;
     }
 
     String getTaskName() {return taskName;}
@@ -25,6 +27,7 @@ public class CreateTaskInputData {
     String getTaskGroup() {return taskGroup;}
     boolean getstatus() {return status;}
     int getPriority() {return priority;}
+    String getDescription() {return description;}
 
 
 }

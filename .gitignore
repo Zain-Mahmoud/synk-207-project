@@ -1,35 +1,14 @@
-Blueprint Assignment  For Task_Habit Tracker.pdf
-########################
-# OS / general
-########################
-.DS_Store
-Thumbs.db
-.discord/
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
 
-########################
-# Java build outputs
-########################
-# Gradle
-.gradle/
-build/
-
-# Maven
-target/
-
-# Generic
-out/
-bin/
-*.class
-*.log
-
-########################
-# IDEs / editors
-########################
-
-# VS Code
-.vscode/
-
-# IntelliJ /
+# .idea
+/.idea_modules/
 .idea/
 *.iml
 
@@ -42,3 +21,23 @@ bin/
 *.env
 .env
 .env.*
+src/main/resources/credentials.json
+tokens/StoredCredential
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+.idea/misc.xml
+# Gradle build output
+/.gradle/
+/build/
+src/main/java/resources/credentials.json
+/Blueprint Assignment  For Task_Habit Tracker.pdf
+/src/main/resources/credentials.json
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+/settings.gradle.kts
+/tokens/StoredCredential
+/TODO.md
+
+.gradle
+*.xml
+/.idea

@@ -1,161 +1,198 @@
-package data_access;
+package data_access;// package data_access;
 
-import entities.Habit;
-import entities.HabitBuilder;
+import entities.Task;
+import entities.TaskBuilder;
+import jdk.jshell.spi.ExecutionControl;
 import use_case.gateways.TaskGateway;
-import use_case.view_leaderboard.ViewLeaderboardUserDataAccessInterface;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * TaskHabitDataAccessObject (LOCALLY)
- *
- * Short description:
- * - Data access layer for persisting and retrieving Task and Habit entities.
- *
- * Responsibilities / contract:
- * - Inputs: domain entities like Task and Habit (or DTOs/IDs) for create,
- *   update, delete, and query operations.
- * - Outputs: persisted entities, collections of entities, or boolean/status
- *   indicators for write operations.
- * - Error modes: persistence failures, validation errors, or missing records.
- *   Callers should handle these by checking return values or catching
- *   exceptions depending on implementation.
- *
- * Notes:
- * - Typical methods: addTask/addHabit, updateTask/updateHabit,
- *   deleteTask/deleteHabit, findTasksByDate, and methods to manage streaks.
+ * Prototype in-memory persistence layer backed by a simple HashMap of user id to tasks.
+ * Create, Update, Remove, Read (Fetch) :
  */
-public class TaskHabitDataAccessObject implements TaskGateway, ViewLeaderboardUserDataAccessInterface {
+public class TaskHabitDataAccessObject implements TaskGateway {
 
-    private static final String HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
+    private static final String HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    private final File habitsCsvFile;
-    private final Map<String, Integer> headers = new LinkedHashMap<>();
-    private final Map<String, List<Habit>> userHabitsMap = new HashMap<>();
+    private final File csvFile;
+    private final Map<String, ArrayList<Task>> userTasks = new HashMap<>();
 
-    public TaskHabitDataAccessObject(String csvPath) throws IOException {
-        habitsCsvFile = new File(csvPath);
-        
-        // Initialize headers
-        headers.put("username", 0);
-        headers.put("habitName", 1);
-        headers.put("streakCount", 2);
-        headers.put("startDateTime", 3);
-        headers.put("frequency", 4);
-        headers.put("habitGroup", 5);
-        headers.put("priority", 6);
-        headers.put("status", 7);
+    public TaskHabitDataAccessObject() {
+        this(Path.of("tasks.csv"));
+    }
 
-        if (!habitsCsvFile.exists() || habitsCsvFile.length() == 0) {
-            // Create empty file with header
-            save();
-        } else {
-            loadHabits();
+    public TaskHabitDataAccessObject(Path csvPath) {
+        this.csvFile = csvPath.toFile();
+        initializeFileIfNeeded();
+        loadFromCsv();
+    }
+
+    private void initializeFileIfNeeded() {
+        if (csvFile.exists()) {
+            return;
+        }
+        try {
+            csvFile.getParentFile(); // parent may be null for relative paths
+            if (csvFile.getParentFile() != null) {
+                csvFile.getParentFile().mkdirs();
+            }
+            if (csvFile.createNewFile()) {
+                writeHeader();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to initialize tasks CSV", e);
         }
     }
 
-    private void loadHabits() throws IOException {
-        userHabitsMap.clear();
-        
-        try (BufferedReader reader = new BufferedReader(new FileReader(habitsCsvFile))) {
-            final String header = reader.readLine();
-            
-            if (header == null || !header.equals(HEADER)) {
-                throw new RuntimeException(String.format("header should be%n: %s%n but was:%n%s", HEADER, header));
-            }
-
-            String row;
-            while ((row = reader.readLine()) != null) {
-                if (row.trim().isEmpty()) {
-                    continue;
-                }
-                
-                final String[] col = row.split(",");
-                if (col.length < headers.size()) {
-                    continue; // Skip malformed rows
-                }
-
-                try {
-                    final String username = col[headers.get("username")].trim();
-                    final String habitName = col[headers.get("habitName")].trim();
-                    final int streakCount = Integer.parseInt(col[headers.get("streakCount")].trim());
-                    final String startDateTimeStr = col[headers.get("startDateTime")].trim();
-                    final String frequencyStr = col.length > headers.get("frequency") && !col[headers.get("frequency")].trim().isEmpty() 
-                            ? col[headers.get("frequency")].trim() : null;
-                    final String habitGroup = col.length > headers.get("habitGroup") && !col[headers.get("habitGroup")].trim().isEmpty()
-                            ? col[headers.get("habitGroup")].trim() : null;
-                    final int priority = col.length > headers.get("priority") && !col[headers.get("priority")].trim().isEmpty()
-                            ? Integer.parseInt(col[headers.get("priority")].trim()) : 0;
-                    final boolean status = col.length > headers.get("status") && !col[headers.get("status")].trim().isEmpty()
-                            ? Boolean.parseBoolean(col[headers.get("status")].trim()) : false;
-
-                    LocalDateTime startDateTime = LocalDateTime.parse(startDateTimeStr);
-                    LocalDateTime frequency = frequencyStr != null ? LocalDateTime.parse(frequencyStr) : null;
-
-                    Habit habit = new HabitBuilder()
-                            .setHabitName(habitName)
-                            .setStartDateTime(startDateTime)
-                            .setFrequency(frequency)
-                            .setHabitGroup(habitGroup)
-                            .setStreakCount(streakCount)
-                            .setPriority(priority)
-                            .setStatus(status)
-                            .build();
-
-                    userHabitsMap.computeIfAbsent(username, k -> new ArrayList<>()).add(habit);
-                } catch (Exception e) {
-                    // Skip malformed rows
-                    System.err.println("Error parsing habit row: " + row + " - " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    private void save() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(habitsCsvFile))) {
+    private void writeHeader() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
             writer.write(HEADER);
             writer.newLine();
+        }
+    }
 
-            for (Map.Entry<String, List<Habit>> entry : userHabitsMap.entrySet()) {
-                String username = entry.getKey();
-                for (Habit habit : entry.getValue()) {
-                    final String line = String.format("%s,%s,%d,%s,%s,%s,%d,%s",
-                            username,
-                            habit.getHabitName(),
-                            habit.getStreakCount(),
-                            habit.getStartDateTime(),
-                            habit.getFrequency() != null ? habit.getFrequency().toString() : "",
-                            habit.getHabitGroup() != null ? habit.getHabitGroup() : "",
-                            habit.getPriority(),
-                            habit.getStatus());
+    private void loadFromCsv() {
+        userTasks.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
+            final String headerLine = reader.readLine();
+            if (headerLine == null) {
+                writeHeader();
+                return;
+            }
+            if (!HEADER.equals(headerLine)) {
+                throw new IllegalStateException("Unexpected header in tasks CSV");
+            }
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                final String[] columns = line.split(",", -1);
+                if (columns.length < 8) {
+                    continue;
+                }
+                final String userId = columns[0];
+                final String taskName = columns[1];
+                final String description = columns[2];
+                final String startTimeRaw = columns[3];
+                final String deadlineRaw = columns[4];
+                final String taskGroup = columns[5];
+                final boolean status = Boolean.parseBoolean(columns[6]);
+                final int priority = columns[7].isBlank() ? 0 : Integer.parseInt(columns[7]);
+
+                LocalDateTime startTime = null;
+                if (!startTimeRaw.isBlank()) {
+                    startTime = LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+                }
+                LocalDateTime deadline = null;
+                if (!deadlineRaw.isBlank()) {
+                    deadline = LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
+                }
+
+                Task task = new TaskBuilder()
+                        .setTaskName(taskName)
+                        .setDescription(description)
+                        // WE NEED A START TIME FIELD IN THE BUILDER
+                        //.setStartTime(startTime)
+                        .setDeadline(deadline)
+                        .setTaskGroup(taskGroup)
+                        .setStatus(status)
+                        .setPriority(priority)
+                        .build();
+
+                userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(task);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load tasks from CSV", e);
+        }
+    }
+
+    private void persistToCsv() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            writer.write(HEADER);
+            writer.newLine();
+            for (Map.Entry<String, ArrayList<Task>> entry : userTasks.entrySet()) {
+                final String userId = entry.getKey();
+                for (Task task : entry.getValue()) {
+                    final String startTime = task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime());
+                    final String deadline = task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline());
+                    final String line = String.join(",",
+                            userId,
+                            safe(task.getName()),
+                            safe(task.getDescription()),
+                            startTime,
+                            deadline,
+                            safe(task.getTaskGroup()),
+                            Boolean.toString(task.getStatus()),
+                            Integer.toString(task.getPriority())
+                    );
                     writer.write(line);
                     writer.newLine();
                 }
             }
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to persist tasks to CSV", e);
         }
     }
 
-    @Override
-    public List<String> getAllUsernames() {
-        return new ArrayList<>(userHabitsMap.keySet());
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     @Override
-    public List<Habit> getHabitsForUser(String username) {
-        return new ArrayList<>(userHabitsMap.getOrDefault(username, new ArrayList<>()));
-    }
+    public String addTask(String userId, Task task) {
+        // Compute if absent to initialize user's task list, if it exists return it
 
-    @Override
-    public Map<String, List<Habit>> getAllUsersWithHabits() {
-        Map<String, List<Habit>> result = new HashMap<>();
-        for (Map.Entry<String, List<Habit>> entry : userHabitsMap.entrySet()) {
-            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        ArrayList<Task> tasksForUser = userTasks.computeIfAbsent(userId, key -> new ArrayList<>());
+
+        try {
+            tasksForUser.add(task);
+            persistToCsv();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error Adding Task";
         }
-        return result;
+        return "Task Added Successfully";
+    }
+
+    @Override
+    public ArrayList<Task> fetchTasks(String userId) {
+        ArrayList<Task> tasks = userTasks.get(userId);
+
+        if (tasks == null) {
+            // Returns Empty List if no tasks for user
+            return new ArrayList<>();
+        }
+
+        return tasks;
+    }
+
+
+    @Override
+    public boolean deleteTask(String userId, Task task) {
+        ArrayList<Task> tasks = userTasks.get(userId);
+        if (tasks == null) {
+            return false;
+        }
+
+        boolean removed = tasks.remove(task);
+        if (removed && !(tasks.contains(task))) {
+            persistToCsv();
+            return removed;
+        }
+        return false;
     }
 }
