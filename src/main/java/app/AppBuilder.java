@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
-import data_access.TaskHabitDataAccessObject;
+import data_access.HabitDataAccessObject;
+import data_access.TaskDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
@@ -38,8 +39,6 @@ import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.*;
 
-import java.nio.file.Paths;
-
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -51,7 +50,9 @@ public class AppBuilder {
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    final TaskHabitDataAccessObject taskDataAccessObject = new TaskHabitDataAccessObject();
+    final TaskDataAccessObject taskDataAccessObject;
+    final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
+
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -65,6 +66,7 @@ public class AppBuilder {
 
     public AppBuilder() throws IOException {
         cardPanel.setLayout(cardLayout);
+        taskDataAccessObject = new TaskDataAccessObject();
 
     }
 
@@ -97,7 +99,7 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addModifyTaskView(){
+    public AppBuilder addModifyTaskView() {
         modifyTaskViewModel = new ModifyTaskViewModel();
         modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
         cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
@@ -148,7 +150,8 @@ public class AppBuilder {
 //        return this;
 //    }
 
-    public AppBuilder addModifyTaskUseCase(){
+
+    public AppBuilder addModifyTaskUseCase() {
         final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel, modifyTaskViewModel, loginViewModel);
         final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary, taskDataAccessObject);
 

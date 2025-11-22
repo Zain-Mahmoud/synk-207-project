@@ -1,10 +1,8 @@
-package data_access;// package data_access;
+package data_access;
 
-import entities.Habit;
-import entities.HabitBuilder;
 import entities.Task;
 import entities.TaskBuilder;
-import use_case.gateways.TaskHabitGateway;
+import use_case.gateways.TaskGateway;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,33 +18,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Persistence layer for both Tasks and Habits backed by CSV files.
- * Create, Update, Remove, Read (Fetch) operations for both tasks and habits.
+ * Persistence layer for Tasks backed by a CSV file.
+ * Implements Create, Update, Remove, Read (Fetch) operations for tasks.
  */
-public class TaskHabitDataAccessObject implements TaskHabitGateway {
+public class TaskDataAccessObject implements TaskGateway {
 
     private static final String TASK_HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
-    private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private final File taskCsvFile;
-    private final File habitCsvFile;
     private final Map<String, ArrayList<Task>> userTasks = new HashMap<>();
-    private final Map<String, ArrayList<Habit>> userHabits = new HashMap<>();
 
-    public TaskHabitDataAccessObject() {
-        this(Path.of("tasks.csv"), Path.of("habits.csv"));
+    public TaskDataAccessObject() {
+        this(Path.of("tasks.csv"));
     }
 
-
-
-    public TaskHabitDataAccessObject(Path taskCsvPath, Path habitCsvPath) {
+    public TaskDataAccessObject(Path taskCsvPath) {
         this.taskCsvFile = taskCsvPath.toFile();
-        this.habitCsvFile = habitCsvPath.toFile();
         initializeFileIfNeeded(taskCsvFile, TASK_HEADER);
-        initializeFileIfNeeded(habitCsvFile, HABIT_HEADER);
         loadTasksFromCsv();
-        loadHabitsFromCsv();
     }
 
     private void initializeFileIfNeeded(File csvFile, String header) {
@@ -72,7 +62,7 @@ public class TaskHabitDataAccessObject implements TaskHabitGateway {
         }
     }
 
-    // ========== TASK METHODS ==========
+    // ========== TASK PERSISTENCE METHODS ==========
 
     private void loadTasksFromCsv() {
         userTasks.clear();
@@ -156,93 +146,6 @@ public class TaskHabitDataAccessObject implements TaskHabitGateway {
         }
     }
 
-    // ========== HABIT METHODS ==========
-
-    private void loadHabitsFromCsv() {
-        userHabits.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader(habitCsvFile))) {
-            final String headerLine = reader.readLine();
-            if (headerLine == null) {
-                writeHeader(habitCsvFile, HABIT_HEADER);
-                return;
-            }
-            if (!HABIT_HEADER.equals(headerLine)) {
-                throw new IllegalStateException("Unexpected header in habits CSV");
-            }
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                final String[] columns = line.split(",", -1);
-                if (columns.length < 8) {
-                    continue;
-                }
-                final String username = columns[0];
-                final String habitName = columns[1];
-                final int streakCount = columns[2].isBlank() ? 0 : Integer.parseInt(columns[2]);
-                final String startDateTimeRaw = columns[3];
-                final String frequencyRaw = columns[4];
-                final String habitGroup = columns[5];
-                final int priority = columns[6].isBlank() ? 0 : Integer.parseInt(columns[6]);
-                final boolean status = Boolean.parseBoolean(columns[7]);
-
-                LocalDateTime startDateTime = null;
-                if (!startDateTimeRaw.isBlank()) {
-                    startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
-                }
-                LocalDateTime frequency = null;
-                if (!frequencyRaw.isBlank()) {
-                    frequency = LocalDateTime.parse(frequencyRaw, DATE_FORMATTER);
-                }
-
-                Habit habit = new HabitBuilder()
-                        .setHabitName(habitName)
-                        .setStartDateTime(startDateTime)
-                        .setFrequency(frequency)
-                        .setHabitGroup(habitGroup)
-                        .setStreakCount(streakCount)
-                        .setPriority(priority)
-                        .setStatus(status)
-                        .build();
-
-                userHabits.computeIfAbsent(username, key -> new ArrayList<>()).add(habit);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load habits from CSV", e);
-        }
-    }
-
-    private void persistHabitsToCsv() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(habitCsvFile))) {
-            writer.write(HABIT_HEADER);
-            writer.newLine();
-            for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
-                final String username = entry.getKey();
-                for (Habit habit : entry.getValue()) {
-                    final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
-                    final String frequency = habit.getFrequency() == null ? "" : DATE_FORMATTER.format(habit.getFrequency());
-                    final String line = String.join(",",
-                            username,
-                            safe(habit.getName()),
-                            Integer.toString(habit.getStreakCount()),
-                            startDateTime,
-                            frequency,
-                            safe(habit.getHabitGroup()),
-                            Integer.toString(habit.getPriority()),
-                            Boolean.toString(habit.getStatus())
-                    );
-                    writer.write(line);
-                    writer.newLine();
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to persist habits to CSV", e);
-        }
-    }
-
-    // ========== UTILITY METHODS ==========
-
     private String safe(String value) {
         return value == null ? "" : value;
     }
@@ -284,45 +187,6 @@ public class TaskHabitDataAccessObject implements TaskHabitGateway {
         boolean removed = tasks.remove(task);
         if (removed && !(tasks.contains(task))) {
             persistTasksToCsv();
-            return removed;
-        }
-        return false;
-    }
-
-    // ========== HABIT GATEWAY METHODS ==========
-
-    public String addHabit(String userId, Habit habit) {
-        ArrayList<Habit> habitsForUser = userHabits.computeIfAbsent(userId, key -> new ArrayList<>());
-
-        try {
-            habitsForUser.add(habit);
-            persistHabitsToCsv();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error Adding Habit";
-        }
-        return "Habit Added Successfully";
-    }
-
-    public ArrayList<Habit> fetchHabits(String userId) {
-        ArrayList<Habit> habits = userHabits.get(userId);
-
-        if (habits == null) {
-            return new ArrayList<>();
-        }
-
-        return habits;
-    }
-
-    public boolean deleteHabit(String userId, Habit habit) {
-        ArrayList<Habit> habits = userHabits.get(userId);
-        if (habits == null) {
-            return false;
-        }
-
-        boolean removed = habits.remove(habit);
-        if (removed && !habits.contains(habit)) {
-            persistHabitsToCsv();
             return removed;
         }
         return false;
