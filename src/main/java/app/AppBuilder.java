@@ -41,9 +41,6 @@ import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -68,8 +65,7 @@ public class AppBuilder {
 
     public AppBuilder() throws IOException {
         cardPanel.setLayout(cardLayout);
-        Path habitsPath = Paths.get("habits.csv");
-        taskHabitDataAccessObject = new TaskHabitDataAccessObject(habitsPath);
+        taskHabitDataAccessObject = new TaskHabitDataAccessObject();
     }
 
     public AppBuilder addSignupView() {
