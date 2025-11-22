@@ -41,3 +41,11 @@ src/main/java/resources/credentials.json
 .gradle
 *.xml
 /.idea
+
+/target/
+
+credentials.json
+/resources/credentials.json
+.credentials.json
+/.vscode/settings.json
+misc.xml
