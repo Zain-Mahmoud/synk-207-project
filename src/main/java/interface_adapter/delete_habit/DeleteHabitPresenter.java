@@ -18,14 +18,20 @@ public class DeleteHabitPresenter implements DeleteHabitOutputBoundary {
     @Override
     public void prepareSuccessView(DeleteHabitOutputData outputData) {
         DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
-        deleteHabitState.setSuccessMessage(
-                "Habit '" + outputData.getHabitName() + "' deleted successfully!"
-        );
+
+        // 把用户名和习惯名都写回到 state 里
+        deleteHabitState.setUsername(outputData.getUsername());
+        deleteHabitState.setHabitName(outputData.getHabitName());
+
         deleteHabitState.setErrorMessage(null);
+        deleteHabitState.setSuccessMessage(
+                "Habit '" + outputData.getHabitName()
+                        + "' deleted successfully for user '" + outputData.getUsername() + "'.");
+
         deleteHabitViewModel.setState(deleteHabitState);
         deleteHabitViewModel.firePropertyChanged();
 
-        // if you want to go back to other view
+        // 如果你希望删除后切换页面，可以在这里做：
         // viewManagerModel.setActiveView("SomeOtherViewName");
     }
 
@@ -34,6 +40,7 @@ public class DeleteHabitPresenter implements DeleteHabitOutputBoundary {
         DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
         deleteHabitState.setErrorMessage(errorMessage);
         deleteHabitState.setSuccessMessage(null);
+
         deleteHabitViewModel.setState(deleteHabitState);
         deleteHabitViewModel.firePropertyChanged();
     }

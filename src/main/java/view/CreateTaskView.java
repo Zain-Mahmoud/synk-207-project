@@ -23,10 +23,10 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
     private final CreateTaskViewModel createTaskViewModel;
 
     private final JTextField taskNameInputField = new JTextField(15);
+    private final JTextField descriptionInputField = new JTextField(15);
     private final JTextField deadlineInputField = new JTextField(15);
     private final JTextField taskGroupInputField = new JTextField(15);
     private final JTextField priorityInputField = new JTextField(15);
-    private final JTextField descriptionInputField = new JTextField(15);
 
     private CreateTaskController createTaskController = null;
 
@@ -43,6 +43,9 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
         LabelTextPanel taskNamePanel = new LabelTextPanel(
                 new JLabel(CreateTaskViewModel.TASK_NAME_LABEL), taskNameInputField);
 
+        LabelTextPanel descriptionPanel = new LabelTextPanel(
+                new JLabel("Description"), descriptionInputField);
+
         LabelTextPanel deadlinePanel = new LabelTextPanel(
                 new JLabel(CreateTaskViewModel.DEADLINE_LABEL), deadlineInputField);
 
@@ -51,9 +54,6 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
 
         LabelTextPanel priorityPanel = new LabelTextPanel(
                 new JLabel(CreateTaskViewModel.PRIORITY_LABEL), priorityInputField);
-
-        LabelTextPanel descriptionPanel = new LabelTextPanel(
-                new JLabel("Description"), descriptionInputField);
 
         createButton = new JButton(CreateTaskViewModel.CREATE_BUTTON_LABEL);
         cancelButton = new JButton(CreateTaskViewModel.CANCEL_BUTTON_LABEL);
@@ -92,7 +92,7 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
 
                 createTaskController.execute(
                         state.getTaskName(),
-                        descriptionInputField.getText(),
+                        state.getDescription(),
                         deadline,
                         state.getTaskGroup(),
                         false,
@@ -104,6 +104,7 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
         cancelButton.addActionListener(this);
 
         addTaskNameListener();
+        addDescriptionListener();
         addDeadlineListener();
         addTaskGroupListener();
         addPriorityListener();
@@ -111,10 +112,10 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(title);
         this.add(taskNamePanel);
+        this.add(descriptionPanel);
         this.add(deadlinePanel);
         this.add(taskGroupPanel);
         this.add(priorityPanel);
-        this.add(descriptionPanel);
         this.add(buttons);
     }
 
@@ -123,6 +124,19 @@ public class CreateTaskView extends JPanel implements ActionListener, PropertyCh
             private void update() {
                 CreateTaskState state = createTaskViewModel.getState();
                 state.setTaskName(taskNameInputField.getText());
+                createTaskViewModel.setState(state);
+            }
+            public void insertUpdate(DocumentEvent e) { update(); }
+            public void removeUpdate(DocumentEvent e) { update(); }
+            public void changedUpdate(DocumentEvent e) { update(); }
+        });
+    }
+
+    private void addDescriptionListener() {
+        descriptionInputField.getDocument().addDocumentListener(new DocumentListener() {
+            private void update() {
+                CreateTaskState state = createTaskViewModel.getState();
+                state.setDescription(descriptionInputField.getText());
                 createTaskViewModel.setState(state);
             }
             public void insertUpdate(DocumentEvent e) { update(); }

@@ -10,9 +10,11 @@ public class DeleteTaskController {
         this.interactor = interactor;
     }
 
+    /**
+     * Execute the delete task use case for a given user and task name.
+     */
     public void execute(String username, String taskName) {
         final DeleteTaskInputData inputData = new DeleteTaskInputData(username, taskName);
-        interactor.excute(inputData);
+        interactor.execute(inputData);
     }
-
 }

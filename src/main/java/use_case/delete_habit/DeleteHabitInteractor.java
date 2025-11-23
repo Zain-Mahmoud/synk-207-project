@@ -13,6 +13,7 @@ public class DeleteHabitInteractor implements DeleteHabitInputBoundary {
 
     @Override
     public void execute(DeleteHabitInputData deleteHabitInputData) {
+        String username = deleteHabitInputData.getUsername();
         String habitName = deleteHabitInputData.getHabitName();
 
         if (habitName == null || habitName.trim().isEmpty()) {
@@ -20,21 +21,23 @@ public class DeleteHabitInteractor implements DeleteHabitInputBoundary {
             return;
         }
 
-        if (!dao.existsByName(habitName)) {
-            presenter.prepareFailView("Habit '" + habitName + "' does not exist.");
+        if (!dao.existsByName(username, habitName)) {
+            presenter.prepareFailView(
+                    "Habit '" + habitName + "' does not exist for user '" + username + "'.");
             return;
         }
 
         try {
-            dao.deleteHabit(habitName);
+            dao.deleteHabit(username, habitName);
 
             DeleteHabitOutputData outputData =
-                    new DeleteHabitOutputData(habitName, false);
+                    new DeleteHabitOutputData(username, habitName, false);
 
             presenter.prepareSuccessView(outputData);
 
         } catch (Exception exception) {
-            presenter.prepareFailView("Failed to delete habit: " + exception.getMessage());
+            presenter.prepareFailView(
+                    "Failed to delete habit for user '" + username + "': " + exception.getMessage());
         }
     }
 }

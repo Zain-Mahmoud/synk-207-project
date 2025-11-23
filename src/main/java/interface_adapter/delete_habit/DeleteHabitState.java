@@ -8,6 +8,9 @@ public class DeleteHabitState {
     private String successMessage;
     private String errorMessage;
 
+    public DeleteHabitState() {
+    }
+
     public DeleteHabitState(DeleteHabitState copy) {
         this.username = copy.username;
         this.habitName = copy.habitName;
@@ -15,8 +18,7 @@ public class DeleteHabitState {
         this.errorMessage = copy.errorMessage;
     }
 
-    public DeleteHabitState() {
-    }
+    // username
 
     public String getUsername() {
         return username;
@@ -26,6 +28,8 @@ public class DeleteHabitState {
         this.username = username;
     }
 
+    // habitName
+
     public String getHabitName() {
         return habitName;
     }
@@ -34,6 +38,8 @@ public class DeleteHabitState {
         this.habitName = habitName;
     }
 
+    // successMessage
+
     public String getSuccessMessage() {
         return successMessage;
     }
@@ -41,6 +47,8 @@ public class DeleteHabitState {
     public void setSuccessMessage(String successMessage) {
         this.successMessage = successMessage;
     }
+
+    // errorMessage
 
     public String getErrorMessage() {
         return errorMessage;
