@@ -51,7 +51,7 @@ public class DeleteHabitView extends JPanel implements ActionListener, PropertyC
             @Override
             public void actionPerformed(ActionEvent e) {
                 DeleteHabitState state = deleteHabitViewModel.getState();
-                deleteHabitController.excute(
+                deleteHabitController.execute(
                         state.getUsername(),
                         state.getHabitName()
                 );

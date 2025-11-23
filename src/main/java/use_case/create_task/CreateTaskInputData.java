@@ -6,20 +6,22 @@ import java.time.LocalDateTime;
 public class CreateTaskInputData {
 
     private final String taskName;
+    private final String description;
     private final LocalDateTime deadline;
     private final String taskGroup;
     private final boolean status;
     private final int priority;
-    private final String description;
 
 
-    public CreateTaskInputData(String taskName, LocalDateTime deadline, String taskGroup, boolean status,int priority, String description){
+
+    public CreateTaskInputData(String taskName,String description, LocalDateTime deadline, String taskGroup, boolean status,int priority){
         this.taskName = taskName;
+        this.description = description;
         this.deadline = deadline;
         this.taskGroup = taskGroup;
         this.status = status;
         this.priority = priority;
-        this.description = description;
+
     }
 
     String getTaskName() {return taskName;}

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class CreateTaskState {
     private String taskName = "";
+    private String description = "";
     private LocalDateTime deadline = null;
     private String taskGroup = "";
     private int priority = 0;
@@ -12,6 +13,7 @@ public class CreateTaskState {
 
     public CreateTaskState(CreateTaskState copy) {
         this.taskName = copy.taskName;
+        this.description = copy.description;
         this.deadline = copy.deadline;
         this.taskGroup = copy.taskGroup;
         this.priority = copy.priority;
@@ -28,6 +30,14 @@ public class CreateTaskState {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getDeadline() {

@@ -28,22 +28,7 @@ public class CreateHabitState {
         this.successMessage = copy.successMessage;
     }
 
-    public CreateHabitState() {}
-
-    public int getFrequencyCount() {
-        return frequencyCount;
-    }
-
-    public void setFrequencyCount(int frequencyCount) {
-        this.frequencyCount = frequencyCount;
-    }
-
-    public String getFrequencyUnit() {
-        return frequencyUnit;
-    }
-
-    public void setFrequencyUnit(String frequencyUnit) {
-        this.frequencyUnit = frequencyUnit;
+    public CreateHabitState() {
     }
 
     public String getHabitName() {
@@ -94,13 +79,14 @@ public class CreateHabitState {
         this.priority = priority;
     }
 
-    public boolean getStatus() {
+    public boolean isStatus() {
         return status;
     }
 
     public void setStatus(boolean status) {
         this.status = status;
     }
+
 
     public String getErrorMessage() {
         return errorMessage;

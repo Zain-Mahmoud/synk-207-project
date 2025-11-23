@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 public class HabitBuilder {
     private String habitName;
     private LocalDateTime startDateTime;
-    private int frequencyCount;
-    private String frequencyUnit;
+    private LocalDateTime frequency;
     private String habitGroup;
     private int streakCount = 0;
     private int priority = 0; //waiting for modifying after.
@@ -22,16 +21,10 @@ public class HabitBuilder {
         return this;
     }
 
-    public HabitBuilder setFrequencyCount(int frequencyCount) {
-        this.frequencyCount = frequencyCount;
+    public HabitBuilder setFrequency(LocalDateTime frequency) {
+        this.frequency = frequency;
         return this;
     }
-
-    public HabitBuilder setFrequencyUnit(String frequencyUnit) {
-        this.frequencyUnit = frequencyUnit;
-        return this;
-    }
-
 
     public HabitBuilder setHabitGroup(String habitGroup) {
         this.habitGroup = habitGroup;
@@ -63,8 +56,7 @@ public class HabitBuilder {
         return new Habit(
                 habitName,
                 startDateTime,
-                frequencyCount,
-                frequencyUnit,
+                frequency,
                 habitGroup,
                 streakCount,
                 priority,

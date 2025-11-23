@@ -34,8 +34,7 @@ public class CreateHabitInteractor implements CreateHabitInputBoundary {
             final Habit newHabit = new HabitBuilder()
                     .setHabitName(habitName)
                     .setStartDateTime(createHabitInputData.getStartDateTime())
-                    .setFrequencyCount(createHabitInputData.getFrequencyCount())
-                    .setFrequencyUnit(createHabitInputData.getFrequencyUnit())
+                    .setFrequency(createHabitInputData.getFrequency())
                     .setHabitGroup(createHabitInputData.getHabitGroup())
                     .setStreakCount(createHabitInputData.getStreakCount())
                     .setPriority(createHabitInputData.getPriority())
@@ -44,7 +43,7 @@ public class CreateHabitInteractor implements CreateHabitInputBoundary {
 
             habitDataAccessObject.save(username, newHabit);
             final CreateHabitOutputData outputData = new CreateHabitOutputData(
-                    newHabit.getHabitName(),
+                    newHabit.getName(),
                     newHabit.getStartDateTime(),
                     false
             );

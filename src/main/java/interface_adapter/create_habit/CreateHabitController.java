@@ -17,29 +17,35 @@ public class CreateHabitController {
     public void execute(String username,
                         String habitName,
                         String startDateTimeText,
-                        int frequencyCount,
-                        String frequencyUnit,
+                        String frequencyDateTimeText,
                         String habitGroup,
                         int streakCount,
                         int priority) {
 
         LocalDateTime startDateTime;
+        LocalDateTime frequency;
 
         try {
             startDateTime = LocalDateTime.parse(startDateTimeText);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid start date & time format. Use yyyy-MM-dd'T'HH:mm");
+            throw new IllegalArgumentException(
+                    "Invalid start date & time format. Use yyyy-MM-dd'T'HH:mm"
+            );
         }
 
-        // No more frequencyText parsing — now frequency = (count + unit)
-        // We pass them directly into CreateHabitInputData.
+        try {
+            frequency = LocalDateTime.parse(frequencyDateTimeText);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException(
+                    "Invalid frequency date & time format. Use yyyy-MM-dd'T'HH:mm"
+            );
+        }
 
         CreateHabitInputData inputData = new CreateHabitInputData(
                 username,
                 habitName,
                 startDateTime,
-                frequencyCount,
-                frequencyUnit,      // update：Per Day / Per Week / Per Month / Per Year
+                frequency,
                 habitGroup,
                 streakCount,
                 priority

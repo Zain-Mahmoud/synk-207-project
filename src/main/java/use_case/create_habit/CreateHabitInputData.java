@@ -7,8 +7,7 @@ public class CreateHabitInputData {
     private final String username;
     private final String habitName;
     private final LocalDateTime startDateTime;
-    private final int frequencyCount;
-    private final String frequencyUnit;
+    private final LocalDateTime frequency;
     private final String habitGroup;
     private final int streakCount;
     private final int priority;
@@ -16,16 +15,14 @@ public class CreateHabitInputData {
     public CreateHabitInputData(String username,
                                 String habitName,
                                 LocalDateTime startDateTime,
-                                int frequencyCount,
-                                String frequencyUnit,
+                                LocalDateTime frequency,
                                 String habitGroup,
                                 int streakCount,
                                 int priority) {
         this.username = username;
         this.habitName = habitName;
         this.startDateTime = startDateTime;
-        this.frequencyCount = frequencyCount;
-        this.frequencyUnit = frequencyUnit;
+        this.frequency = frequency;
         this.habitGroup = habitGroup;
         this.streakCount = streakCount;
         this.priority = priority;
@@ -35,8 +32,7 @@ public class CreateHabitInputData {
     public String getHabitName() { return habitName; }
     public LocalDateTime getStartDateTime() { return startDateTime; }
 
-    public int getFrequencyCount() { return frequencyCount; }
-    public String getFrequencyUnit() { return frequencyUnit; }
+    public LocalDateTime getFrequency() { return frequency; }
 
     public String getHabitGroup() { return habitGroup; }
     public int getStreakCount() { return streakCount; }

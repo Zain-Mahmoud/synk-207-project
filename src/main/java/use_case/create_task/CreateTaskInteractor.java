@@ -21,13 +21,16 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
 
         if ( inputdata.getTaskName() == null || inputdata.getTaskName().isBlank()) {
             presenter.prepareFailView("Task name cannot be empty.");
+            return;
         }
 
         if (dao.existsByName(inputdata.getTaskName())) {
             presenter.prepareFailView("Task already exists.");
+            return;
         }
 
         String taskName = inputdata.getTaskName();
+        String description = inputdata.getDescription();
         LocalDateTime deadline = inputdata.getDeadline();
         String taskGroup = inputdata.getTaskGroup();
         boolean status = inputdata.getstatus();
@@ -35,6 +38,7 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
 
         Task newTask = new TaskBuilder()
                 .setTaskName(taskName)
+                .setDescription(description)
                 .setDeadline(deadline)
                 .setTaskGroup(taskGroup)
                 .setStatus(status)
@@ -43,7 +47,7 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
 
         dao.save(newTask);
         presenter.prepareSuccessView(
-                new CreateTaskOutputData(newTask.getTaskName(), true, "Task created successfully!"));
+                new CreateTaskOutputData(newTask.getName(), true, "Task created successfully!"));
 
     }
 }
