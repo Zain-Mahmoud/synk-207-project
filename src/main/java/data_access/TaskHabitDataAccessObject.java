@@ -44,10 +44,11 @@ public class TaskHabitDataAccessObject implements TaskGateway, ViewLeaderboardUs
         headers.put("habitName", 1);
         headers.put("streakCount", 2);
         headers.put("startDateTime", 3);
-        headers.put("frequency", 4);
-        headers.put("habitGroup", 5);
-        headers.put("priority", 6);
-        headers.put("status", 7);
+        headers.put("frequencyUnit", 4);
+        headers.put("frequencyCount", 5);
+        headers.put("habitGroup", 6);
+        headers.put("priority", 7);
+        headers.put("status", 8);
 
         if (!habitsCsvFile.exists() || habitsCsvFile.length() == 0) {
             // Create empty file with header
@@ -98,7 +99,7 @@ public class TaskHabitDataAccessObject implements TaskGateway, ViewLeaderboardUs
                     Habit habit = new HabitBuilder()
                             .setHabitName(habitName)
                             .setStartDateTime(startDateTime)
-                            .setFrequency(frequency)
+                            .setFrequencyUnit(frequency)
                             .setHabitGroup(habitGroup)
                             .setStreakCount(streakCount)
                             .setPriority(priority)
