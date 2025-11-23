@@ -4,7 +4,7 @@ import entities.Task;
 
 public interface CreateTaskUserDataAccessInterface {
 
-    boolean existsByName( String taskName);
+    boolean existsByName(String taskName);
 
     void save(Task task);
 }

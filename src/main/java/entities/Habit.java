@@ -6,7 +6,8 @@ import java.util.Objects;
 public class Habit implements Completable {
     private String habitName;
     private LocalDateTime startDateTime;
-    private LocalDateTime frequency;
+    private int frequencyCount;
+    private String frequencyUnit;
     private String habitGroup;
     private int streakCount;
     private int priority;
@@ -14,14 +15,16 @@ public class Habit implements Completable {
 
     Habit(String habitName,
           LocalDateTime startDateTime,
-          LocalDateTime frequency,
+          int frequencyCount,
+          String frequencyUnit,
           String habitGroup,
           int streakCount,
           int priority,
           boolean status) {
         this.habitName = habitName;
         this.startDateTime = startDateTime;
-        this.frequency = frequency;
+        this.frequencyCount = frequencyCount;
+        this.frequencyUnit = frequencyUnit;
         this.habitGroup = habitGroup;
         this.streakCount = streakCount;
         this.priority = priority;
@@ -37,14 +40,20 @@ public class Habit implements Completable {
     public void incrementStreak() { this.streakCount++; }
 
     public String getHabitName() { return this.habitName; }
+
     public void setHabitName(String habitName) { this.habitName = habitName; }
 
     public LocalDateTime getStartDateTime() { return this.startDateTime; }
+
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
 
-    public LocalDateTime getFrequency() { return this.frequency; }
-    public void setFrequency(LocalDateTime frequency) { this.frequency = frequency; }
+    public int getFrequencyCount() { return frequencyCount; }
 
+    public void setFrequencyCount(int frequencyCount) { this.frequencyCount = frequencyCount; }
+
+    public String getFrequencyUnit() { return frequencyUnit; }
+
+    public void setFrequencyUnit(String frequencyUnit) { this.frequencyUnit = frequencyUnit; }
     public String getHabitGroup() { return this.habitGroup; }
     public void setHabitGroup(String habitGroup) { this.habitGroup = habitGroup; }
 
@@ -72,7 +81,8 @@ public class Habit implements Completable {
         return "Habit{" +
                 "habitName='" + habitName + '\'' +
                 ", startDateTime=" + startDateTime +
-                ", frequency=" + frequency +
+                ", frequencyCount=" + frequencyCount +
+                ", frequencyUnit='" + frequencyUnit + '\'' +
                 ", habitGroup='" + habitGroup + '\'' +
                 ", streakCount=" + streakCount +
                 ", priority=" + priority +
