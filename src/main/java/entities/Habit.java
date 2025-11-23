@@ -12,7 +12,6 @@ public class Habit implements Completable {
     private int priority;
     private boolean status;
     private String description;
-    private String description;
 
     Habit(String habitName,
           LocalDateTime startDateTime,
@@ -45,6 +44,22 @@ public class Habit implements Completable {
     @Override
     public String getDescription() {
         return this.description;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String getTitle() {
+        return "";
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Object getDueDate() {
+        return null;
     }
 
 

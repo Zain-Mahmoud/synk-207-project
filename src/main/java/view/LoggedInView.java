@@ -4,6 +4,9 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController; // TODO: Controller for triggering calendar sync
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarControllerState; // TODO: Sync state data carrier
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel; // TODO: View model for sync updates
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -24,11 +27,15 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JLabel passwordErrorField = new JLabel();
     private ChangePasswordController changePasswordController = null;
     private ViewManagerModel viewManagerModel;
+    private SyncToGoogleCalendarController syncToGoogleCalendarController; // TODO: Injected controller to kick off calendar sync
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // TODO: View model providing sync result updates
 
     private final JLabel username;
 
     private final JButton logOut;
     private final JButton viewLeaderboard;
+    private final JButton syncCalendarButton; // TODO: Button to sync tasks to Google Calendar
+    private final JLabel syncStatusLabel = new JLabel(); // TODO: Inline status label for sync results
 
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
@@ -55,6 +62,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         viewLeaderboard = new JButton("View Leaderboard");
         buttons.add(viewLeaderboard);
+
+        syncCalendarButton = new JButton("Sync to Google Calendar"); // TODO: Create sync trigger button
+        buttons.add(syncCalendarButton); // TODO: Add sync button alongside other actions
 
         logOut.addActionListener(this);
         
@@ -105,6 +115,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 }
         );
 
+        syncCalendarButton.addActionListener(evt -> { // TODO: Invoke calendar sync when button is clicked
+            if (evt.getSource().equals(syncCalendarButton) && syncToGoogleCalendarController != null) {
+                final LoggedInState currentState = loggedInViewModel.getState(); // TODO: Use logged-in username as user identifier for sync
+                syncToGoogleCalendarController.execute(currentState.getUsername()); // TODO: Trigger sync interactor via controller
+            }
+        });
+
         this.add(title);
         this.add(usernameInfo);
         this.add(username);
@@ -112,6 +129,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.add(passwordInfo);
         this.add(passwordErrorField);
         this.add(buttons);
+        this.add(syncStatusLabel); // TODO: Show latest sync success/error message in UI
     }
 
     /**
@@ -132,6 +150,16 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             final LoggedInState state = (LoggedInState) evt.getNewValue();
             JOptionPane.showMessageDialog(null, "password updated for " + state.getUsername());
         }
+        else if (evt.getPropertyName().equals("sync")) { // TODO: React to sync view model updates
+            final SyncToGoogleCalendarControllerState syncState = (SyncToGoogleCalendarControllerState) evt.getNewValue(); // TODO: Capture sync state updates
+            if (syncState.isSuccess()) {
+                syncStatusLabel.setText(syncState.getStatusMessage()); // TODO: Reflect successful sync in label
+                JOptionPane.showMessageDialog(this, syncState.getStatusMessage(), "Sync Complete", JOptionPane.INFORMATION_MESSAGE); // TODO: Show confirmation dialog on success
+            } else {
+                syncStatusLabel.setText(syncState.getError()); // TODO: Show error on failure
+                JOptionPane.showMessageDialog(this, syncState.getError(), "Sync Failed", JOptionPane.ERROR_MESSAGE); // TODO: Alert user when sync fails
+            }
+        }
 
     }
 
@@ -145,5 +173,14 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     public void setViewManagerModel(ViewManagerModel viewManagerModel) {
         this.viewManagerModel = viewManagerModel;
+    }
+
+    public void setSyncToGoogleCalendarController(SyncToGoogleCalendarController syncToGoogleCalendarController) { // TODO: Allow builder to inject sync controller
+        this.syncToGoogleCalendarController = syncToGoogleCalendarController; // TODO: Store injected sync controller
+    }
+
+    public void setSyncToGoogleCalendarViewModel(SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel) { // TODO: Subscribe to sync view model updates
+        this.syncToGoogleCalendarViewModel = syncToGoogleCalendarViewModel; // TODO: Capture sync view model reference
+        this.syncToGoogleCalendarViewModel.addPropertyChangeListener(this); // TODO: Listen for sync result changes
     }
 }

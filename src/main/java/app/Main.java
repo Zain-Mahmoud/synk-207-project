@@ -2,9 +2,10 @@ package app;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.security.GeneralSecurityException; // TODO: Propagate calendar gateway initialization issues
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, GeneralSecurityException { // TODO: Allow calendar gateway setup exceptions to surface
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addLoginView()
@@ -15,6 +16,7 @@ public class Main {
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
+                .addSyncToGoogleCalendarUseCase() // TODO: Wire sync to Google Calendar use case into app
                 .build();
 
         application.pack();
