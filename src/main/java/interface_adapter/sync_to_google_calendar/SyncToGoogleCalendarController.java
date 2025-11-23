@@ -25,7 +25,7 @@ public class SyncToGoogleCalendarController {
     // Here we construct a ID object
     public void execute(String userId) {
         final SyncToGoogleCalendarInputData syncToGoogleCalendarInputData = new SyncToGoogleCalendarInputData(userId);
-        syncToGoogleCalendarUseCaseInteractor.execute(syncToGoogleCalendarInputData); // TODO: Trigger sync interactor with packaged input
+        syncToGoogleCalendarUseCaseInteractor.execute(syncToGoogleCalendarInputData); // Trigger sync interactor with packaged input
     }
 
 

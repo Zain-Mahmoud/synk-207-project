@@ -2,14 +2,14 @@ package app;
 
 import java.awt.CardLayout;
 import java.io.IOException;
-import java.security.GeneralSecurityException; // TODO: Surface calendar gateway initialization errors
+import java.security.GeneralSecurityException; // Type Safety
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
-import data_access.GoogleCalendarDataAccessObject; // TODO: Use Google Calendar implementation for syncing
+import data_access.GoogleCalendarDataAccessObject;
 import data_access.TaskHabitDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
@@ -25,22 +25,22 @@ import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController; // TODO: Controller for sync use case
-import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter; // TODO: Presenter for sync use case
-import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel; // TODO: View model for sync status
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.gateways.CalendarGateway; // TODO: Gateway abstraction for calendar operations
+import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputBoundary; // TODO: Input boundary for sync use case
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor; // TODO: Interactor performing sync logic
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary; // TODO: Output boundary for sync use case
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputBoundary;
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor;
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
@@ -67,7 +67,7 @@ public class AppBuilder {
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskHabitDataAccessObject taskHabitDataAccessObject;
     final ViewLeaderboardUserDataAccessInterface viewLeaderboardUserDataAccessInterface;
-    private final CalendarGateway calendarGateway; // TODO: Calendar gateway used for syncing to Google Calendar
+    private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -77,14 +77,14 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
-    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // TODO: View model carrying sync status updates
-    private SyncToGoogleCalendarController syncToGoogleCalendarController; // TODO: Controller to kick off sync flow
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //View model carrying sync status updates
+    private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
 
-    public AppBuilder() throws IOException, GeneralSecurityException { // TODO: Constructor now accounts for calendar gateway setup
+    public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
         Path habitsPath = Paths.get("habits.csv");
         taskHabitDataAccessObject = new TaskHabitDataAccessObject(habitsPath);
-        calendarGateway = new GoogleCalendarDataAccessObject(); // TODO: Initialize Google Calendar gateway implementation
+        calendarGateway = new GoogleCalendarDataAccessObject(); // Initialize Google Calendar gateway implementation
         viewLeaderboardUserDataAccessInterface = null;
     }
 
@@ -161,17 +161,17 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addSyncToGoogleCalendarUseCase() { // TODO: Wire sync-to-calendar use case components together
-        if (syncToGoogleCalendarViewModel == null) { // TODO: Avoid recreating sync view model on repeated builder calls
-            syncToGoogleCalendarViewModel = new SyncToGoogleCalendarViewModel(); // TODO: Build sync view model once for lifecycle
+    public AppBuilder addSyncToGoogleCalendarUseCase() { // Wire sync-to-calendar use case components together
+        if (syncToGoogleCalendarViewModel == null) {
+            syncToGoogleCalendarViewModel = new SyncToGoogleCalendarViewModel();
         }
         SyncToGoogleCalendarOutputBoundary syncOutputBoundary =
-                new SyncToGoogleCalendarPresenter(syncToGoogleCalendarViewModel); // TODO: Presenter connecting sync interactor to UI
+                new SyncToGoogleCalendarPresenter(syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
         SyncToGoogleCalendarInputBoundary syncInteractor =
-                new SyncToGoogleCalendarInteractor(taskHabitDataAccessObject, calendarGateway, syncOutputBoundary); // TODO: Interactor to sync tasks to calendar
-        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // TODO: Controller invoked by logged-in view
-        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // TODO: Inject controller into logged-in view
-        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // TODO: Provide sync view model for UI updates
+                new SyncToGoogleCalendarInteractor(taskHabitDataAccessObject, calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
+        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by logged-in view
+        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into logged-in view
+        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI updates
         return this;
     }
 

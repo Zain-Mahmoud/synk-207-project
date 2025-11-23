@@ -1,9 +1,9 @@
 package interface_adapter.sync_to_google_calendar;
 
 public class SyncToGoogleCalendarControllerState {
-    private String error = "Error with Syncing"; // TODO: Default sync error message holder
-    private String statusMessage = ""; // TODO: Track latest sync success message
-    private boolean success; // TODO: Track if last sync attempt was successful
+    private String error = "Error with Syncing";
+    private String statusMessage = "";
+    private boolean success;
 
     public void setError(String errorMessage) {
         this.error = errorMessage;
@@ -13,19 +13,19 @@ public class SyncToGoogleCalendarControllerState {
         return error;
     }
 
-    public void setStatusMessage(String statusMessage) { // TODO: Store sync success message
+    public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
     }
 
-    public String getStatusMessage() { // TODO: Expose sync success message
+    public String getStatusMessage() {
         return statusMessage;
     }
 
-    public boolean isSuccess() { // TODO: Expose sync success state
+    public boolean isSuccess() { //
         return success;
     }
 
-    public void setSuccess(boolean success) { // TODO: Record sync success state
+    public void setSuccess(boolean success) {
         this.success = success;
     }
 }

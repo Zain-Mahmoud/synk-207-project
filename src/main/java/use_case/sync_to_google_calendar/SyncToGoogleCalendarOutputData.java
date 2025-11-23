@@ -15,7 +15,7 @@ public class SyncToGoogleCalendarOutputData {
         return result;
     }
 
-    public boolean isSuccess() { // TODO: Surface success flag for presenter usage
+    public boolean isSuccess() {
         return success;
     }
 }
