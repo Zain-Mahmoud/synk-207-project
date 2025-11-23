@@ -1,6 +1,5 @@
 package view;
 
-import interface_adapter.leaderboard.ViewLeaderboardViewModel;
 import interface_adapter.update_profile.UpdateProfileController;
 import interface_adapter.update_profile.UpdateProfileState;
 import interface_adapter.update_profile.UpdateProfileViewModel;
@@ -23,11 +22,11 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     private final UpdateProfileViewModel updateProfileViewModel;
     private UpdateProfileController updateProfileController = null;
 
-    private String currentUid;
-
     private final JTextField usernameInputField = new JTextField(15);
     private final JLabel usernameErrorField = new JLabel();
     private final JLabel successMessageField = new JLabel();
+    private final JButton chooseAvatarButton;
+    private final JLabel avatarPreviewLabel = new JLabel();
 
     private final JButton saveButton;
     private final JButton cancelButton;
@@ -43,27 +42,46 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
                 new JLabel(UpdateProfileViewModel.USERNAME_LABEL), usernameInputField);
 
         final JPanel buttons = new JPanel();
+        chooseAvatarButton = new JButton(UpdateProfileViewModel.AVATAR_LABEL);
+        buttons.add(chooseAvatarButton);
         saveButton = new JButton(UpdateProfileViewModel.SAVE_BUTTON_LABEL);
         buttons.add(saveButton);
         cancelButton = new JButton(UpdateProfileViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                if (evt.getSource().equals(saveButton)) {
-                    final UpdateProfileState currentState = updateProfileViewModel.getState();
-
-                    updateProfileController.execute(
-                            currentUid,
-                            currentState.getUsername(),
-                            null
-                    );
+        chooseAvatarButton.addActionListener(evt -> {
+            if (evt.getSource().equals(chooseAvatarButton)) {
+                JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    String path = fileChooser.getSelectedFile().getAbsolutePath();
+                    UpdateProfileState state = updateProfileViewModel.getState();
+                    state.setAvatarPath(path);
+                    updateProfileViewModel.setState(state);
+                    updateProfileViewModel.firePropertyChanged();
                 }
             }
         });
 
-        cancelButton.addActionListener(this);
+        saveButton.addActionListener(evt -> {
+            if (evt.getSource().equals(saveButton)) {
+                final UpdateProfileState currentState = updateProfileViewModel.getState();
+
+                updateProfileController.execute(
+                        currentState.getUid(),
+                        currentState.getUsername(),
+                        currentState.getAvatarPath()
+                );
+            }
+        });
+
+//        cancelButton.addActionListener(evt -> {
+//
+//            if (evt.getSource().equals(cancelButton) && viewManagerModel != null) {
+//                viewManagerModel.setState("loggedin");
+//                viewManagerModel.firePropertyChanged();
+//            }
+//        });
 
         usernameInputField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -93,6 +111,8 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
         this.add(title);
         this.add(usernameInfo);
+        this.add(chooseAvatarButton);
+        this.add(avatarPreviewLabel);
         this.add(usernameErrorField);
         this.add(successMessageField);
         this.add(buttons);
@@ -117,6 +137,17 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private void setFields(UpdateProfileState state) {
         usernameInputField.setText(state.getUsername());
+        updateAvatarPreview(state.getAvatarPath());
+    }
+
+    private void updateAvatarPreview(String avatarPath) {
+        if (avatarPath == null || avatarPath.isBlank()) {
+            avatarPreviewLabel.setIcon(null);
+            return;
+        }
+        ImageIcon icon = new ImageIcon(avatarPath);
+        Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+        avatarPreviewLabel.setIcon(new ImageIcon(img));
     }
 
     public String getViewName() {
@@ -127,7 +158,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         this.updateProfileController = updateProfileController;
     }
 
-    public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
-    }
+//    public void setCurrentUid(String currentUid) {
+//        this.currentUid = currentUid;
+//    }
 }

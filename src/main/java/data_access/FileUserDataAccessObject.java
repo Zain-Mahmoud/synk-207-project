@@ -20,17 +20,21 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                                                  ChangePasswordUserDataAccessInterface,
                                                  UpdateProfileUserDataAccessInterface {
 
-    private static final String HEADER = "username,password";
+    private static final String HEADER = "uid,username,avatarpath,password";
 
     private final File csvFile;
     private final Map<String, Integer> headers = new LinkedHashMap<>();
-    private final Map<String, User> accounts = new HashMap<>();
+    private final Map<String, User> usersByName = new HashMap<>();
+    private final Map<String, User> usersByUid = new HashMap<>();
+
 
     public FileUserDataAccessObject(String csvPath, UserFactory userFactory) throws IOException {
 
         csvFile = new File(csvPath);
-        headers.put("username", 0);
-        headers.put("password", 1);
+        headers.put("uid", 0);
+        headers.put("username", 1);
+        headers.put("avatarpath", 2);
+        headers.put("password", 3);
 
         if (csvFile.length() == 0) {
             save();
@@ -47,10 +51,13 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                 String row;
                 while ((row = reader.readLine()) != null) {
                     final String[] col = row.split(",");
+                    final String uid = String.valueOf(col[headers.get("uid")]);
                     final String username = String.valueOf(col[headers.get("username")]);
+                    final String avatarpath = String.valueOf(col[headers.get("avatarpath")]);
                     final String password = String.valueOf(col[headers.get("password")]);
                     final User user = userFactory.create(username, password);
-                    accounts.put(username, user);
+                    usersByName.put(username, user);
+                    usersByUid.put(uid, user);
                 }
             }
         }
@@ -63,9 +70,9 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
             writer.write(String.join(",", headers.keySet()));
             writer.newLine();
 
-            for (User user : accounts.values()) {
-                final String line = String.format("%s,%s",
-                        user.getUsername(), user.getPassword());
+            for (User user : usersByUid.values()) {
+                final String line = String.format("%s,%s,%s,%s",
+                        user.getUid(), user.getUsername(), user.getAvatarPath(), user.getPassword());
                 writer.write(line);
                 writer.newLine();
             }
@@ -80,17 +87,17 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
     @Override
     public boolean existsByUid(String uid) {
-        return accounts.containsKey(uid);
+        return usersByUid.containsKey(uid);
     }
 
     @Override
     public User getByUid(String uid) {
-        return accounts.get(uid);
+        return usersByUid.get(uid);
     }
 
     @Override
     public boolean isUsernameTaken(String username) {
-        for (User u : accounts.values()) {
+        for (User u : usersByName.values()) {
             if (u.getUsername().equals(username)) {
                 return true;
             }
@@ -100,24 +107,24 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
     @Override
     public void save(User user) {
-        accounts.put(user.getUsername(), user);
+        usersByName.put(user.getUsername(), user);
         this.save();
     }
 
     @Override
     public User get(String username) {
-        return accounts.get(username);
+        return usersByName.get(username);
     }
 
     @Override
     public boolean existsByName(String identifier) {
-        return accounts.containsKey(identifier);
+        return usersByName.containsKey(identifier);
     }
 
     @Override
     public void changePassword(User user) {
         // Replace the User object in the map
-        accounts.put(user.getUsername(), user);
+        usersByName.put(user.getUsername(), user);
         save();
     }
 }
