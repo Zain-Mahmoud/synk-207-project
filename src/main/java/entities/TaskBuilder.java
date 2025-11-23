@@ -40,7 +40,7 @@ public class TaskBuilder {
         return this;
     }
 
-    public Completable build() {
+    public Task build() {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalStateException("taskName must not be null or empty");
         }
