@@ -115,19 +115,10 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     }
 
     /**
-     * Public helper that ensures a credential exists for the provided user identifier,
-     * prompting for Google consent if necessary.
-     */
-
-    public Credential authenticateUser(String userId) throws IOException {
-        return ensureCredential(normalizeUserId(userId));
-    }
-
-    /**
      * Public helper that attempts to load a previously stored credential without prompting.
      */
     public Credential getStoredCredential(String userId) throws IOException {
-        return authorizationFlow.loadCredential(normalizeUserId(userId));
+        return authorizationFlow.loadCredential(normalizeUserId(userId)); // fetch credential without prompting
     }
 
     /* -----------------------------------------------------------------------
@@ -244,6 +235,24 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public boolean hasStoredCredential(String userId) { // report if credential is already available
+        try {
+            return getStoredCredential(userId) != null; // true when credential exists
+        } catch (IOException e) {
+            return false; // treat IO failure as missing credential
+        }
+    }
+
+    @Override
+    public void authenticateUser(String userId) { //  run OAuth flow when credential missing
+        try {
+            ensureCredential(normalizeUserId(userId)); // invoke credential setup
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to authenticate user for calendar", e); // surface auth errors to caller
         }
     }
 

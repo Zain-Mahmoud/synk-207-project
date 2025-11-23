@@ -41,6 +41,9 @@ public class SyncToGoogleCalendarInteractor implements SyncToGoogleCalendarInput
             // TODO Turn into Completable
             // get tasks and sync
             String userId = inputData.getUserID();
+            if (!calendarGateway.hasStoredCredential(userId)) { // run auth if credential is missing
+                calendarGateway.authenticateUser(userId); // initiate OAuth flow for user
+            }
             ArrayList<Task> userCompletables = taskGateway.fetchTasks(userId);
             // Prepare output data
             for(Completable completable : userCompletables) {
