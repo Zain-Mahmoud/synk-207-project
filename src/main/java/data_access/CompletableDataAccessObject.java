@@ -24,14 +24,14 @@ import java.util.Map;
  */
 public class CompletableDataAccessObject implements CompletableGateway {
 
-    private static final String HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
+    private static final String HEADER = "userId,completableName,description,startTime,deadline,completableGroup,status,priority";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private final File csvFile;
-    private final Map<String, ArrayList<Completable>> userTasks = new HashMap<>();
+    private final Map<String, ArrayList<Completable>> completable = new HashMap<>();
 
     public CompletableDataAccessObject() {
-        this(Path.of("tasks.csv"));
+        this(Path.of("completable.csv"));
     }
 
     public CompletableDataAccessObject(Path csvPath) {
@@ -53,7 +53,7 @@ public class CompletableDataAccessObject implements CompletableGateway {
                 writeHeader();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Unable to initialize tasks CSV", e);
+            throw new RuntimeException("Unable to initialize completable CSV", e);
         }
     }
 
@@ -65,7 +65,7 @@ public class CompletableDataAccessObject implements CompletableGateway {
     }
 
     private void loadFromCsv() {
-        userTasks.clear();
+        completable.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             final String headerLine = reader.readLine();
             if (headerLine == null) {
@@ -73,7 +73,7 @@ public class CompletableDataAccessObject implements CompletableGateway {
                 return;
             }
             if (!HEADER.equals(headerLine)) {
-                throw new IllegalStateException("Unexpected header in tasks CSV");
+                throw new IllegalStateException("Unexpected header in completable CSV");
             }
             String line;
             while ((line = reader.readLine()) != null) {
@@ -85,11 +85,11 @@ public class CompletableDataAccessObject implements CompletableGateway {
                     continue;
                 }
                 final String userId = columns[0];
-                final String taskName = columns[1];
+                final String completableName = columns[1];
                 final String description = columns[2];
                 final String startTimeRaw = columns[3];
                 final String deadlineRaw = columns[4];
-                final String taskGroup = columns[5];
+                final String completableGroup = columns[5];
                 final boolean status = Boolean.parseBoolean(columns[6]);
                 final int priority = columns[7].isBlank() ? 0 : Integer.parseInt(columns[7]);
 
@@ -103,20 +103,20 @@ public class CompletableDataAccessObject implements CompletableGateway {
                 }
 
                 Completable completable = new TaskBuilder()
-                        .setTaskName(taskName)
+                        .setTaskName(completableName)
                         .setDescription(description)
                         // WE NEED A START TIME FIELD IN THE BUILDER
                         //.setStartTime(startTime)
                         .setDeadline(deadline)
-                        .setTaskGroup(taskGroup)
+                        .setTaskGroup(completableGroup)
                         .setStatus(status)
                         .setPriority(priority)
                         .build();
 
-                userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(completable);
+                this.completable.computeIfAbsent(userId, key -> new ArrayList<>()).add(completable);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load tasks from CSV", e);
+            throw new RuntimeException("Failed to load completable from CSV", e);
         }
     }
 
@@ -124,7 +124,7 @@ public class CompletableDataAccessObject implements CompletableGateway {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
             writer.write(HEADER);
             writer.newLine();
-            for (Map.Entry<String, ArrayList<Completable>> entry : userTasks.entrySet()) {
+            for (Map.Entry<String, ArrayList<Completable>> entry : completable.entrySet()) {
                 final String userId = entry.getKey();
                 for (Completable completable : entry.getValue()) {
                     final String startTime = completable.getStartTime() == null ? "" : DATE_FORMATTER.format(completable.getStartTime());
@@ -144,7 +144,7 @@ public class CompletableDataAccessObject implements CompletableGateway {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to persist tasks to CSV", e);
+            throw new RuntimeException("Failed to persist completable to CSV", e);
         }
     }
 
@@ -153,10 +153,10 @@ public class CompletableDataAccessObject implements CompletableGateway {
     }
 
     @Override
-    public String addTask(String userId, Completable completable) {
+    public String addCompletable(String userId, Completable completable) {
         // Compute if absent to initialize user's task list, if it exists return it
 
-        ArrayList<Completable> tasksForUser = userTasks.computeIfAbsent(userId, key -> new ArrayList<>());
+        ArrayList<Completable> tasksForUser = this.completable.computeIfAbsent(userId, key -> new ArrayList<>());
 
         try {
             tasksForUser.add(completable);
@@ -169,8 +169,8 @@ public class CompletableDataAccessObject implements CompletableGateway {
     }
 
     @Override
-    public ArrayList<Completable> fetchTasks(String userId) {
-        ArrayList<Completable> completable = userTasks.get(userId);
+    public ArrayList<Completable> fetchCompletable(String userId) {
+        ArrayList<Completable> completable = this.completable.get(userId);
 
         if (completable == null) {
             // Returns Empty List if no tasks for user
@@ -182,8 +182,8 @@ public class CompletableDataAccessObject implements CompletableGateway {
 
 
     @Override
-    public boolean deleteTask(String userId, Completable Completable) {
-        ArrayList<Completable> tasks = userTasks.get(userId);
+    public boolean deleteCompletable(String userId, Completable Completable) {
+        ArrayList<Completable> tasks = completable.get(userId);
         if (tasks == null) {
             return false;
         }

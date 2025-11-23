@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 public interface CompletableGateway {
 
-    String addTask(String userId, Completable Completable);
+    String addCompletable(String userId, Completable Completable);
 
-    ArrayList<Completable> fetchTasks(String userId);
+    ArrayList<Completable> fetchCompletable(String userId);
 
-    boolean deleteTask(String userId, Completable completable);
+    boolean deleteCompletable(String userId, Completable completable);
 
 
 }
