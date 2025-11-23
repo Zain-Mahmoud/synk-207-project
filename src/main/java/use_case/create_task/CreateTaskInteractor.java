@@ -6,32 +6,24 @@ import entities.TaskBuilder;
 import java.time.LocalDateTime;
 
 public class CreateTaskInteractor implements CreateTaskInputBoundary {
-    private final CreateTaskUserDataAccessInterface dao;
-    private final CreateTaskOutputBoundary presenter;
+    private CreateTaskUserDataAccessInterface userDataAccess;
+    private CreateTaskInputBoundary presenter;
 
-    public CreateTaskInteractor(CreateTaskUserDataAccessInterface dao,
-                                CreateTaskOutputBoundary presenter) {
+    public CreateTaskInteractor( CreateTaskUserDataAccessInterface userDataAccess, CreateTaskInputBoundary presenter){
         this.presenter = presenter;
-        this.dao = dao;
+        this.userDataAccess = userDataAccess;
     }
 
 
     @Override
-    public void execute(CreateTaskInputData inputdata) {
+    public void execute(CreateTaskInputData InputData) {
 
-        if ( inputdata.getTaskName() == null || inputdata.getTaskName().isBlank()) {
-            presenter.prepareFailView("Task name cannot be empty.");
-        }
-
-        if (dao.existsByName(inputdata.getTaskName())) {
-            presenter.prepareFailView("Task already exists.");
-        }
-
-        String taskName = inputdata.getTaskName();
-        LocalDateTime deadline = inputdata.getDeadline();
-        String taskGroup = inputdata.getTaskGroup();
-        boolean status = inputdata.getstatus();
-        int priority = inputdata.getPriority();
+        String taskName = InputData.getTaskName();
+        LocalDateTime deadline = InputData.getDeadline();
+        String taskGroup = InputData.getTaskGroup();
+        boolean status = InputData.getstatus();
+        int priority = InputData.getPriority();
+        String description = InputData.getDescription();
 
         Task newTask = new TaskBuilder()
                 .setTaskName(taskName)
@@ -39,11 +31,7 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
                 .setTaskGroup(taskGroup)
                 .setStatus(status)
                 .setPriority(priority)
+                .setDescription(description)
                 .build();
-
-        dao.save(newTask);
-        presenter.prepareSuccessView(
-                new CreateTaskOutputData(newTask.getTaskName(), true, "Task created successfully!"));
-
     }
 }
