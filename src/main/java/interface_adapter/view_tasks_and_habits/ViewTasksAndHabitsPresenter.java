@@ -25,12 +25,9 @@ public class ViewTasksAndHabitsPresenter implements ViewTasksAndHabitsOutputBoun
 
     @Override
     public void prepareSuccessView(ViewTasksAndHabitsOutputData response) {
-        // On success, switch to the logged in view.
-
     }
 
     @Override
     public void prepareFailView(String error) {
-
     }
 }

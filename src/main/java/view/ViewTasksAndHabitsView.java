@@ -1,6 +1,8 @@
 package view;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginState;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 
@@ -8,43 +10,64 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
+import java.util.ArrayList;
 
 public class ViewTasksAndHabitsView extends JPanel {
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private final String viewName = "view tasks and habits";
     private ViewTasksAndHabitsController viewTasksAndHabitsController = null;
+    private ViewManagerModel viewManagerModel;
 
 
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel) {
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
+        this.viewManagerModel = viewManagerModel;
 
         final JPanel mainPanel = new JPanel();
         final JPanel taskTablePanel = new JPanel();
         final JPanel habitTablePanel = new JPanel();
 
-        final JButton
+        final JButton exitButton = new JButton("Exit");
+        final JButton refreshButton = new JButton("Refresh");
 
         mainPanel.add(taskTablePanel);
         mainPanel.add(habitTablePanel);
+        mainPanel.add(exitButton);
+        mainPanel.add(refreshButton);
 
         final JLabel taskTableLabel = new JLabel("Task Table");
         final JLabel habitTableLabel = new JLabel("Habit Table");
 
-        final DefaultTableModel taskModel =  new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0);
-        final DefaultTableModel habitModel =  new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0);
+        final DefaultTableModel taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0);
+        final DefaultTableModel habitModel = new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0);
 
         JTable taskTable = new JTable(taskModel);
         JTable habitTable = new JTable(habitModel);
 
         taskModel.addRow(ViewTasksAndHabitsViewModel.sampleTask);
         habitModel.addRow(ViewTasksAndHabitsViewModel.sampleHabit);
+
+        ArrayList<ArrayList<String>> taskList = viewTasksAndHabitsController.getFormattedTasks();
+
+        for (ArrayList<String> row : taskList) {
+            Object[] rowData = row.toArray();
+            taskModel.addRow(rowData);
+        }
+
+        ArrayList<ArrayList<String>> habitList = viewTasksAndHabitsController.getFormattedHabits();
+
+        for (ArrayList<String> row : habitList) {
+            Object[] rowData = row.toArray();
+            habitModel.addRow(rowData);
+        }
 
         taskTablePanel.add(taskTableLabel);
         taskTablePanel.add(taskTable);
@@ -59,9 +82,11 @@ public class ViewTasksAndHabitsView extends JPanel {
                 int row = e.getFirstRow();
                 int col = e.getColumn();
 
+                Object changedValue = taskModel.getValueAt(row, col);
+
                 String taskName = taskModel.getValueAt(row, 0).toString();
 
-                viewTasksAndHabitsController.execute("task", col, taskName);
+                viewTasksAndHabitsController.execute("task", col, taskName, changedValue);
 
             }
         });
@@ -71,17 +96,55 @@ public class ViewTasksAndHabitsView extends JPanel {
                 int row = e.getFirstRow();
                 int col = e.getColumn();
 
+                Object changedValue = habitModel.getValueAt(row, col);
+
                 String habitName = habitModel.getValueAt(row, 0).toString();
 
-                viewTasksAndHabitsController.execute("habit", col, habitName);
+                viewTasksAndHabitsController.execute("habit", col, habitName, changedValue);
 
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (evt.getSource().equals(exitButton)) {
+                    viewTasksAndHabitsController.exit();
+                }
+            }
+        });
+
+        refreshButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (evt.getSource().equals(refreshButton)) {
+                    ArrayList<ArrayList<String>> taskList = viewTasksAndHabitsController.getFormattedTasks();
+
+                    for (ArrayList<String> row : taskList) {
+                        Object[] rowData = row.toArray();
+                        taskModel.addRow(rowData);
+                    }
+
+                    ArrayList<ArrayList<String>> habitList = viewTasksAndHabitsController.getFormattedHabits();
+
+                    for (ArrayList<String> row : habitList) {
+                        Object[] rowData = row.toArray();
+                        habitModel.addRow(rowData);
+                    }
+                }
             }
         });
     }
 
-    public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
+    public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
     }
 
-    public String getViewName() { return viewName; }
+    public String getViewName () {
+        return viewName;
+    }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+    }
 }
+
+

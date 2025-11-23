@@ -24,6 +24,9 @@ import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsPresenter;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -36,11 +39,10 @@ import use_case.signup.SignupOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
-import view.LeaderboardView;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputBoundary;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInteractor;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsOutputBoundary;
+import view.*;
 
 
 public class AppBuilder {
@@ -61,6 +63,8 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
+    private ViewTasksAndHabitsView viewtasksAndHabitsView;
+    private ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
@@ -89,6 +93,14 @@ public class AppBuilder {
         loggedInView = new LoggedInView(loggedInViewModel);
         loggedInView.setViewManagerModel(viewManagerModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addViewTasksAndHabitsView() {
+        viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel);
+        viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
     }
 
@@ -143,6 +155,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addViewTasksAndHabitsUseCase() {
+        final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewTasksAndHabitsViewModel);
+        final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
+                (taskHabitDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
+
+        ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor);
+        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        return this;
+    }
+
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -154,5 +176,6 @@ public class AppBuilder {
 
         return application;
     }
+
 }
 
