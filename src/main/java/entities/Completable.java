@@ -1,5 +1,7 @@
 package entities;
 
+import java.time.temporal.TemporalAccessor;
+
 public interface Completable {
     void complete();
 
@@ -8,4 +10,14 @@ public interface Completable {
     String getName();
 
     String getDescription();
+
+    TemporalAccessor getStartTime();
+
+    TemporalAccessor getDeadline();
+
+    String getTaskGroup();
+
+    boolean getStatus();
+
+    int getPriority();
 }

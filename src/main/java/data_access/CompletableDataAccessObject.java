@@ -1,9 +1,9 @@
 package data_access;// package data_access;
 
-import entities.Task;
+import entities.Completable;
+
 import entities.TaskBuilder;
-import jdk.jshell.spi.ExecutionControl;
-import use_case.gateways.TaskGateway;
+import use_case.gateways.CompletableGateway;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,19 +22,19 @@ import java.util.Map;
  * Prototype in-memory persistence layer backed by a simple HashMap of user id to tasks.
  * Create, Update, Remove, Read (Fetch) :
  */
-public class TaskHabitDataAccessObject implements TaskGateway {
+public class CompletableDataAccessObject implements CompletableGateway {
 
     private static final String HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private final File csvFile;
-    private final Map<String, ArrayList<Task>> userTasks = new HashMap<>();
+    private final Map<String, ArrayList<Completable>> userTasks = new HashMap<>();
 
-    public TaskHabitDataAccessObject() {
+    public CompletableDataAccessObject() {
         this(Path.of("tasks.csv"));
     }
 
-    public TaskHabitDataAccessObject(Path csvPath) {
+    public CompletableDataAccessObject(Path csvPath) {
         this.csvFile = csvPath.toFile();
         initializeFileIfNeeded();
         loadFromCsv();
@@ -102,7 +102,7 @@ public class TaskHabitDataAccessObject implements TaskGateway {
                     deadline = LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
                 }
 
-                Task task = new TaskBuilder()
+                Completable completable = new TaskBuilder()
                         .setTaskName(taskName)
                         .setDescription(description)
                         // WE NEED A START TIME FIELD IN THE BUILDER
@@ -113,7 +113,7 @@ public class TaskHabitDataAccessObject implements TaskGateway {
                         .setPriority(priority)
                         .build();
 
-                userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(task);
+                userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(completable);
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load tasks from CSV", e);
@@ -124,20 +124,20 @@ public class TaskHabitDataAccessObject implements TaskGateway {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
             writer.write(HEADER);
             writer.newLine();
-            for (Map.Entry<String, ArrayList<Task>> entry : userTasks.entrySet()) {
+            for (Map.Entry<String, ArrayList<Completable>> entry : userTasks.entrySet()) {
                 final String userId = entry.getKey();
-                for (Task task : entry.getValue()) {
-                    final String startTime = task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime());
-                    final String deadline = task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline());
+                for (Completable completable : entry.getValue()) {
+                    final String startTime = completable.getStartTime() == null ? "" : DATE_FORMATTER.format(completable.getStartTime());
+                    final String deadline = completable.getDeadline() == null ? "" : DATE_FORMATTER.format(completable.getDeadline());
                     final String line = String.join(",",
                             userId,
-                            safe(task.getName()),
-                            safe(task.getDescription()),
+                            safe(completable.getName()),
+                            safe(completable.getDescription()),
                             startTime,
                             deadline,
-                            safe(task.getTaskGroup()),
-                            Boolean.toString(task.getStatus()),
-                            Integer.toString(task.getPriority())
+                            safe(completable.getTaskGroup()),
+                            Boolean.toString(completable.getStatus()),
+                            Integer.toString(completable.getPriority())
                     );
                     writer.write(line);
                     writer.newLine();
@@ -153,13 +153,13 @@ public class TaskHabitDataAccessObject implements TaskGateway {
     }
 
     @Override
-    public String addTask(String userId, Task task) {
+    public String addTask(String userId, Completable completable) {
         // Compute if absent to initialize user's task list, if it exists return it
 
-        ArrayList<Task> tasksForUser = userTasks.computeIfAbsent(userId, key -> new ArrayList<>());
+        ArrayList<Completable> tasksForUser = userTasks.computeIfAbsent(userId, key -> new ArrayList<>());
 
         try {
-            tasksForUser.add(task);
+            tasksForUser.add(completable);
             persistToCsv();
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,27 +169,27 @@ public class TaskHabitDataAccessObject implements TaskGateway {
     }
 
     @Override
-    public ArrayList<Task> fetchTasks(String userId) {
-        ArrayList<Task> tasks = userTasks.get(userId);
+    public ArrayList<Completable> fetchTasks(String userId) {
+        ArrayList<Completable> completable = userTasks.get(userId);
 
-        if (tasks == null) {
+        if (completable == null) {
             // Returns Empty List if no tasks for user
             return new ArrayList<>();
         }
 
-        return tasks;
+        return completable;
     }
 
 
     @Override
-    public boolean deleteTask(String userId, Task task) {
-        ArrayList<Task> tasks = userTasks.get(userId);
+    public boolean deleteTask(String userId, Completable Completable) {
+        ArrayList<Completable> tasks = userTasks.get(userId);
         if (tasks == null) {
             return false;
         }
 
-        boolean removed = tasks.remove(task);
-        if (removed && !(tasks.contains(task))) {
+        boolean removed = tasks.remove(Completable);
+        if (removed && !(tasks.contains(Completable))) {
             persistToCsv();
             return removed;
         }
