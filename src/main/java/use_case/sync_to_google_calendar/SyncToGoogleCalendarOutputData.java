@@ -9,8 +9,6 @@ public class SyncToGoogleCalendarOutputData {
         this.result = result;
     }
 
-    // idk if you want to repeat the message again
-
     public String getResult() {
         return result;
     }
