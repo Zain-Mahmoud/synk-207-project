@@ -7,9 +7,11 @@ public class UpdateProfileState {
 
     private String uid = "";
     private String username = "";
+    private String password = "";
     private String avatarPath = "";
 
     private String usernameError;
+    private String passwordError;
     private String avatarError;
     private String successMessage;
 
@@ -29,6 +31,16 @@ public class UpdateProfileState {
         this.username = username;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+
     public String getAvatarPath() {
         return avatarPath;
     }
@@ -43,6 +55,12 @@ public class UpdateProfileState {
 
     public void setUsernameError(String usernameError) {
         this.usernameError = usernameError;
+    }
+
+    public String getPasswordError() {return this.passwordError; }
+
+    public void setPasswordError(String passwordError) {
+        this.passwordError = passwordError;
     }
 
     public String getAvatarError() {

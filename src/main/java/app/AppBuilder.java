@@ -14,7 +14,7 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardController;
 import interface_adapter.leaderboard.ViewLeaderboardPresenter;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
-import interface_adapter.logged_in.ChangePasswordController;
+import interface_adapter.update_profile.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
@@ -121,7 +121,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
+                loggedInViewModel, loginViewModel, updateProfileViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
@@ -138,7 +138,7 @@ public class AppBuilder {
                 new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
 
         ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
+        updateProfileView.setChangePasswordController(changePasswordController);
         return this;
     }
 
