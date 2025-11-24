@@ -9,7 +9,6 @@ public class TaskBuilder {
     private boolean status = false;
     private int priority = 0;
     private String description;
-    private LocalDateTime startTime; // ADDED: Field for startTime
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
@@ -41,16 +40,12 @@ public class TaskBuilder {
         return this;
     }
 
-    public TaskBuilder setStartTime(LocalDateTime startTime) { // ADDED: Setter for startTime
-        this.startTime = startTime;
-        return this;
-    }
-
     public Task build() {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalStateException("taskName must not be null or empty");
         }
-        // UPDATED: Added startTime and removed the trailing comma
-        return new Task(taskName, deadline, taskGroup, status, priority, description, startTime);
+        return new Task(taskName, deadline, taskGroup, status, priority, description);
     }
+
+
 }

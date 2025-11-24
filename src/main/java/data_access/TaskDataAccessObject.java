@@ -4,185 +4,191 @@ import entities.Task;
 import entities.TaskBuilder;
 import use_case.gateways.TaskGateway;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Persistence layer for Tasks backed by the API.
+ * Persistence layer for Tasks backed by a CSV file.
  * Implements Create, Update, Remove, Read (Fetch) operations for tasks.
  */
 public class TaskDataAccessObject implements TaskGateway {
 
+    private static final String TASK_HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    private static final String PLACEHOLDER_PASSWORD = "password"; // ASSUMPTION for API authentication
-    private static final String API_URL_USER = "http://vm003.teach.cs.toronto.edu:20112/user?username=%s";
-    private static final String API_URL_MODIFY = "http://vm003.teach.cs.toronto.edu:20112/modifyUserInfo";
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse(CONTENT_TYPE_JSON);
-    private static final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
+    private final File taskCsvFile;
+    private final Map<String, ArrayList<Task>> userTasks = new HashMap<>();
 
     public TaskDataAccessObject() {
+        this(Path.of("tasks.csv"));
     }
 
-
-    private JSONObject taskToJson(Task task) {
-        JSONObject json = new JSONObject();
-        json.put("taskName", safe(task.getName()));
-        json.put("description", safe(task.getDescription()));
-        json.put("deadline", task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline()));
-        json.put("taskGroup", safe(task.getTaskGroup()));
-        json.put("status", task.getStatus());
-        json.put("priority", task.getPriority());
-        json.put("startTime", task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime()));
-        return json;
+    public TaskDataAccessObject(Path taskCsvPath) {
+        this.taskCsvFile = taskCsvPath.toFile();
+        initializeFileIfNeeded(taskCsvFile, TASK_HEADER);
+        loadTasksFromCsv();
     }
 
-    private Task jsonToTask(JSONObject json) {
-        String taskName = json.getString("taskName");
-        String description = json.getString("description");
-        String deadlineRaw = json.getString("deadline");
-        String taskGroup = json.getString("taskGroup");
-        boolean status = json.getBoolean("status");
-        int priority = json.getInt("priority");
-        String startTimeRaw = json.getString("startTime");
+    private void initializeFileIfNeeded(File csvFile, String header) {
+        if (csvFile.exists()) {
+            return;
+        }
+        try {
+            if (csvFile.getParentFile() != null) {
+                csvFile.getParentFile().mkdirs();
+            }
+            if (csvFile.createNewFile()) {
+                writeHeader(csvFile, header);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to initialize CSV file: " + csvFile.getName(), e);
+        }
+    }
 
-        LocalDateTime deadline = deadlineRaw.isBlank() ? null : LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
-        LocalDateTime startTime = startTimeRaw.isBlank() ? null : LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+    private void writeHeader(File csvFile, String header) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            writer.write(header);
+            writer.newLine();
+        }
+    }
 
-        return new TaskBuilder()
-                .setTaskName(taskName)
-                .setDescription(description)
-                .setDeadline(deadline)
-                .setTaskGroup(taskGroup)
-                .setStatus(status)
-                .setPriority(priority)
-                .setStartTime(startTime)
-                .build();
+    // ========== TASK PERSISTENCE METHODS ==========
+
+    private void loadTasksFromCsv() {
+        userTasks.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(taskCsvFile))) {
+            final String headerLine = reader.readLine();
+            if (headerLine == null) {
+                writeHeader(taskCsvFile, TASK_HEADER);
+                return;
+            }
+            if (!TASK_HEADER.equals(headerLine)) {
+                throw new IllegalStateException("Unexpected header in tasks CSV");
+            }
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                final String[] columns = line.split(",", -1);
+                if (columns.length < 8) {
+                    continue;
+                }
+                final String userId = columns[0];
+                final String taskName = columns[1];
+                final String description = columns[2];
+                final String startTimeRaw = columns[3];
+                final String deadlineRaw = columns[4];
+                final String taskGroup = columns[5];
+                final boolean status = Boolean.parseBoolean(columns[6]);
+                final int priority = columns[7].isBlank() ? 0 : Integer.parseInt(columns[7]);
+
+                LocalDateTime startTime = null;
+                if (!startTimeRaw.isBlank()) {
+                    startTime = LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+                }
+                LocalDateTime deadline = null;
+                if (!deadlineRaw.isBlank()) {
+                    deadline = LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
+                }
+
+                Task task = new TaskBuilder()
+                        .setTaskName(taskName)
+                        .setDescription(description)
+                        .setDeadline(deadline)
+                        .setTaskGroup(taskGroup)
+                        .setStatus(status)
+                        .setPriority(priority)
+                        .build();
+
+                userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(task);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load tasks from CSV", e);
+        }
+    }
+
+    private void persistTasksToCsv() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(taskCsvFile))) {
+            writer.write(TASK_HEADER);
+            writer.newLine();
+            for (Map.Entry<String, ArrayList<Task>> entry : userTasks.entrySet()) {
+                final String userId = entry.getKey();
+                for (Task task : entry.getValue()) {
+                    final String startTime = task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime());
+                    final String deadline = task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline());
+                    final String line = String.join(",",
+                            userId,
+                            safe(task.getName()),
+                            safe(task.getDescription()),
+                            startTime,
+                            deadline,
+                            safe(task.getTaskGroup()),
+                            Boolean.toString(task.getStatus()),
+                            Integer.toString(task.getPriority())
+                    );
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to persist tasks to CSV", e);
+        }
     }
 
     private String safe(String value) {
         return value == null ? "" : value;
     }
 
-
-    /**
-     * Retrieves the list of tasks for a user by calling the API and deserializing the JSON array.
-     */
-    private ArrayList<Task> loadTasksFromApi(String userId) {
-        final Request request = new Request.Builder()
-                .url(String.format(API_URL_USER, userId))
-                .addHeader("Content-Type", CONTENT_TYPE_JSON)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            final JSONObject responseBody = new JSONObject(response.body().string());
-
-            if (responseBody.getInt("status_code") == 200) {
-                final JSONObject userJSONObject = responseBody.getJSONObject("user");
-                final JSONObject info = userJSONObject.getJSONObject("info");
-
-                if (!info.has("tasks")) {
-                    return new ArrayList<>();
-                }
-
-                JSONArray tasksJsonArray = info.getJSONArray("tasks");
-                ArrayList<Task> tasks = new ArrayList<>();
-                for (int i = 0; i < tasksJsonArray.length(); i++) {
-                    tasks.add(jsonToTask(tasksJsonArray.getJSONObject(i)));
-                }
-                return tasks;
-            } else {
-                // Handle API error response
-                throw new RuntimeException("API error loading tasks: " + responseBody.getString("message"));
-            }
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException("Failed to load tasks from API", ex);
-        }
-    }
-
-    /**
-     * Persists the list of tasks to the API by serializing them into a JSON array.
-     */
-    private void persistTasksToApi(String userId, List<Task> tasks) {
-        JSONArray tasksJsonArray = new JSONArray(tasks.stream().map(this::taskToJson).collect(Collectors.toList()));
-
-        final JSONObject requestBody = new JSONObject();
-        requestBody.put("username", userId);
-        requestBody.put("password", PLACEHOLDER_PASSWORD);
-
-        final JSONObject info = new JSONObject();
-        info.put("tasks", tasksJsonArray);
-
-        requestBody.put("info", info);
-        final RequestBody body = RequestBody.create(requestBody.toString(), MEDIA_TYPE_JSON);
-
-        final Request request = new Request.Builder()
-                .url(API_URL_MODIFY)
-                .method("PUT", body)
-                .addHeader("Content-Type", CONTENT_TYPE_JSON)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            final JSONObject responseBody = new JSONObject(response.body().string());
-            if (responseBody.getInt("status_code") != 200) {
-                throw new RuntimeException("API error persisting tasks: " + responseBody.getString("message"));
-            }
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException("Failed to persist tasks to API", ex);
-        }
-    }
-
+    // ========== TASK GATEWAY IMPLEMENTATION ==========
 
     @Override
     public String addTask(String userId, Task task) {
+        ArrayList<Task> tasksForUser = userTasks.computeIfAbsent(userId, key -> new ArrayList<>());
+
         try {
-            ArrayList<Task> tasks = loadTasksFromApi(userId);
-            tasks.add(task);
-            persistTasksToApi(userId, tasks);
-            return "Task Added Successfully";
-        } catch (RuntimeException e) {
+            tasksForUser.add(task);
+            persistTasksToCsv();
+        } catch (Exception e) {
             e.printStackTrace();
-            return "Error Adding Task: " + e.getMessage();
+            return "Error Adding Task";
         }
+        return "Task Added Successfully";
     }
 
     @Override
     public ArrayList<Task> fetchTasks(String userId) {
-        try {
-            return loadTasksFromApi(userId);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        ArrayList<Task> tasks = userTasks.get(userId);
+
+        if (tasks == null) {
             return new ArrayList<>();
         }
+
+        return tasks;
     }
 
     @Override
     public boolean deleteTask(String userId, Task task) {
-        try {
-            ArrayList<Task> tasks = loadTasksFromApi(userId);
-            boolean removed = tasks.remove(task);
-            if (removed) {
-                persistTasksToApi(userId, tasks);
-            }
-            return removed;
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        ArrayList<Task> tasks = userTasks.get(userId);
+        if (tasks == null) {
             return false;
         }
+
+        boolean removed = tasks.remove(task);
+        if (removed && !(tasks.contains(task))) {
+            persistTasksToCsv();
+            return removed;
+        }
+        return false;
     }
 }
