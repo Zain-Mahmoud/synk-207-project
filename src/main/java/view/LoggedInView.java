@@ -67,7 +67,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         buttons.add(syncCalendarButton); // Add sync button alongside other actions
 
         logOut.addActionListener(this);
-        
+
         viewLeaderboard.addActionListener(evt -> {
             if (evt.getSource().equals(viewLeaderboard) && viewManagerModel != null) {
                 viewManagerModel.setState("leaderboard");

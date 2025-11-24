@@ -6,6 +6,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.modify_habit.*;
 
 import java.awt.event.ActionEvent;
@@ -33,6 +34,7 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
 
     private final JButton save = new JButton("save");
     private final JButton cancel = new JButton("cancel");
+    private ViewManagerModel setViewManagerModel;
 
     public ModifyHabitView(ModifyHabitViewModel modifyHabitViewModel) {
         this.modifyHabitViewModel = modifyHabitViewModel;
@@ -303,5 +305,9 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
 
     public void setModifyHabitController(ModifyHabitController modifyHabitController) {
         this.modifyHabitController = modifyHabitController;
+    }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel){
+        this.setViewManagerModel = viewManagerModel;
     }
 }

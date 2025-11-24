@@ -51,7 +51,7 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                     .setTaskName(newTaskName)
                     .setDescription(newDescription)
                     .setDeadline(newDeadlineFormatted)
-                    .setStartTime(newStartTimeFormatted) // ADDED setStartTime
+                    .setStartTime(newStartTimeFormatted)
                     .setTaskGroup(newTaskGroup)
                     .setPriority(newPriorityFormatted)
                     .setStatus(newTaskStatus).build();

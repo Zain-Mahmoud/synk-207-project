@@ -24,6 +24,11 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.modify_habit.ModifyHabitController;
+import interface_adapter.modify_habit.ModifyHabitViewModel;
+import interface_adapter.modify_task.ModifyTaskController;
+import interface_adapter.modify_task.ModifyTaskPresenter;
+import interface_adapter.modify_task.ModifyTaskViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -37,6 +42,9 @@ import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.modify_task.ModifyTaskInputBoundary;
+import use_case.modify_task.ModifyTaskInteractor;
+import use_case.modify_task.ModifyTaskOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -47,11 +55,7 @@ import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardUserDataAccessInterface;
-import view.LeaderboardView;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.ViewManager;
+import view.*;
 
 
 public class AppBuilder {
@@ -64,9 +68,8 @@ public class AppBuilder {
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    final TaskDataAccessObject taskHabitDataAccessObject;
     final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
-//    final TaskHabitDataAccessObject taskHabitDataAccessObject;
+    final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
     final ViewLeaderboardUserDataAccessInterface viewLeaderboardUserDataAccessInterface;
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
 
@@ -80,14 +83,17 @@ public class AppBuilder {
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
     private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //View model carrying sync status updates
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private ModifyTaskViewModel modifyTaskViewModel;
+    private ModifyTaskView modifyTaskView;
+    private ModifyTaskController modifyTaskController;
+    private ModifyHabitView modifyHabitView;
+    private ModifyHabitController modifyHabitController;
+    private ModifyHabitViewModel modifyHabitViewModel;
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
-//        Path habitsPath = Paths.get("habits.csv");
-//        taskHabitDataAccessObject = new TaskHabitDataAccessObject(habitsPath);
         calendarGateway = new GoogleCalendarDataAccessObject(); // Initialize Google Calendar gateway implementation
         viewLeaderboardUserDataAccessInterface = null;
-        taskHabitDataAccessObject = new TaskDataAccessObject();
     }
 
     public AppBuilder addSignupView() {
@@ -117,6 +123,21 @@ public class AppBuilder {
         leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
         leaderboardView.setViewManagerModel(viewManagerModel);
         cardPanel.add(leaderboardView, leaderboardView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyTaskView() {
+        modifyTaskViewModel = new ModifyTaskViewModel();
+        modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
+        modifyTaskView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyHabitView(){
+        modifyHabitViewModel = new ModifyHabitViewModel();
+        modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
+        modifyHabitView.setViewManagerModel(viewManagerModel);
         return this;
     }
 
@@ -159,7 +180,6 @@ public class AppBuilder {
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
                 viewLeaderboardUserDataAccessInterface, viewLeaderboardOutputBoundary);
 
-        // habitDataAccessObject, viewLeaderboardOutputBoundary);
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
@@ -173,10 +193,25 @@ public class AppBuilder {
         SyncToGoogleCalendarOutputBoundary syncOutputBoundary =
                 new SyncToGoogleCalendarPresenter(syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
         SyncToGoogleCalendarInputBoundary syncInteractor =
-                new SyncToGoogleCalendarInteractor(taskHabitDataAccessObject, calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
+                new SyncToGoogleCalendarInteractor(taskDataAccessObject, calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
         syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by logged-in view
         loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into logged-in view
         loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI updates
+        return this;
+    }
+
+    public AppBuilder addModifyTaskUseCase() {
+        final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel,
+                modifyTaskViewModel, loginViewModel);
+        final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
+                taskDataAccessObject);
+
+        modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
+        modifyTaskView.setModifyTaskController(modifyTaskController);
+        return this;
+    }
+
+    public AppBuilder addModifyHabitUseCase(){
         return this;
     }
 

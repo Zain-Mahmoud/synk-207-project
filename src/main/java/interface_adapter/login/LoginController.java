@@ -26,7 +26,4 @@ public class LoginController {
         loginUseCaseInteractor.execute(loginInputData);
     }
 
-    public void switchToSignupView(){
-        loginUseCaseInteractor.switchToSignupView();
-    }
 }

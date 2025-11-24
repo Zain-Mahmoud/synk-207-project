@@ -9,6 +9,7 @@ public class TaskBuilder {
     private boolean status = false;
     private int priority = 0;
     private String description;
+    private LocalDateTime startTime;
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
@@ -40,12 +41,15 @@ public class TaskBuilder {
         return this;
     }
 
+    public TaskBuilder setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
     public Task build() {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalStateException("taskName must not be null or empty");
         }
-        return new Task(taskName, deadline, taskGroup, status, priority, description);
+        return new Task(taskName, deadline, taskGroup, status, priority, description, startTime);
     }
-
-
 }
