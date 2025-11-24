@@ -1,9 +1,5 @@
 package data_access;
 
-import entities.Habit;
-import entities.HabitBuilder;
-import use_case.gateways.HabitGateway;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,13 +11,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import entities.Habit;
+import entities.HabitBuilder;
+import use_case.gateways.HabitGateway;
+import use_case.view_leaderboard.ViewLeaderboardUserDataAccessInterface;
 
 /**
  * Persistence layer for Habits backed by a CSV file.
  * Implements Create, Update, Remove, Read (Fetch) operations for habits.
  */
-public class HabitDataAccessObject implements HabitGateway {
+public class HabitDataAccessObject implements HabitGateway, ViewLeaderboardUserDataAccessInterface {
 
     private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -188,5 +190,30 @@ public class HabitDataAccessObject implements HabitGateway {
             return removed;
         }
         return false;
+    }
+
+    // ========== VIEW LEADERBOARD DATA ACCESS INTERFACE METHODS ==========
+
+    @Override
+    public List<String> getAllUsernames() {
+        return new ArrayList<>(userHabits.keySet());
+    }
+
+    @Override
+    public List<Habit> getHabitsForUser(String username) {
+        ArrayList<Habit> habits = userHabits.get(username);
+        if (habits == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(habits);
+    }
+
+    @Override
+    public Map<String, List<Habit>> getAllUsersWithHabits() {
+        Map<String, List<Habit>> result = new HashMap<>();
+        for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
+            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return result;
     }
 }
