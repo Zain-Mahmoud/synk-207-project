@@ -33,11 +33,7 @@ public class InMemoryUserDataAccessObject implements UserGateway {
 
     @Override
     public void updateUser(String oldUserID, User newUser) {
-        for (User user : users.values()){
-            if (user.getName().equals(oldUserID)){
-                users.replace(oldUserID, newUser);
-            }
-        }
+        users.replace(oldUserID, newUser);
     }
 
     @Override
