@@ -7,7 +7,7 @@ public interface UserGateway {
 
     User getUserById(String userId);
 
-    boolean updateUser(User user);
+    boolean updateUser(String oldUserID, User user);
 
     boolean deleteUser(String userId);
 }
