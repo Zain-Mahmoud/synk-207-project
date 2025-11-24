@@ -17,13 +17,12 @@ import java.util.Map;
 import entities.Habit;
 import entities.HabitBuilder;
 import use_case.gateways.HabitGateway;
-import use_case.view_leaderboard.ViewLeaderboardUserDataAccessInterface;
 
 /**
  * Persistence layer for Habits backed by a CSV file.
  * Implements Create, Update, Remove, Read (Fetch) operations for habits.
  */
-public class HabitDataAccessObject implements HabitGateway, ViewLeaderboardUserDataAccessInterface {
+public class HabitDataAccessObject implements HabitGateway {
 
     private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -192,7 +191,7 @@ public class HabitDataAccessObject implements HabitGateway, ViewLeaderboardUserD
         return false;
     }
 
-    // ========== VIEW LEADERBOARD DATA ACCESS INTERFACE METHODS ==========
+
 
     @Override
     public List<String> getAllUsernames() {
