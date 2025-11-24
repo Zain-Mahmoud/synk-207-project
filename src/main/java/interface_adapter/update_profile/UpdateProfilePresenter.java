@@ -1,13 +1,15 @@
 package interface_adapter.update_profile;
 
 import interface_adapter.ViewManagerModel;
+import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.change_password.ChangePasswordOutputData;
 import use_case.update_profile.UpdateProfileOutputBoundary;
 import use_case.update_profile.UpdateProfileOutputData;
 
 /**
  * The Presenter for the Update Profile Use Case.
  */
-public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
+public class UpdateProfilePresenter implements UpdateProfileOutputBoundary, ChangePasswordOutputBoundary {
 
     private final ViewManagerModel viewManagerModel;
     private final UpdateProfileViewModel updateProfileViewModel;
@@ -32,6 +34,12 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
 
         updateProfileViewModel.setState(state);
         updateProfileViewModel.firePropertyChanged();
+    }
+
+    @Override
+    public void prepareSuccessView(ChangePasswordOutputData outputData) {
+        // TODO update the viewmodel!
+        updateProfileViewModel.firePropertyChanged("password");
     }
 
     @Override
