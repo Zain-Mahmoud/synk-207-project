@@ -27,6 +27,10 @@ public interface CalendarGateway {
 
     List<Event> getEvents(String userID);
 
+    boolean hasStoredCredential(String userId); //  expose way to see if OAuth credential already exists
+
+    void authenticateUser(String userId); // trigger OAuth flow to create credential when missing
+
 //    String getCalendarByUsername(String username);
 
 //    String getCalendarByEmail(String email);

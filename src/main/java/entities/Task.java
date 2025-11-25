@@ -76,6 +76,22 @@ public class Task implements Completable {
         return description;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public String getTitle() {
+        return this.taskName;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Object getDueDate() {
+        return this.deadline;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }

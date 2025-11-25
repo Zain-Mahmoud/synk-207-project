@@ -46,6 +46,22 @@ public class Habit implements Completable {
         return this.description;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public String getTitle() {
+        return "";
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Object getDueDate() {
+        return null;
+    }
+
 
     public void incrementStreak() { this.streakCount++; }
 

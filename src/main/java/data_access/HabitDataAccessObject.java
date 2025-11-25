@@ -1,194 +1,218 @@
 package data_access;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import entities.Habit;
 import entities.HabitBuilder;
 import use_case.gateways.HabitGateway;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 /**
- * Persistence layer for Habits backed by the API.
+ * Persistence layer for Habits backed by a CSV file.
  * Implements Create, Update, Remove, Read (Fetch) operations for habits.
  */
 public class HabitDataAccessObject implements HabitGateway {
 
+    private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    private static final String PLACEHOLDER_PASSWORD = "password"; // ASSUMPTION for API authentication
-    private static final String API_URL_USER = "http://vm003.teach.cs.toronto.edu:20112/user?username=%s";
-    private static final String API_URL_MODIFY = "http://vm003.teach.cs.toronto.edu:20112/modifyUserInfo";
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse(CONTENT_TYPE_JSON);
-    private static final OkHttpClient client = new OkHttpClient().newBuilder().build();
 
+    private final File habitCsvFile;
+    private final Map<String, ArrayList<Habit>> userHabits = new HashMap<>();
 
     public HabitDataAccessObject() {
-        // No local file initialization needed anymore
+        this(Path.of("habits.csv"));
     }
 
-
-
-    private JSONObject habitToJson(Habit habit) {
-        JSONObject json = new JSONObject();
-        json.put("habitName", safe(habit.getName()));
-        json.put("description", safe(habit.getDescription()));
-        json.put("startDateTime", habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime()));
-        json.put("frequency", habit.getFrequency() == null ? "" : DATE_FORMATTER.format(habit.getFrequency()));
-        json.put("habitGroup", safe(habit.getHabitGroup()));
-        json.put("streakCount", habit.getStreakCount());
-        json.put("priority", habit.getPriority());
-        json.put("status", habit.getStatus());
-        return json;
+    public HabitDataAccessObject(Path habitCsvPath) {
+        this.habitCsvFile = habitCsvPath.toFile();
+        initializeFileIfNeeded(habitCsvFile, HABIT_HEADER);
+        loadHabitsFromCsv();
     }
 
-    private Habit jsonToHabit(JSONObject json) {
-        String habitName = json.getString("habitName");
-        String description = json.getString("description");
-        String startDateTimeRaw = json.getString("startDateTime");
-        String frequencyRaw = json.getString("frequency");
-        String habitGroup = json.getString("habitGroup");
-        int streakCount = json.getInt("streakCount");
-        int priority = json.getInt("priority");
-        boolean status = json.getBoolean("status");
+    private void initializeFileIfNeeded(File csvFile, String header) {
+        if (csvFile.exists()) {
+            return;
+        }
+        try {
+            if (csvFile.getParentFile() != null) {
+                csvFile.getParentFile().mkdirs();
+            }
+            if (csvFile.createNewFile()) {
+                writeHeader(csvFile, header);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to initialize CSV file: " + csvFile.getName(), e);
+        }
+    }
 
-        LocalDateTime startDateTime = startDateTimeRaw.isBlank() ? null : LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
-        LocalDateTime frequency = frequencyRaw.isBlank() ? null : LocalDateTime.parse(frequencyRaw, DATE_FORMATTER);
+    private void writeHeader(File csvFile, String header) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            writer.write(header);
+            writer.newLine();
+        }
+    }
 
-        HabitBuilder builder = new HabitBuilder()
-                .setHabitName(habitName)
-                .setStartDateTime(startDateTime)
-                .setFrequency(frequency)
-                .setHabitGroup(habitGroup)
-                .setStreakCount(streakCount)
-                .setPriority(priority)
-                .setStatus(status);
-        builder.build().setDescription(description);
-        return builder.build();
+    // ========== HABIT PERSISTENCE METHODS ==========
+
+    private void loadHabitsFromCsv() {
+        userHabits.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(habitCsvFile))) {
+            final String headerLine = reader.readLine();
+            if (headerLine == null) {
+                writeHeader(habitCsvFile, HABIT_HEADER);
+                return;
+            }
+            if (!HABIT_HEADER.equals(headerLine)) {
+                throw new IllegalStateException("Unexpected header in habits CSV");
+            }
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                final String[] columns = line.split(",", -1);
+                if (columns.length < 8) {
+                    continue;
+                }
+                final String username = columns[0];
+                final String habitName = columns[1];
+                final int streakCount = columns[2].isBlank() ? 0 : Integer.parseInt(columns[2]);
+                final String startDateTimeRaw = columns[3];
+                final String frequencyRaw = columns[4];
+                final String habitGroup = columns[5];
+                final int priority = columns[6].isBlank() ? 0 : Integer.parseInt(columns[6]);
+                final boolean status = Boolean.parseBoolean(columns[7]);
+
+                LocalDateTime startDateTime = null;
+                if (!startDateTimeRaw.isBlank()) {
+                    startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
+                }
+                LocalDateTime frequency = null;
+                if (!frequencyRaw.isBlank()) {
+                    frequency = LocalDateTime.parse(frequencyRaw, DATE_FORMATTER);
+                }
+
+                Habit habit = new HabitBuilder()
+                        .setHabitName(habitName)
+                        .setStartDateTime(startDateTime)
+                        .setFrequency(frequency)
+                        .setHabitGroup(habitGroup)
+                        .setStreakCount(streakCount)
+                        .setPriority(priority)
+                        .setStatus(status)
+                        .build();
+
+                userHabits.computeIfAbsent(username, key -> new ArrayList<>()).add(habit);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load habits from CSV", e);
+        }
+    }
+
+    private void persistHabitsToCsv() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(habitCsvFile))) {
+            writer.write(HABIT_HEADER);
+            writer.newLine();
+            for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
+                final String username = entry.getKey();
+                for (Habit habit : entry.getValue()) {
+                    final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
+                    final String frequency = habit.getFrequency() == null ? "" : DATE_FORMATTER.format(habit.getFrequency());
+                    final String line = String.join(",",
+                            username,
+                            safe(habit.getName()),
+                            Integer.toString(habit.getStreakCount()),
+                            startDateTime,
+                            frequency,
+                            safe(habit.getHabitGroup()),
+                            Integer.toString(habit.getPriority()),
+                            Boolean.toString(habit.getStatus())
+                    );
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to persist habits to CSV", e);
+        }
     }
 
     private String safe(String value) {
         return value == null ? "" : value;
     }
 
+    // ========== HABIT GATEWAY METHODS (Stand-in) ==========
 
-
-    /**
-     * Retrieves the list of habits for a user by calling the API and deserializing the JSON array.
-     */
-    private ArrayList<Habit> loadHabitsFromApi(String userId) {
-        final Request request = new Request.Builder()
-                .url(String.format(API_URL_USER, userId))
-                .addHeader("Content-Type", CONTENT_TYPE_JSON)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            final JSONObject responseBody = new JSONObject(response.body().string());
-
-            if (responseBody.getInt("status_code") == 200) {
-                final JSONObject userJSONObject = responseBody.getJSONObject("user");
-                final JSONObject info = userJSONObject.getJSONObject("info");
-
-                if (!info.has("habits")) {
-                    return new ArrayList<>();
-                }
-
-                JSONArray habitsJsonArray = info.getJSONArray("habits");
-                ArrayList<Habit> habits = new ArrayList<>();
-                for (int i = 0; i < habitsJsonArray.length(); i++) {
-                    habits.add(jsonToHabit(habitsJsonArray.getJSONObject(i)));
-                }
-                return habits;
-            } else {
-                throw new RuntimeException("API error loading habits: " + responseBody.getString("message"));
-            }
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException("Failed to load habits from API", ex);
-        }
-    }
-
-    /**
-     * Persists the list of habits to the API by serializing them into a JSON array.
-     */
-    private void persistHabitsToApi(String userId, List<Habit> habits) {
-        JSONArray habitsJsonArray = new JSONArray(habits.stream().map(this::habitToJson).collect(Collectors.toList()));
-
-        final JSONObject requestBody = new JSONObject();
-        requestBody.put("username", userId);
-        requestBody.put("password", PLACEHOLDER_PASSWORD);
-
-        final JSONObject info = new JSONObject();
-        info.put("habits", habitsJsonArray);
-
-        requestBody.put("info", info);
-        final RequestBody body = RequestBody.create(requestBody.toString(), MEDIA_TYPE_JSON);
-
-        final Request request = new Request.Builder()
-                .url(API_URL_MODIFY)
-                .method("PUT", body)
-                .addHeader("Content-Type", CONTENT_TYPE_JSON)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            final JSONObject responseBody = new JSONObject(response.body().string());
-            if (responseBody.getInt("status_code") != 200) {
-                throw new RuntimeException("API error persisting habits: " + responseBody.getString("message"));
-            }
-        } catch (IOException | JSONException ex) {
-            throw new RuntimeException("Failed to persist habits to API", ex);
-        }
-    }
-
-
-
-    @Override
     public String addHabit(String userId, Habit habit) {
+        ArrayList<Habit> habitsForUser = userHabits.computeIfAbsent(userId, key -> new ArrayList<>());
+
         try {
-            ArrayList<Habit> habits = loadHabitsFromApi(userId);
-            habits.add(habit);
-            persistHabitsToApi(userId, habits);
-            return "Habit Added Successfully";
-        } catch (RuntimeException e) {
+            habitsForUser.add(habit);
+            persistHabitsToCsv();
+        } catch (Exception e) {
             e.printStackTrace();
-            return "Error Adding Habit: " + e.getMessage();
+            return "Error Adding Habit";
         }
+        return "Habit Added Successfully";
     }
 
-    @Override
     public ArrayList<Habit> fetchHabits(String userId) {
-        try {
-            return loadHabitsFromApi(userId);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        ArrayList<Habit> habits = userHabits.get(userId);
+
+        if (habits == null) {
             return new ArrayList<>();
         }
+
+        return habits;
+    }
+
+    public boolean deleteHabit(String userId, Habit habit) {
+        ArrayList<Habit> habits = userHabits.get(userId);
+        if (habits == null) {
+            return false;
+        }
+
+        boolean removed = habits.remove(habit);
+        if (removed && !habits.contains(habit)) {
+            persistHabitsToCsv();
+            return removed;
+        }
+        return false;
+    }
+
+
+
+    @Override
+    public List<String> getAllUsernames() {
+        return new ArrayList<>(userHabits.keySet());
     }
 
     @Override
-    public boolean deleteHabit(String userId, Habit habit) {
-        try {
-            ArrayList<Habit> habits = loadHabitsFromApi(userId);
-            boolean removed = habits.remove(habit);
-            if (removed) {
-                persistHabitsToApi(userId, habits);
-            }
-            return removed;
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return false;
+    public List<Habit> getHabitsForUser(String username) {
+        ArrayList<Habit> habits = userHabits.get(username);
+        if (habits == null) {
+            return new ArrayList<>();
         }
+        return new ArrayList<>(habits);
+    }
+
+    @Override
+    public Map<String, List<Habit>> getAllUsersWithHabits() {
+        Map<String, List<Habit>> result = new HashMap<>();
+        for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
+            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package use_case.view_leaderboard;
 
 import entities.Habit;
+import use_case.gateways.HabitGateway;
 
 import java.util.*;
 
@@ -9,10 +10,10 @@ import java.util.*;
  * Calculates each user's maximum streak count and sorts them for display.
  */
 public class ViewLeaderboardInteractor implements ViewLeaderboardInputBoundary {
-    private final ViewLeaderboardUserDataAccessInterface userDataAccess;
+    private final HabitGateway userDataAccess;
     private final ViewLeaderboardOutputBoundary presenter;
 
-    public ViewLeaderboardInteractor(ViewLeaderboardUserDataAccessInterface userDataAccess,
+    public ViewLeaderboardInteractor(HabitGateway userDataAccess,
                                      ViewLeaderboardOutputBoundary presenter) {
         this.userDataAccess = userDataAccess;
         this.presenter = presenter;
