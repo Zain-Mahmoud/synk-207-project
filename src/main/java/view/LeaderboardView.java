@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardController;
 import interface_adapter.leaderboard.ViewLeaderboardState;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
@@ -22,11 +23,13 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     private final String viewName = "leaderboard";
     private final ViewLeaderboardViewModel viewLeaderboardViewModel;
     private ViewLeaderboardController viewLeaderboardController;
+    private ViewManagerModel viewManagerModel;
 
     private final JLabel title = new JLabel(ViewLeaderboardViewModel.TITLE_LABEL);
     private final JTable leaderboardTable;
     private final DefaultTableModel tableModel;
     private final JButton refreshButton;
+    private final JButton backButton;
     private final JLabel errorLabel = new JLabel();
 
     public LeaderboardView(ViewLeaderboardViewModel viewLeaderboardViewModel) {
@@ -57,6 +60,14 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         refreshButton = new JButton(ViewLeaderboardViewModel.REFRESH_BUTTON_LABEL);
         refreshButton.addActionListener(this);
 
+        backButton = new JButton("Back");
+        backButton.addActionListener(evt -> {
+            if (evt.getSource().equals(backButton) && viewManagerModel != null) {
+                viewManagerModel.setState("logged in");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
         errorLabel.setForeground(Color.RED);
         errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -66,7 +77,11 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         this.add(Box.createRigidArea(new Dimension(0, 10)));
         this.add(scrollPane);
         this.add(Box.createRigidArea(new Dimension(0, 10)));
-        this.add(refreshButton);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(refreshButton);
+        buttonPanel.add(backButton);
+        this.add(buttonPanel);
         this.add(errorLabel);
     }
 
@@ -119,6 +134,10 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         if (controller != null) {
             controller.execute();
         }
+    }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
     }
 }
 

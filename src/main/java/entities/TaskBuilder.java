@@ -4,12 +4,11 @@ import java.time.LocalDateTime;
 
 public class TaskBuilder {
     private String taskName;
-    private String description;
     private LocalDateTime deadline;
     private String taskGroup;
-    private boolean status;
-    private int priority; //May use different data object.
-    private LocalDateTime startTime;
+    private boolean status = false;
+    private int priority = 0;
+    private String description;
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
@@ -48,10 +47,5 @@ public class TaskBuilder {
         return new Task(taskName, deadline, taskGroup, status, priority, description);
     }
 
-
-    public TaskBuilder setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-        return this;
-    }
 
 }
