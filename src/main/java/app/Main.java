@@ -12,11 +12,13 @@ public class Main {
                 .addSignupView()
                 .addLoggedInView()
                 .addLeaderboardView()
+                .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
                 .addSyncToGoogleCalendarUseCase()
+                .addViewStatsUseCase()
                 .build();
 
         application.pack();

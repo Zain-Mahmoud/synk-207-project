@@ -7,6 +7,7 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarControllerState;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
+import interface_adapter.view_stats.ViewStatsController;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -29,13 +30,15 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private ViewManagerModel viewManagerModel;
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Injected controller to kick off calendar sync
     private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //  View model providing sync result updates
-
+    private ViewStatsController viewStatsController;
     private final JLabel username;
 
     private final JButton logOut;
     private final JButton viewLeaderboard;
     private final JButton syncCalendarButton; //  Button to sync tasks to Google Calendar
     private final JLabel syncStatusLabel = new JLabel(); //  Inline status label for sync results
+
+    private final JButton viewStats;
 
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
@@ -66,11 +69,22 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         syncCalendarButton = new JButton("Sync to Google Calendar"); //  Create sync trigger button
         buttons.add(syncCalendarButton); // Add sync button alongside other actions
 
+        viewStats = new JButton("View statistics");
+        buttons.add(viewStats);
+
         logOut.addActionListener(this);
         
         viewLeaderboard.addActionListener(evt -> {
             if (evt.getSource().equals(viewLeaderboard) && viewManagerModel != null) {
                 viewManagerModel.setState("leaderboard");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
+        viewStats.addActionListener(evt -> {
+            if (evt.getSource().equals(viewStats) && viewManagerModel != null){
+                viewStatsController.execute();
+                viewManagerModel.setState("view stats");
                 viewManagerModel.firePropertyChanged();
             }
         });
@@ -182,5 +196,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     public void setSyncToGoogleCalendarViewModel(SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel) { //  Subscribe to sync view model updates
         this.syncToGoogleCalendarViewModel = syncToGoogleCalendarViewModel; //  Capture sync view model reference
         this.syncToGoogleCalendarViewModel.addPropertyChangeListener(this); // Listen for sync result changes
+    }
+
+    public void setViewStatsController(ViewStatsController viewStatsController){
+        this.viewStatsController = viewStatsController;
     }
 }
