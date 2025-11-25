@@ -29,7 +29,7 @@ gradle/wrapper/gradle-wrapper.properties
 # Gradle build output
 /.gradle/
 /build/
-src/main/java/resources/credentials.json
+src/main/resources/credentials.json
 /Blueprint Assignment  For Task_Habit Tracker.pdf
 /src/main/resources/credentials.json
 /gradle/wrapper/gradle-wrapper.jar
@@ -49,3 +49,7 @@ credentials.json
 .credentials.json
 /.vscode/settings.json
 misc.xml
+tokens
+StoredCredential
+habits.csv
+users.csv

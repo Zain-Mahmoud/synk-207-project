@@ -8,4 +8,8 @@ public interface Completable {
     String getName();
 
     String getDescription();
+
+    String getTitle();
+
+    Object getDueDate();
 }

@@ -4,24 +4,33 @@ import interface_adapter.ViewManagerModel;
 import use_case.delete_task.DeleteTaskOutputBoundary;
 import use_case.delete_task.DeleteTaskOutputData;
 
-public class DeleteTaskPresenter implements DeleteTaskOutputBoundary{
+public class DeleteTaskPresenter implements DeleteTaskOutputBoundary {
     private final DeleteTaskViewModel deleteTaskViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public DeleteTaskPresenter(DeleteTaskViewModel deleteTaskViewModel, ViewManagerModel viewManagerModel) {
+    public DeleteTaskPresenter(DeleteTaskViewModel deleteTaskViewModel,
+                               ViewManagerModel viewManagerModel) {
         this.deleteTaskViewModel = deleteTaskViewModel;
         this.viewManagerModel = viewManagerModel;
     }
 
-
     @Override
     public void prepareSuccessView(DeleteTaskOutputData outputData) {
         final DeleteTaskState deleteTaskState = deleteTaskViewModel.getState();
-        deleteTaskState.setSuccessMessage( "Task '" + outputData.getTaskName() + "' deleted successfully!");
+
+        deleteTaskState.setUsername(outputData.getUsername());
+        deleteTaskState.setTaskName(outputData.getTaskName());
+
+        deleteTaskState.setSuccessMessage(
+                "Task '" + outputData.getTaskName()
+                        + "' deleted successfully for user '" + outputData.getUsername() + "'."
+        );
         deleteTaskState.setErrorMessage(null);
+
         deleteTaskViewModel.setState(deleteTaskState);
         deleteTaskViewModel.firePropertyChanged();
     }
+
 
     @Override
     public void prepareFailView(String errorMessage) {

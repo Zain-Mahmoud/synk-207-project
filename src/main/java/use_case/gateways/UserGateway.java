@@ -3,11 +3,11 @@ package use_case.gateways;
 import entities.User;
 
 public interface UserGateway {
-    boolean createUser(User user);
+    void createUser(User user);
 
     User getUserById(String userId);
 
-    boolean updateUser(User user);
+    void updateUser(String oldUserID, User user);
 
-    boolean deleteUser(String userId);
+    void deleteUser(String userId);
 }

@@ -11,10 +11,9 @@ public class CreateTaskController {
         this.interactor = interactor;
     }
 
-    public void excute(String username, String taskName, LocalDateTime deadline, String group, boolean status, int priority) {
-        final CreateTaskInputData createTaskInputData = new CreateTaskInputData(
-                username, taskName, deadline, group, status, priority);
+    public void execute(String username, String taskName, String description, LocalDateTime deadline, String group, boolean status, int priority) {
+        final CreateTaskInputData createTaskInputData = new CreateTaskInputData(username, taskName, description, deadline, group, status, priority);
 
-        interactor.execute(new CreateTaskInputData(username, taskName, deadline, group, status, priority));
+        interactor.execute(createTaskInputData);
     }
 }

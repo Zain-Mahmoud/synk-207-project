@@ -20,11 +20,14 @@ public class CreateTaskPresenter implements CreateTaskOutputBoundary  {
     @Override
     public void prepareSuccessView(CreateTaskOutputData outputData) {
         final CreateTaskState createTaskState = createTaskViewModel.getState();
+        createTaskState.setUsername("");
         createTaskState.setTaskName("");
+        createTaskState.setDescription("");
+        createTaskState.setDeadline(null);
         createTaskState.setTaskGroup("");
         createTaskState.setPriority(0);
         createTaskState.setErrorMessage(null);
-        createTaskState.setSuccessMessage("Task '" + outputData.getTaskName() + "' created successfully!");
+        createTaskState.setSuccessMessage("Task '" + outputData.getTaskName() + "' created successfully for user '" + outputData.getUsername() + "'!");
 
         createTaskViewModel.setState(createTaskState);
         createTaskViewModel.firePropertyChanged();
