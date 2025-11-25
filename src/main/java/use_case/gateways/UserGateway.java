@@ -1,5 +1,13 @@
 package use_case.gateways;
 
-public interface UserGateway {
+import entities.User;
 
+public interface UserGateway {
+    void createUser(User user);
+
+    User getUserById(String userId);
+
+    void updateUser(String oldUserID, User user);
+
+    void deleteUser(String userId);
 }

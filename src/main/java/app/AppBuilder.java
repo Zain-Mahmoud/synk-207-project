@@ -2,13 +2,16 @@ package app;
 
 import java.awt.CardLayout;
 import java.io.IOException;
+import java.security.GeneralSecurityException; // Type Safety
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
-import data_access.TaskHabitDataAccessObject;
+import data_access.GoogleCalendarDataAccessObject;
+import data_access.HabitDataAccessObject;
+import data_access.TaskDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardController;
@@ -29,6 +32,7 @@ import interface_adapter.update_profile.UpdateProfileViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
+import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -43,6 +47,7 @@ import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
 import view.*;
 
+
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -53,7 +58,9 @@ public class AppBuilder {
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-    final TaskHabitDataAccessObject taskHabitDataAccessObject;
+    final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
+    final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
+    private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -67,9 +74,9 @@ public class AppBuilder {
     private UpdateProfileView updateProfileView;
 
 
-    public AppBuilder() throws IOException {
+    public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
-        taskHabitDataAccessObject = new TaskHabitDataAccessObject("habits.csv");
+        calendarGateway = new GoogleCalendarDataAccessObject(); // Initialize Google Calendar gateway implementation
     }
 
     public AppBuilder addSignupView() {
@@ -97,6 +104,7 @@ public class AppBuilder {
     public AppBuilder addLeaderboardView() {
         viewLeaderboardViewModel = new ViewLeaderboardViewModel();
         leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
+        leaderboardView.setViewManagerModel(viewManagerModel);
         cardPanel.add(leaderboardView, leaderboardView.getViewName());
         return this;
     }
@@ -145,7 +153,7 @@ public class AppBuilder {
     public AppBuilder addViewLeaderboardUseCase() {
         final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(viewLeaderboardViewModel);
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
-                taskHabitDataAccessObject, viewLeaderboardOutputBoundary);
+                habitDataAccessObject, viewLeaderboardOutputBoundary);
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
