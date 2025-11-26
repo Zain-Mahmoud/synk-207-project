@@ -7,7 +7,8 @@ public class ViewStatsOutputData {
     private final int totalTasks;
     private final int totalHabits;
 
-    public ViewStatsOutputData(int longestHabitStreak, int numTasksCompleted, int numHabitsCompleted, int totalTasks, int totalHabits) {
+    public ViewStatsOutputData(int longestHabitStreak, int numTasksCompleted, int numHabitsCompleted, int totalTasks,
+                               int totalHabits) {
         this.longestHabitStreak = longestHabitStreak;
         this.numTasksCompleted = numTasksCompleted;
         this.numHabitsCompleted = numHabitsCompleted;

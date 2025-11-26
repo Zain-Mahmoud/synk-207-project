@@ -7,7 +7,6 @@ public class ViewStatsState {
     private int totalTasks;
     private int totalHabits;
 
-
     public int getLongestHabitStreak() {
         return longestHabitStreak;
     }

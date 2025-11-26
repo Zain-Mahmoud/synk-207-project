@@ -1,7 +1,6 @@
 package interface_adapter.view_stats;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.leaderboard.ViewLeaderboardState;
 import use_case.view_stats.ViewStatsOutputBoundary;
 import use_case.view_stats.ViewStatsOutputData;
 
@@ -14,14 +13,18 @@ public class ViewStatsPresenter implements ViewStatsOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
-    public void prepareSuccessView(ViewStatsOutputData outputData){
+    /**
+     * Prepares success view.
+     * @param outputData output data to present
+     */
+    public void prepareSuccessView(ViewStatsOutputData outputData) {
         final int longestHabitStreak = outputData.getLongestHabitStreak();
         final int numTasksCompleted = outputData.getNumTasksCompleted();
         final int numHabitsCompleted = outputData.getNumHabitsCompleted();
         final int totalTasks = outputData.getTotalTasks();
         final int totalHabits = outputData.getTotalHabits();
 
-        ViewStatsState viewStatsState = viewStatsViewModel.getState();
+        final ViewStatsState viewStatsState = viewStatsViewModel.getState();
         viewStatsState.setLongestHabitStreak(longestHabitStreak);
         viewStatsState.setNumHabitsCompleted(numHabitsCompleted);
         viewStatsState.setNumTasksCompleted(numTasksCompleted);
@@ -32,7 +35,10 @@ public class ViewStatsPresenter implements ViewStatsOutputBoundary {
         viewStatsViewModel.firePropertyChanged();
     }
 
-    public void switchToTaskList(){
+    /**
+     * Switches to task list.
+     */
+    public void switchToTaskList() {
         viewManagerModel.setState("logged in");
     }
 }

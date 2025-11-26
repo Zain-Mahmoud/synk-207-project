@@ -7,19 +7,26 @@ import use_case.view_stats.ViewStatsInputData;
 public class ViewStatsController {
     private final ViewStatsInputBoundary viewStatsInteractor;
     private final LoggedInViewModel loggedInViewModel;
+
     public ViewStatsController(ViewStatsInputBoundary viewStatsInteractor, LoggedInViewModel loggedInViewModel) {
         this.viewStatsInteractor = viewStatsInteractor;
         this.loggedInViewModel = loggedInViewModel;
     }
 
-    public void execute(){
-        String userID = loggedInViewModel.getState().getUsername();
-        ViewStatsInputData inputData = new ViewStatsInputData(userID);
+    /**
+     * Executes the use case.
+     */
+    public void execute() {
+        final String userID = loggedInViewModel.getState().getUsername();
+        final ViewStatsInputData inputData = new ViewStatsInputData(userID);
 
         this.viewStatsInteractor.execute(inputData);
     }
 
-    public void switchToTaskView(){
+    /**
+     * Switches to task view.
+     */
+    public void switchToTaskView() {
         viewStatsInteractor.switchToTaskView();
     }
 }
