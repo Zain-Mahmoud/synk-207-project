@@ -69,9 +69,7 @@ public class Task implements Completable {
                 '}';
     }
 
-    // ========= GETTERS ======== if Private
-
-
+    @Override
     public String getDescription() {
         return description;
     }
@@ -80,15 +78,7 @@ public class Task implements Completable {
      * @return
      */
     @Override
-    public String getTitle() {
-        return this.taskName;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public Object getDueDate() {
+    public LocalDateTime getDueDate() {
         return this.deadline;
     }
 

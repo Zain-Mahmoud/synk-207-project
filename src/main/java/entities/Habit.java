@@ -50,16 +50,8 @@ public class Habit implements Completable {
      * @return
      */
     @Override
-    public String getTitle() {
-        return "";
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public Object getDueDate() {
-        return null;
+    public LocalDateTime getDueDate() {
+        return this.getDueDate();
     }
 
 
