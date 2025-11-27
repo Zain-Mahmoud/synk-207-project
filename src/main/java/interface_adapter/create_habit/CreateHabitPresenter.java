@@ -12,8 +12,8 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
     private final ViewManagerModel viewManagerModel;
 
     public CreateHabitPresenter(CreateHabitViewModel createHabitViewModel,
-                                LoggedInViewModel loggedInViewModel,
-                                ViewManagerModel viewManagerModel) {
+            LoggedInViewModel loggedInViewModel,
+            ViewManagerModel viewManagerModel) {
         this.createHabitViewModel = createHabitViewModel;
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
@@ -33,13 +33,12 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
 
         state.setErrorMessage(null);
         state.setSuccessMessage(
-                "Habit '" + outputData.getHabitName() + "' created successfully!"
-        );
+                "Habit '" + outputData.getHabitName() + "' created successfully!");
 
         createHabitViewModel.setState(state);
         createHabitViewModel.firePropertyChanged();
 
-        // 如果你希望创建成功后切回 LoggedIn 页面，可以取消注释：
+        // If you want to switch back to LoggedIn page after success, uncomment:
         // viewManagerModel.setActiveView(loggedInViewModel.getViewName());
         // viewManagerModel.firePropertyChanged();
     }

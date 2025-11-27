@@ -13,18 +13,19 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * Create Habit 的 Swing View。
- * 频率 frequency 以一个 LocalDateTime 字符串输入，不再使用 count/unit。
+ * Swing View for Create Habit.
+ * Frequency is input as a LocalDateTime string, no longer using count/unit.
  */
 public class CreateHabitView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final CreateHabitController controller;
     private final CreateHabitViewModel viewModel;
 
-    // 这里直接保存当前用户名，由外部在构造时传入（你也可以改成从 LoggedInViewModel 读）
+    // Save current username directly, passed externally during construction (can be
+    // changed to read from LoggedInViewModel)
     private final String username;
 
-    // UI 组件
+    // UI Components
     private final JTextField habitNameField = new JTextField(20);
     private final JTextField startDateTimeField = new JTextField(20);
     private final JTextField frequencyField = new JTextField(20);
@@ -38,22 +39,22 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
     private final JButton cancelButton = new JButton();
 
     public CreateHabitView(CreateHabitController controller,
-                           CreateHabitViewModel viewModel,
-                           String username) {
+            CreateHabitViewModel viewModel,
+            String username) {
         this.controller = controller;
         this.viewModel = viewModel;
         this.username = username;
 
         this.viewModel.addPropertyChangeListener(this);
 
-        // 初始化 UI
+        // Initialize UI
         loadLabelsFromViewModel();
         setupLayout();
         addListeners();
     }
 
     private void loadLabelsFromViewModel() {
-        // 标题可以在外面用，也可以不用
+        // Title can be used externally or not
         createButton.setText(CreateHabitViewModel.CREATE_BUTTON_LABEL);
         cancelButton.setText(CreateHabitViewModel.CANCEL_BUTTON_LABEL);
     }
@@ -75,7 +76,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         formPanel.add(new JLabel(CreateHabitViewModel.HABIT_NAME_LABEL + ":"), gbc);
 
         gbc.gridx = 1;
-        habitNameField.setToolTipText("例如：Exercise, Reading...");
+        habitNameField.setToolTipText("e.g., Exercise, Reading...");
         formPanel.add(habitNameField, gbc);
         row++;
 
@@ -85,7 +86,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         formPanel.add(new JLabel(CreateHabitViewModel.START_DATETIME_LABEL + ":"), gbc);
 
         gbc.gridx = 1;
-        startDateTimeField.setToolTipText("格式: yyyy-MM-dd'T'HH:mm，例如 2025-11-23T09:00");
+        startDateTimeField.setToolTipText("Format: yyyy-MM-dd'T'HH:mm, e.g., 2025-11-23T09:00");
         formPanel.add(startDateTimeField, gbc);
         row++;
 
@@ -95,7 +96,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         formPanel.add(new JLabel(CreateHabitViewModel.FREQUENCY_LABEL + ":"), gbc);
 
         gbc.gridx = 1;
-        frequencyField.setToolTipText("下一次提醒时间，格式同上");
+        frequencyField.setToolTipText("Next reminder time, same format as above");
         formPanel.add(frequencyField, gbc);
         row++;
 
@@ -105,7 +106,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         formPanel.add(new JLabel(CreateHabitViewModel.HABIT_GROUP_LABEL + ":"), gbc);
 
         gbc.gridx = 1;
-        habitGroupField.setToolTipText("例如：Health, Study, Work...");
+        habitGroupField.setToolTipText("e.g., Health, Study, Work...");
         formPanel.add(habitGroupField, gbc);
         row++;
 
@@ -162,7 +163,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
     }
 
     private void onCreate() {
-        // 从 view 中拿数据
+        // Get data from view
         String habitName = habitNameField.getText().trim();
         String startDateTimeText = startDateTimeField.getText().trim();
         String frequencyDateTimeText = frequencyField.getText().trim();
@@ -194,7 +195,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         }
 
         try {
-            // 调用 controller（frequency 作为 LocalDateTime 字符串传入）
+            // Call controller (frequency passed as LocalDateTime string)
             controller.execute(
                     username,
                     habitName,
@@ -202,10 +203,9 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
                     frequencyDateTimeText,
                     habitGroup,
                     streakCount,
-                    priority
-            );
+                    priority);
         } catch (IllegalArgumentException ex) {
-            // 比如日期格式错误时 controller 抛出的
+            // e.g., thrown by controller when date format is incorrect
             JOptionPane.showMessageDialog(this,
                     ex.getMessage(),
                     "invalid input.",
@@ -214,8 +214,8 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
     }
 
     private void onCancel() {
-        // 如果你有 ViewManager，可以在这里切换回 LoggedIn 或别的 view。
-        // 这里先简单清空表单。
+        // If you have ViewManager, you can switch back to LoggedIn or other views here.
+        // Clear form simply here.
         habitNameField.setText("");
         startDateTimeField.setText("");
         frequencyField.setText("");
@@ -238,19 +238,17 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         frequencyField.setText(state.getFrequencyText());
         habitGroupField.setText(state.getHabitGroup());
         streakCountField.setText(
-                state.getStreakCount() == 0 ? "" : String.valueOf(state.getStreakCount())
-        );
+                state.getStreakCount() == 0 ? "" : String.valueOf(state.getStreakCount()));
         priorityField.setText(
-                state.getPriority() == 0 ? "" : String.valueOf(state.getPriority())
-        );
+                state.getPriority() == 0 ? "" : String.valueOf(state.getPriority()));
 
         if (state.getErrorMessage() != null) {
             messageLabel.setForeground(Color.RED);
             messageLabel.setText(state.getErrorMessage());
         } else if (state.getSuccessMessage() != null) {
-            messageLabel.setForeground(new Color(0, 128, 0)); // 深绿色
+            messageLabel.setForeground(new Color(0, 128, 0)); // Dark green
             messageLabel.setText(state.getSuccessMessage());
-            // 创建成功时也可以清空文本框
+            // Clear text fields on success
             habitNameField.setText("");
             startDateTimeField.setText("");
             frequencyField.setText("");
