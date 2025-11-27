@@ -63,7 +63,7 @@ public class AppBuilder {
 
     // set which data access implementation to use, can be any
     // of the classes from the data_access package
-    final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject("users.csv", userFactory);
+    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
     final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
@@ -110,7 +110,7 @@ public class AppBuilder {
 
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
-        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel);
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
@@ -188,7 +188,7 @@ public class AppBuilder {
                 (taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
-        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
     }
 

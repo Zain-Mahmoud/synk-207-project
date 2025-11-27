@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,9 +99,9 @@ public class HabitDataAccessObject implements HabitGateway {
                 if (!startDateTimeRaw.isBlank()) {
                     startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
                 }
-                LocalDateTime frequency = null;
+                Period frequency = null;
                 if (!frequencyRaw.isBlank()) {
-                    frequency = LocalDateTime.parse(frequencyRaw, DATE_FORMATTER);
+                    frequency = Period.parse(frequencyRaw);
                 }
 
                 Habit habit = new HabitBuilder()
@@ -128,7 +129,7 @@ public class HabitDataAccessObject implements HabitGateway {
                 final String username = entry.getKey();
                 for (Habit habit : entry.getValue()) {
                     final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
-                    final String frequency = habit.getFrequency() == null ? "" : DATE_FORMATTER.format(habit.getFrequency());
+                    final String frequency = habit.getFrequency() == null ? "" : habit.getFrequency().toString();
                     final String line = String.join(",",
                             username,
                             safe(habit.getName()),

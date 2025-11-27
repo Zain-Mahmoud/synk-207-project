@@ -1,7 +1,7 @@
 package use_case.view_tasks_and_habits;
 
 
-import data_access.DBUserDataAccessObject;
+import data_access.FileUserDataAccessObject;
 import data_access.HabitDataAccessObject;
 import data_access.TaskDataAccessObject;
 import entities.Task;
@@ -14,12 +14,12 @@ import java.time.Period;
 import java.util.ArrayList;
 
 public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoundary {
-    private DBUserDataAccessObject userDataAccess;
+    private FileUserDataAccessObject userDataAccess;
     private TaskDataAccessObject taskDataAccess;
     private HabitDataAccessObject habitDataAccess;
     private ViewTasksAndHabitsOutputBoundary presenter;
 
-    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess, DBUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter){
+    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess, FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter){
         this.presenter = presenter;
         this.userDataAccess = userDataAccess;
         this.taskDataAccess = new TaskDataAccessObject();
@@ -130,7 +130,6 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
             String habitName = habit.getName();
             LocalDateTime habitStartDateTime = habit.getStartDateTime();
             Period habitFrequency = habit.getFrequency();
-            LocalDateTime habitLastDateTimeCompleted = habit.getlastDateTimeCompleted();
             String habitGroup = habit.getHabitGroup();
             int habitStreakCount = habit.getStreakCount();
             int priority = habit.getPriority();
@@ -194,58 +193,6 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
             formattedHabit.add(Integer.toString(habitFrequency.getYears()) + " Years, " +
                     Integer.toString(habitFrequency.getMonths()) + " Months, " +
                     Integer.toString(habitFrequency.getDays()) + " Days");
-
-            String habitLastDateTimeCompletedToString = habitLastDateTimeCompleted.toString();
-            switch (habitLastDateTimeCompletedToString.substring(5, 7)) {
-                case "01":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " January, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "02":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " February, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "03":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " March, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "04":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " April, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "05":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " May, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "06":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " June, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "07":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " July, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "08":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " August, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "09":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " September, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "10":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " October, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "11":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " November, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-                case "12":
-                    formattedHabit.add(habitLastDateTimeCompletedToString.substring(8, 10) + " December, " +
-                            habitLastDateTimeCompletedToString.substring(0, 4) + " " + habitLastDateTimeCompletedToString.substring(11, 16));
-                    break;
-            }
 
             formattedHabit.add(habitGroup);
 

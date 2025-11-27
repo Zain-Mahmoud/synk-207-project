@@ -12,8 +12,5 @@ public interface ViewLeaderboardInputBoundary {
      */
     void execute(ViewLeaderboardInputData inputData);
 
-    ArrayList<ArrayList<String>> getFormattedTasks();
-
-    ArrayList<ArrayList<String>> getFormattedHabits();
 }
 

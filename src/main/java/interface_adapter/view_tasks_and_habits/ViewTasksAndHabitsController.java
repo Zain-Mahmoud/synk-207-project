@@ -6,7 +6,7 @@ import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputData;
 import view.LoggedInView;
 import view.ViewTasksAndHabitsView;
 
-import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
 
 import java.util.ArrayList;
 

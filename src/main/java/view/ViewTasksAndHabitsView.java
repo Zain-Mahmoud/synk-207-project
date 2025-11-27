@@ -3,8 +3,9 @@ package view;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
-import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
+
+import interface_adapter.logged_in.LoggedInViewModel;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -23,11 +24,11 @@ public class ViewTasksAndHabitsView extends JPanel {
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private final String viewName = "view tasks and habits";
-    private ViewTasksAndHabitsController viewTasksAndHabitsController = null;
     private ViewManagerModel viewManagerModel;
+    private LoggedInViewModel loggedInViewModel;
 
 
-    public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel) {
+    public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel, ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel) {
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
         this.viewManagerModel = viewManagerModel;
 
@@ -54,20 +55,6 @@ public class ViewTasksAndHabitsView extends JPanel {
 
         taskModel.addRow(ViewTasksAndHabitsViewModel.sampleTask);
         habitModel.addRow(ViewTasksAndHabitsViewModel.sampleHabit);
-
-        ArrayList<ArrayList<String>> taskList = viewTasksAndHabitsController.getFormattedTasks();
-
-        for (ArrayList<String> row : taskList) {
-            Object[] rowData = row.toArray();
-            taskModel.addRow(rowData);
-        }
-
-        ArrayList<ArrayList<String>> habitList = viewTasksAndHabitsController.getFormattedHabits();
-
-        for (ArrayList<String> row : habitList) {
-            Object[] rowData = row.toArray();
-            habitModel.addRow(rowData);
-        }
 
         taskTablePanel.add(taskTableLabel);
         taskTablePanel.add(taskTable);
@@ -116,14 +103,14 @@ public class ViewTasksAndHabitsView extends JPanel {
         refreshButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (evt.getSource().equals(refreshButton)) {
-                    ArrayList<ArrayList<String>> taskList = viewTasksAndHabitsController.getFormattedTasks();
+                    ArrayList<ArrayList<String>> taskList = viewTasksAndHabitsController.getFormattedTasks(loggedInViewModel);
 
                     for (ArrayList<String> row : taskList) {
                         Object[] rowData = row.toArray();
                         taskModel.addRow(rowData);
                     }
 
-                    ArrayList<ArrayList<String>> habitList = viewTasksAndHabitsController.getFormattedHabits();
+                    ArrayList<ArrayList<String>> habitList = viewTasksAndHabitsController.getFormattedHabits(loggedInViewModel);
 
                     for (ArrayList<String> row : habitList) {
                         Object[] rowData = row.toArray();

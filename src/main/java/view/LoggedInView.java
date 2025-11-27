@@ -8,6 +8,7 @@ import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarControllerState;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -37,12 +38,14 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private ChangePasswordController changePasswordController = null;
     private ViewManagerModel viewManagerModel;
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Injected controller to kick off calendar sync
+    private ViewTasksAndHabitsController viewTasksAndHabitsController;
     private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //  View model providing sync result updates
     private ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
 
     private final JLabel username;
 
     private final JButton logOut;
+    private final JButton viewTasksAndHabits;
     private final JButton viewLeaderboard;
     private final JButton syncCalendarButton; //  Button to sync tasks to Google Calendar
     private final JLabel syncStatusLabel = new JLabel(); //  Inline status label for sync results
@@ -67,6 +70,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         logOut = new JButton("Log Out");
         buttons.add(logOut);
 
+        viewTasksAndHabits = new JButton("View Tasks and Habits");
+        buttons.add(viewTasksAndHabits);
+
         changePassword = new JButton("Change Password");
         buttons.add(changePassword);
 
@@ -76,13 +82,20 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         syncCalendarButton = new JButton("Sync to Google Calendar"); //  Create sync trigger button
         buttons.add(syncCalendarButton); // Add sync button alongside other actions
 
-        final JPanel viewTasksAndHabits = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel);
 
         logOut.addActionListener(this);
         
         viewLeaderboard.addActionListener(evt -> {
             if (evt.getSource().equals(viewLeaderboard) && viewManagerModel != null) {
                 viewManagerModel.setState("leaderboard");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
+        viewTasksAndHabits.addActionListener(evt -> {
+            if (evt.getSource().equals(viewTasksAndHabits) && viewManagerModel != null) {
+                viewTasksAndHabitsController.;
+                viewManagerModel.setState("view tasks and habits");
                 viewManagerModel.firePropertyChanged();
             }
         });
@@ -194,5 +207,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     public void setSyncToGoogleCalendarViewModel(SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel) { //  Subscribe to sync view model updates
         this.syncToGoogleCalendarViewModel = syncToGoogleCalendarViewModel; //  Capture sync view model reference
         this.syncToGoogleCalendarViewModel.addPropertyChangeListener(this); // Listen for sync result changes
+    }
+
+    public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
+        this.viewTasksAndHabitsController = viewTasksAndHabitsController;
     }
 }
