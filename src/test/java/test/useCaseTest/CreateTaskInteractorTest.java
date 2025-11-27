@@ -164,4 +164,103 @@ class CreateTaskInteractorTest {
         // Assert
         assertEquals("Task already exists.", presenter.failMessage);
     }
+    @Test
+    void createTask_failsWhenUsernameIsNull() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(adapter, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                null,
+                "Study",
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                "School",
+                false,
+                1);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createTask_failsWhenUsernameIsWhitespace() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(adapter, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                "   ",
+                "Study",
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                "School",
+                false,
+                1);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createTask_failsWhenTaskNameIsNull() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(adapter, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                "testUser",
+                null,
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                "School",
+                false,
+                1);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createTask_failsWhenTaskNameIsWhitespace() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(adapter, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                "testUser",
+                "   ",
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                "School",
+                false,
+                1);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
 }

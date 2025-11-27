@@ -167,4 +167,39 @@ class DeleteHabitInteractorTest {
         assertTrue(presenter.failMessage.contains("Failed to delete habit"));
         assertTrue(presenter.failMessage.contains("Database error"));
     }
+    @Test
+    void deleteHabit_failsWhenNameIsNull() {
+        // Arrange
+        InMemoryHabitDataAccessObject realDAO = new InMemoryHabitDataAccessObject();
+        InMemoryHabitDAOAdapter adapter = new InMemoryHabitDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, adapter);
+
+        DeleteHabitInputData input = new DeleteHabitInputData("roy", null);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteHabit_failsWhenNameIsWhitespace() {
+        // Arrange
+        InMemoryHabitDataAccessObject realDAO = new InMemoryHabitDataAccessObject();
+        InMemoryHabitDAOAdapter adapter = new InMemoryHabitDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, adapter);
+
+        DeleteHabitInputData input = new DeleteHabitInputData("roy", "   ");
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
 }

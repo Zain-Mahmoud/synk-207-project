@@ -163,4 +163,86 @@ class CreateHabitInteractorTest {
         // Assert
         assertTrue(presenter.failMessage.contains("Failed to create habit: Database error"));
     }
+    @Test
+    void createHabit_failsWhenNameIsNull() {
+        // Arrange
+        InMemoryHabitDataAccessObject realDAO = new InMemoryHabitDataAccessObject();
+        InMemoryHabitDAOAdapter adapter = new InMemoryHabitDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(adapter, presenter);
+
+        CreateHabitInputData input = new CreateHabitInputData(
+                "roy",
+                null,
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 2, 10, 0),
+                "Health",
+                0,
+                5);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createHabit_failsWhenNameIsWhitespace() {
+        // Arrange
+        InMemoryHabitDataAccessObject realDAO = new InMemoryHabitDataAccessObject();
+        InMemoryHabitDAOAdapter adapter = new InMemoryHabitDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(adapter, presenter);
+
+        CreateHabitInputData input = new CreateHabitInputData(
+                "roy",
+                "   ",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 2, 10, 0),
+                "Health",
+                0,
+                5);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createHabit_failsWhenBuilderThrowsIllegalStateException() {
+        // Arrange
+        CreateHabitUserDataAccess throwingDAO = new CreateHabitUserDataAccess() {
+            @Override
+            public void save(String username, Habit habit) {
+                throw new IllegalStateException("DAO State Error");
+            }
+
+            @Override
+            public boolean existsByName(String username, String habitName) {
+                return false;
+            }
+        };
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(throwingDAO, presenter);
+
+        CreateHabitInputData input = new CreateHabitInputData(
+                "roy",
+                "Exercise",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 2, 10, 0),
+                "Health",
+                0,
+                5);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertTrue(presenter.failMessage.contains("Failed to create habit: DAO State Error"));
+    }
 }

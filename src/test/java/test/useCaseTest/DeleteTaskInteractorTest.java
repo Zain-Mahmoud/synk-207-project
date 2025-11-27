@@ -173,4 +173,75 @@ class DeleteTaskInteractorTest {
         assertTrue(presenter.failMessage.contains("Failed to delete task"));
         assertTrue(presenter.failMessage.contains("Database error"));
     }
+    @Test
+    void deleteTask_failsWhenUsernameIsNull() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, adapter);
+
+        DeleteTaskInputData input = new DeleteTaskInputData(null, "Study");
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenUsernameIsWhitespace() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, adapter);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("   ", "Study");
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenTaskNameIsNull() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, adapter);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("roy", null);
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenTaskNameIsWhitespace() {
+        // Arrange
+        InMemoryTaskDataAccessObject realDAO = new InMemoryTaskDataAccessObject();
+        InMemoryTaskDAOAdapter adapter = new InMemoryTaskDAOAdapter(realDAO);
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, adapter);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("roy", "   ");
+
+        // Act
+        interactor.execute(input);
+
+        // Assert
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
 }
