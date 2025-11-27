@@ -13,13 +13,13 @@ public class Main {
                 .addLoggedInView()
                 .addLeaderboardView()
                 .addViewTasksAndHabitsView()
+                .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
-//              .addViewLeaderboardUseCase()
-                .addViewTasksAndHabitsUseCase()
                 .addViewLeaderboardUseCase()
                 .addSyncToGoogleCalendarUseCase()
+                .addViewStatsUseCase()
                 .build();
 
         application.pack();

@@ -32,6 +32,9 @@ import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
+import interface_adapter.view_stats.ViewStatsController;
+import interface_adapter.view_stats.ViewStatsPresenter;
+import interface_adapter.view_stats.ViewStatsViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -51,6 +54,10 @@ import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
 import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputBoundary;
 import use_case.view_tasks_and_habits.ViewTasksAndHabitsInteractor;
 import use_case.view_tasks_and_habits.ViewTasksAndHabitsOutputBoundary;
+import view.*;
+import use_case.view_stats.ViewStatsInputBoundary;
+import use_case.view_stats.ViewStatsInteractor;
+import use_case.view_stats.ViewStatsOutputBoundary;
 import view.*;
 
 
@@ -80,6 +87,8 @@ public class AppBuilder {
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
     private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //View model carrying sync status updates
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private ViewStatsViewModel viewStatsViewModel;
+    private StatsView statsView;
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
@@ -121,6 +130,14 @@ public class AppBuilder {
         leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
         leaderboardView.setViewManagerModel(viewManagerModel);
         cardPanel.add(leaderboardView, leaderboardView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addStatsView(){
+        viewStatsViewModel = new ViewStatsViewModel();
+        statsView = new StatsView(viewStatsViewModel);
+        statsView.setViewManager(viewManagerModel);
+        cardPanel.add(statsView, statsView.getViewName());
         return this;
     }
 
@@ -189,6 +206,18 @@ public class AppBuilder {
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        return this;
+    }
+
+    public AppBuilder addViewStatsUseCase(){
+        final ViewStatsOutputBoundary viewStatsOutputBoundary = new ViewStatsPresenter(viewStatsViewModel,
+                viewManagerModel);
+        final ViewStatsInputBoundary viewStatsInteractor = new ViewStatsInteractor(habitDataAccessObject,
+                taskDataAccessObject, viewStatsOutputBoundary);
+
+        ViewStatsController viewStatsController = new ViewStatsController(viewStatsInteractor, loggedInViewModel);
+        loggedInView.setViewStatsController(viewStatsController);
+
         return this;
     }
 
