@@ -38,6 +38,9 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
     private ViewManagerModel viewManagerModel;
 
     public ModifyHabitView(ModifyHabitViewModel modifyHabitViewModel) {
+
+        ModifyHabitState currState = modifyHabitViewModel.getState();
+
         this.modifyHabitViewModel = modifyHabitViewModel;
         this.modifyHabitViewModel.addPropertyChangeListener(this);
 
@@ -51,6 +54,20 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
         JLabel habitStatusLabel = new JLabel("Habit status");
         JLabel habitPriorityLabel = new JLabel("Habit priority");
         JLabel streakCountLabel = new JLabel("Streak count");
+
+        newHabitName.setText(currState.getOldHabitName());
+        newFrequency.setText(currState.getOldFrequency());
+        newHabitPriority.setText(currState.getOldPriority());
+        newStreakCount.setText(currState.getOldStreakCount());
+        newHabitGroup.setText(currState.getOldHabitGroup());
+        newStartDateTime.setText(currState.getOldStartDateTime());
+
+
+        if (currState.getOldStatus()){
+            habitCompleted.setSelected(true);
+        } else{
+            habitCompleted.setSelected(true);
+        }
 
         newHabitName.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -79,7 +96,6 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
 
             public void documentStateHelper() {
                 final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                // Parse and set startDateTime - you may want to add proper parsing
                 currentState.setStartDateTime(newStartDateTime.getText());
             }
 
@@ -103,7 +119,6 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
 
             public void documentStateHelper() {
                 final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                // Parse and set frequency - you may want to add proper parsing
                 currentState.setFrequency(newFrequency.getText());
             }
 
@@ -272,11 +287,12 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
         save.addActionListener(evt -> {
             if (evt.getSource().equals(save)){
                 ModifyHabitState currentState = modifyHabitViewModel.getState();
-                // TODO add old information to execute parameter list before new information is set
-                modifyHabitController.execute("", "", true, "1/2/3",
-                        " ",
-                        "",
-                        "",
+                modifyHabitController.execute(currentState.getOldHabitName(), currentState.getOldPriority(),
+                        currentState.getOldStatus(),
+                        currentState.getOldStartDateTime(),
+                        currentState.getOldStreakCount(),
+                        currentState.getOldHabitGroup(),
+                        currentState.getOldFrequency(),
                         currentState.getHabitName(),
                         currentState.getPriority(),
                         currentState.getStatus(),

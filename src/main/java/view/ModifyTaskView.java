@@ -41,8 +41,24 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
     private final JButton cancel = new JButton("cancel");
 
     public ModifyTaskView(ModifyTaskViewModel modifyTaskViewModel) {
+        ModifyTaskState modifyTaskState = modifyTaskViewModel.getState();
+
         this.modifyTaskViewModel = modifyTaskViewModel;
         this.modifyTaskViewModel.addPropertyChangeListener(this);
+
+        newTaskName.setText(modifyTaskState.getOldTaskName());
+        newTaskDeadline.setText(modifyTaskState.getOldDeadline());
+
+        if (modifyTaskState.getStatus()){
+            taskCompleted.setSelected(true);
+        } else {
+            taskNotCompleted.setSelected(true);
+        }
+
+        newTaskPriority.setText(modifyTaskState.getOldPriority());
+        newTaskGroup.setText(modifyTaskState.getTaskGroup());
+        newStartTime.setText(modifyTaskState.getOldStartTime());
+        newDescription.setText(modifyTaskState.getDescription());
 
         newTaskStatus.add(taskCompleted);
         newTaskStatus.add(taskNotCompleted);
@@ -190,15 +206,13 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
 
 
-                // TODO: Replace these hardcoded/placeholder OLD values with actual data retrieved
-                // from the TaskListViewModel or the ModifyTaskViewModel's previous state.
-                String oldTaskName = currentState.getNewTaskName();
-                int oldPriority = 0;
-                String oldDeadline = currentState.getDeadline();
-                boolean oldStatus = currentState.getStatus();
-                String oldTaskGroup = currentState.getTaskGroup();
-                String oldDescription = currentState.getDescription();
-                String oldStartTime = currentState.getStartTime();
+                String oldTaskName = currentState.getOldTaskName();
+                String oldPriority = currentState.getOldPriority();
+                String oldDeadline = currentState.getOldDeadline();
+                boolean oldStatus = currentState.getOldStatus();
+                String oldTaskGroup = currentState.getOldTaskGroup();
+                String oldDescription = currentState.getOldDescription();
+                String oldStartTime = currentState.getOldStartTime();
 
                 modifyTaskController.execute(
                         oldTaskName,

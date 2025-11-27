@@ -19,7 +19,7 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
     public void execute(ModifyHabitInputData modifyHabitInputData) {
         String userID = modifyHabitInputData.getUserID();
         
-        // Old habit information
+
         String oldHabitName = modifyHabitInputData.getOldHabitName();
         String oldPriority = modifyHabitInputData.getOldPriority();
         boolean oldHabitStatus = modifyHabitInputData.getOldHabitStatus();
@@ -28,7 +28,7 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
         String oldHabitGroup = modifyHabitInputData.getOldHabitGroup();
         String oldFrequency = modifyHabitInputData.getOldFrequency();
         
-        // New habit information
+
         String newHabitName = modifyHabitInputData.getNewHabitName();
         String newPriority = modifyHabitInputData.getNewPriority();
         boolean newHabitStatus = modifyHabitInputData.getNewHabitStatus();
@@ -38,13 +38,13 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
         String newFrequency = modifyHabitInputData.getNewFrequency();
 
         try {
-            // Parse new habit values
+
             LocalDateTime newStartDateTimeFormatted = LocalDateTime.parse(newStartDateTime);
             LocalDateTime newFrequencyFormatted = LocalDateTime.parse(newFrequency);
             int newPriorityFormatted = Integer.parseInt(newPriority);
             int newStreakCountFormatted = Integer.parseInt(newStreakCount);
 
-            // Build new modified habit
+
             final Habit modifiedHabit = new HabitBuilder()
                     .setHabitName(newHabitName)
                     .setPriority(newPriorityFormatted)
@@ -55,7 +55,7 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
                     .setFrequency(newFrequencyFormatted)
                     .build();
 
-            // Build old habit for deletion
+
             final Habit oldHabit = new HabitBuilder()
                     .setHabitName(oldHabitName)
                     .setPriority(Integer.parseInt(oldPriority))
@@ -77,7 +77,8 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
             userDataAccessObject.deleteHabit(userID, oldHabit);
             userDataAccessObject.addHabit(userID, modifiedHabit);
 
-            modifyHabitPresenter.prepareSuccessView(new ModifyHabitOutputData());
+            modifyHabitPresenter.prepareSuccessView(new
+                    ModifyHabitOutputData(userDataAccessObject.fetchHabits(userID)));
 
         } catch (java.time.format.DateTimeParseException d) {
             modifyHabitPresenter.prepareFailView("Invalid Date/Time Format");

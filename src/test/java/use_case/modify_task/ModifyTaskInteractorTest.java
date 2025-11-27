@@ -1,7 +1,6 @@
 package use_case.modify_task;
 
 import data_access.InMemoryTaskDataAccessObject;
-import entities.Habit;
 import entities.Task;
 import entities.TaskBuilder;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), oldTask.getPriority(), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
                 "New Task Name", "5", FUTURE_DATETIME, true, "Personal", "New Description", FUTURE_DATETIME,
                 USER_ID
         );
@@ -65,6 +64,7 @@ public class ModifyTaskInteractorTest {
                 assertEquals("Personal", modifiedTask.getTaskGroup());
                 assertEquals("New Description", modifiedTask.getDescription());
                 assertEquals(LocalDateTime.parse(FUTURE_DATETIME), modifiedTask.getStartTime());
+                assertEquals(1, outputData.getTaskList().toArray().length);
             }
 
             @Override
@@ -81,6 +81,37 @@ public class ModifyTaskInteractorTest {
 
         ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(successPresenter, taskGateway);
         interactor.execute(inputData);
+
+    }
+
+    @Test
+    void successSwitchToTaskList() {
+
+        TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
+        Task oldTask = createInitialTask();
+        taskGateway.addTask(USER_ID, oldTask);
+
+
+        ModifyTaskOutputBoundary successPresenter = new ModifyTaskOutputBoundary() {
+            @Override
+            public void prepareSuccessView(ModifyTaskOutputData outputData) {
+                fail("Tasks and habits list should be displayed");
+            }
+
+            @Override
+            public void prepareFailView(String errorMessage) {
+                fail("Tasks and habits list should be displayed");
+            }
+
+            @Override
+            public void switchToTaskListView() {
+
+            }
+        };
+
+
+        ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(successPresenter, taskGateway);
+        interactor.switchToTaskListView();
     }
 
 
@@ -93,7 +124,7 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), oldTask.getPriority(), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
                 "New Task", "1", "2025/11/27", false, "Group", "Desc", FUTURE_DATETIME,
                 USER_ID
         );
@@ -130,7 +161,44 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), oldTask.getPriority(), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
+                "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc", FUTURE_DATETIME,
+                USER_ID
+        );
+
+
+        ModifyTaskOutputBoundary failPresenter = new ModifyTaskOutputBoundary() {
+            @Override
+            public void prepareSuccessView(ModifyTaskOutputData outputData) {
+                fail("Modification should have failed due to invalid priority format.");
+            }
+
+            @Override
+            public void prepareFailView(String errorMessage) {
+                assertEquals("Invalid Priority. Must be a whole number.", errorMessage);
+            }
+
+            @Override
+            public void switchToTaskListView() {
+
+            }
+        };
+
+
+        ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(failPresenter, taskGateway);
+        interactor.execute(inputData);
+    }
+
+    @Test
+    void failTest_InvalidOldPriorityFormat() {
+
+        TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
+        Task oldTask = createInitialTask();
+        taskGateway.addTask(USER_ID, oldTask);
+
+
+        ModifyTaskInputData inputData = new ModifyTaskInputData(
+                oldTask.getName(), "5", oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
                 "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc", FUTURE_DATETIME,
                 USER_ID
         );
@@ -166,7 +234,7 @@ public class ModifyTaskInteractorTest {
 
         // 2. Define Input Data with a deadline in the past
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), oldTask.getPriority(), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
                 "Past Task", "1", PAST_DATETIME, false, "Group", "Desc", VALID_DATETIME,
                 USER_ID
         );
@@ -224,7 +292,7 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTaskToModify.getName(), oldTaskToModify.getPriority(), oldTaskToModify.getDeadline().toString(),
+                oldTaskToModify.getName(), Integer.toString(oldTaskToModify.getPriority()), oldTaskToModify.getDeadline().toString(),
                 oldTaskToModify.getStatus(), oldTaskToModify.getTaskGroup(), oldTaskToModify.getDescription(),
                 oldTaskToModify.getStartTime().toString(), existingTask.getName(), "3", FUTURE_DATETIME,
                 true, "Group", "Desc", FUTURE_DATETIME,

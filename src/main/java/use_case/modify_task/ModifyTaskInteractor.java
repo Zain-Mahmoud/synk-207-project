@@ -18,9 +18,8 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
 
     public void execute(ModifyTaskInputData modifyInputData) {
 
-
         String oldTaskName = modifyInputData.getOldTaskName();
-        int oldTaskPriority = modifyInputData.getOldPriority();
+        String oldTaskPriority = modifyInputData.getOldPriority();
         boolean oldTaskStatus = modifyInputData.getOldTaskStatus();
         String oldDeadline = modifyInputData.getOldDeadline();
         String oldTaskGroup = modifyInputData.getOldTaskGroup();
@@ -41,6 +40,7 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             LocalDateTime newDeadlineFormatted = LocalDateTime.parse(newDeadline);
             LocalDateTime newStartTimeFormatted = LocalDateTime.parse(newStartTimeRaw);
             int newPriorityFormatted = Integer.parseInt(newTaskPriority);
+            int oldPriorityFormatted = Integer.parseInt(oldTaskPriority);
 
             if (newDeadlineFormatted.isBefore(LocalDateTime.now())) {
                 modifyTaskPresenter.prepareFailView("New deadline cannot be in the past.");
@@ -58,8 +58,7 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                     .setStatus(newTaskStatus).build();
 
             LocalDateTime oldDeadlineFormatted = LocalDateTime.parse(oldDeadline);
-            LocalDateTime oldStartTimeFormatted = oldStartTimeRaw.isBlank() ? null :
-                    LocalDateTime.parse(oldStartTimeRaw);
+            LocalDateTime oldStartTimeFormatted = LocalDateTime.parse(oldStartTimeRaw);
 
             final Task oldTask = new TaskBuilder()
                     .setTaskName(oldTaskName)
@@ -67,10 +66,11 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                     .setDeadline(oldDeadlineFormatted)
                     .setStartTime(oldStartTimeFormatted) // ADDED setStartTime
                     .setTaskGroup(oldTaskGroup)
-                    .setPriority(oldTaskPriority)
+                    .setPriority(oldPriorityFormatted)
                     .setStatus(oldTaskStatus).build();
 
             ArrayList<Task> taskList = userDataAccessObject.fetchTasks(userID);
+
             for (Task task : taskList) {
                 if (!task.equals(oldTask) && task.getName().equals(modifiedTask.getName())){
                     modifyTaskPresenter.prepareFailView("Task already exists");
@@ -82,7 +82,7 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             userDataAccessObject.addTask(userID, modifiedTask);
 
 
-            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData());
+            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(userDataAccessObject.fetchTasks(userID)));
         } catch (java.time.format.DateTimeParseException d) {
             modifyTaskPresenter.prepareFailView("Invalid date/time format. Use ISO format (e.g., YYYY-MM-DDTHH:MM:SS) for dates.");
         } catch (NumberFormatException n) {

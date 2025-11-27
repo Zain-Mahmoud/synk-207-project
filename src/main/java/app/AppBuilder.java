@@ -212,7 +212,7 @@ public class AppBuilder {
         final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
                 taskDataAccessObject);
 
-        modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
+        modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel); // TODO update second constructor parameter
         modifyTaskView.setModifyTaskController(modifyTaskController);
         return this;
     }

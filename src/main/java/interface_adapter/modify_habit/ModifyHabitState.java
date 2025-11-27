@@ -1,15 +1,25 @@
 package interface_adapter.modify_habit;
 
 public class ModifyHabitState {
-    private String habitName = "";
-    private String startDateTime = "";
-    private String frequency = "";
-    private String habitGroup = "";
-    private String streakCount = "";
-    private String priority = "";
-    private boolean status = false;
-    private String description = "";
+
+    private String habitName;
+    private String startDateTime;
+    private String frequency;
+    private String habitGroup;
+    private String streakCount;
+    private String priority;
+    private boolean status;
+    private String description;
     private String habitError;
+
+    private String oldHabitName;
+    private String oldStartDateTime;
+    private String oldFrequency;
+    private String oldHabitGroup;
+    private String oldStreakCount;
+    private String oldPriority;
+    private boolean oldStatus;
+    private String oldDescription;
 
     public String getHabitName() {
         return habitName;
@@ -75,11 +85,77 @@ public class ModifyHabitState {
         this.description = description;
     }
 
+    public String getHabitError() {
+        return habitError;
+    }
+
     public void setHabitError(String habitError) {
         this.habitError = habitError;
     }
 
-    public String getHabitError() {
-        return habitError;
+    // ========== Old getters & setters ==========
+
+    public String getOldHabitName() {
+        return oldHabitName;
+    }
+
+    public void setOldHabitName(String oldHabitName) {
+        this.oldHabitName = oldHabitName;
+    }
+
+    public String getOldStartDateTime() {
+        return oldStartDateTime;
+    }
+
+    public void setOldStartDateTime(String oldStartDateTime) {
+        this.oldStartDateTime = oldStartDateTime;
+    }
+
+    public String getOldFrequency() {
+        return oldFrequency;
+    }
+
+    public void setOldFrequency(String oldFrequency) {
+        this.oldFrequency = oldFrequency;
+    }
+
+    public String getOldHabitGroup() {
+        return oldHabitGroup;
+    }
+
+    public void setOldHabitGroup(String oldHabitGroup) {
+        this.oldHabitGroup = oldHabitGroup;
+    }
+
+    public String getOldStreakCount() {
+        return oldStreakCount;
+    }
+
+    public void setOldStreakCount(String oldStreakCount) {
+        this.oldStreakCount = oldStreakCount;
+    }
+
+    public String getOldPriority() {
+        return oldPriority;
+    }
+
+    public void setOldPriority(String oldPriority) {
+        this.oldPriority = oldPriority;
+    }
+
+    public boolean getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(boolean oldStatus) {
+        this.oldStatus = oldStatus;
+    }
+
+    public String getOldDescription() {
+        return oldDescription;
+    }
+
+    public void setOldDescription(String oldDescription) {
+        this.oldDescription = oldDescription;
     }
 }

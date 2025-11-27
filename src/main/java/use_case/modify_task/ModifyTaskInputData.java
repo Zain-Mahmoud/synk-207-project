@@ -3,7 +3,7 @@ package use_case.modify_task;
 public class ModifyTaskInputData {
     private final String userID;
     private final String oldTaskName;
-    private final int oldPriority;
+    private final String oldPriority;
     private final String oldDeadline;
     private final Boolean oldTaskStatus;
     private final String oldTaskGroup;
@@ -17,7 +17,7 @@ public class ModifyTaskInputData {
     private final String newDescription;
     private final String newStartTime; // ADDED
 
-    public ModifyTaskInputData(String oldTaskName, int oldPriority, String oldDeadline, Boolean oldTaskStatus,
+    public ModifyTaskInputData(String oldTaskName, String oldPriority, String oldDeadline, Boolean oldTaskStatus,
                                String oldTaskGroup, String oldDescription, String oldStartTime, // ADDED
                                String newTaskName, String newPriority, String newDeadline, Boolean newTaskStatus,
                                String newTaskGroup, String newDescription, String newStartTime, // ADDED
@@ -43,7 +43,7 @@ public class ModifyTaskInputData {
         return oldTaskName;
     }
 
-    public int getOldPriority() {
+    public String getOldPriority() {
         return oldPriority;
     }
 

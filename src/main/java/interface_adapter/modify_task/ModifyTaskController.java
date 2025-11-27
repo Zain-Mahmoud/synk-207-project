@@ -10,15 +10,12 @@ public class ModifyTaskController {
     private final ModifyTaskInputBoundary modifyTaskUseCaseInteractor;
     private final LoggedInViewModel loggedInViewModel;
 
-    // TODO obtain previous task information from Arya's task list view model
     public ModifyTaskController(ModifyTaskInputBoundary modifyTaskInteractor, LoggedInViewModel loggedInViewModel) {
         this.modifyTaskUseCaseInteractor = modifyTaskInteractor;
         this.loggedInViewModel = loggedInViewModel;
     }
 
-    // TODO remove previous task parameters from execute method and obtain them from Arya's task list view state
     /***
-     /***
      * Executes modify task use case
      * @param oldTaskName
      * @param oldPriority
@@ -26,25 +23,25 @@ public class ModifyTaskController {
      * @param oldStatus
      * @param oldTaskGroup
      * @param oldDescription
-     * @param oldStartTime     // ADDED
+     * @param oldStartTime
      * @param newTaskName
      * @param newPriority
      * @param newDeadline
      * @param newStatus
      * @param newTaskGroup
      * @param newDescription
-     * @param newStartTime     // ADDED
+     * @param newStartTime
      */
-    public void execute(String oldTaskName, int oldPriority, String oldDeadline, boolean oldStatus,
-                        String oldTaskGroup, String oldDescription, String oldStartTime, // ADDED
+    public void execute(String oldTaskName, String oldPriority, String oldDeadline, boolean oldStatus,
+                        String oldTaskGroup, String oldDescription, String oldStartTime,
                         String newTaskName, String newPriority, String newDeadline, boolean newStatus,
-                        String newTaskGroup, String newDescription, String newStartTime){ // ADDED
+                        String newTaskGroup, String newDescription, String newStartTime){
 
         String username = loggedInViewModel.getState().getUsername();
         ModifyTaskInputData modifyTaskInputData = new ModifyTaskInputData(oldTaskName, oldPriority, oldDeadline, oldStatus,
-                oldTaskGroup, oldDescription, oldStartTime, // ADDED
+                oldTaskGroup, oldDescription, oldStartTime,
                 newTaskName, newPriority, newDeadline, newStatus,
-                newTaskGroup, newDescription, newStartTime, // ADDED
+                newTaskGroup, newDescription, newStartTime,
                 username);
 
         this.modifyTaskUseCaseInteractor.execute(modifyTaskInputData);

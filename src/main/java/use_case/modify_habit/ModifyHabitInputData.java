@@ -2,8 +2,7 @@ package use_case.modify_habit;
 
 public class ModifyHabitInputData {
     private final String userID;
-    
-    // Old habit information
+
     private final String oldHabitName;
     private final String oldPriority;
     private final Boolean oldHabitStatus;
@@ -11,8 +10,7 @@ public class ModifyHabitInputData {
     private final String oldStreakCount;
     private final String oldHabitGroup;
     private final String oldFrequency;
-    
-    // New habit information
+
     private final String newHabitName;
     private final String newPriority;
     private final Boolean newHabitStatus;
@@ -26,7 +24,7 @@ public class ModifyHabitInputData {
                                  String newHabitName, String newPriority, Boolean newHabitStatus, 
                                  String newStartDateTime, String newStreakCount, String newHabitGroup, String newFrequency,
                                  String userID) {
-        // Old values
+
         this.oldHabitName = oldHabitName;
         this.oldPriority = oldPriority;
         this.oldHabitStatus = oldHabitStatus;
@@ -35,7 +33,7 @@ public class ModifyHabitInputData {
         this.oldHabitGroup = oldHabitGroup;
         this.oldFrequency = oldFrequency;
         
-        // New values
+
         this.newHabitName = newHabitName;
         this.newPriority = newPriority;
         this.newHabitStatus = newHabitStatus;
@@ -47,7 +45,7 @@ public class ModifyHabitInputData {
         this.userID = userID;
     }
 
-    // Getters for old habit information
+
     public String getOldHabitName() {
         return oldHabitName;
     }
@@ -76,7 +74,7 @@ public class ModifyHabitInputData {
         return oldFrequency;
     }
 
-    // Getters for new habit information
+
     public String getNewPriority() {
         return newPriority;
     }

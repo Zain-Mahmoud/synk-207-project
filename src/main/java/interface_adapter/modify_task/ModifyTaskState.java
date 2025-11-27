@@ -8,8 +8,16 @@ public class ModifyTaskState {
     private boolean status = false;
     private String taskGroup = "";
     private String description = "";
-    private String startTime = ""; // ADDED
+    private String startTime = "";
     private String taskError;
+    private String oldTaskName = "";
+    private String oldPriority = "";
+    private String oldDeadline = "";
+    private boolean oldStatus = false;
+    private String oldTaskGroup = "";
+    private String oldDescription = "";
+    private String oldStartTime = "";
+
 
 
     public String getNewTaskName() {
@@ -60,7 +68,7 @@ public class ModifyTaskState {
         this.description = description;
     }
 
-    // GETTERS AND SETTERS FOR ADDED START TIME
+
     public String getStartTime() {
         return startTime;
     }
@@ -75,5 +83,61 @@ public class ModifyTaskState {
 
     public void setTaskError(String taskError) {
         this.taskError = taskError;
+    }
+
+    public String getOldTaskName() {
+        return oldTaskName;
+    }
+
+    public void setOldTaskName(String oldTaskName) {
+        this.oldTaskName = oldTaskName;
+    }
+
+    public String getOldPriority() {
+        return oldPriority;
+    }
+
+    public void setOldPriority(String oldPriority) {
+        this.oldPriority = oldPriority;
+    }
+
+    public String getOldDeadline() {
+        return oldDeadline;
+    }
+
+    public void setOldDeadline(String oldDeadline) {
+        this.oldDeadline = oldDeadline;
+    }
+
+    public boolean getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(boolean oldStatus) {
+        this.oldStatus = oldStatus;
+    }
+
+    public String getOldTaskGroup() {
+        return oldTaskGroup;
+    }
+
+    public void setOldTaskGroup(String oldTaskGroup) {
+        this.oldTaskGroup = oldTaskGroup;
+    }
+
+    public String getOldDescription() {
+        return oldDescription;
+    }
+
+    public void setOldDescription(String oldDescription) {
+        this.oldDescription = oldDescription;
+    }
+
+    public String getOldStartTime() {
+        return oldStartTime;
+    }
+
+    public void setOldStartTime(String oldStartTime) {
+        this.oldStartTime = oldStartTime;
     }
 }

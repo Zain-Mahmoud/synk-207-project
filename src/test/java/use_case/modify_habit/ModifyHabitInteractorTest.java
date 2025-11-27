@@ -58,6 +58,7 @@ public class ModifyHabitInteractorTest {
         ModifyHabitOutputBoundary successPresenter = new ModifyHabitOutputBoundary() {
             @Override
             public void prepareSuccessView(ModifyHabitOutputData outputData) {
+                assertEquals(1, outputData.getHabitList().toArray().length);
             }
 
             @Override

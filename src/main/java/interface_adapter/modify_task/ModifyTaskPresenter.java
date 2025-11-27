@@ -8,23 +8,25 @@ import use_case.modify_task.ModifyTaskOutputData;
 public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
     private ViewManagerModel viewManagerModel;
     private ModifyTaskViewModel modifyTaskViewModel;
-    private LoginViewModel loginViewModel;
-    // TODO add Arya's view
+    // TODO uncomment when ready
+    // private ViewTasksAndHabitsModel tasksViewModel;
 
 
-    // TODO add Arya's use case's view model when ready
     public ModifyTaskPresenter(ViewManagerModel viewManagerModel,
                                ModifyTaskViewModel modifyTaskViewModel,
                                LoginViewModel loginViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.modifyTaskViewModel = modifyTaskViewModel;
-        this.loginViewModel = loginViewModel;
+        // this.tasksViewModel = tasksView mode TODO add to constructor and uncomment
     }
 
     @Override
     public void prepareSuccessView(ModifyTaskOutputData outputData) {
-        // on success, switch to task list view
-        // TODO switch to Arya's use case's view when ready
+        // ViewTasksAndHabitState currState = tasksViewModel.getState();
+        // currState.setTaskList(outputData.getTaskList());
+        // tasksViewModel.firePropertyChanged();
+
+        // switchToTaskListView();
     }
 
     @Override
@@ -35,8 +37,7 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
     }
 
     public void switchToTaskListView(){
-        // TODO Arya's use case's view
-        viewManagerModel.setState(loginViewModel.getViewName());
-        viewManagerModel.firePropertyChanged();
+//`        viewManagerModel.setState(viewTasksModel.getViewName());
+//        viewManagerModel.firePropertyChanged();`
     }
 }
