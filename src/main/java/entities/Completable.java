@@ -12,4 +12,6 @@ public interface Completable {
     String getTitle();
 
     Object getDueDate();
+
+    Completable clone();
 }

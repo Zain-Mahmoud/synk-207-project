@@ -3,7 +3,7 @@ package entities;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task implements Completable {
+public class Task implements Completable, Cloneable {
 
     private String taskName;
     private String description;
@@ -81,8 +81,6 @@ public class Task implements Completable {
                 '}';
     }
 
-    // ========= GETTERS ======== if Private
-
 
     public String getDescription() {
         return description;
@@ -106,5 +104,14 @@ public class Task implements Completable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Task clone(){
+        try{
+            return (Task) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return this;
+        }
+
     }
 }

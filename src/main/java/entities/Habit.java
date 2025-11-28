@@ -3,7 +3,7 @@ package entities;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Habit implements Completable {
+public class Habit implements Completable, Cloneable {
     private String habitName;
     private LocalDateTime startDateTime;
     private LocalDateTime frequency;
@@ -83,8 +83,7 @@ public class Habit implements Completable {
     public int getPriority() { return this.priority; }
     public void setPriority(int priority) { this.priority = priority; }
 
-    // Implement by default, same convention from other entity.
-    // Not necessary, logically being covered by isCompleted.
+
     public boolean getStatus() { return this.status; }
     public void setStatus( boolean status) { this.status = status; }
 
@@ -114,5 +113,14 @@ public class Habit implements Completable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public Habit clone(){
+        try{
+            return (Habit) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return this;
+        }
     }
 }

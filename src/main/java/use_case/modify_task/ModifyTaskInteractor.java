@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyTaskPresenter;
-    private final TaskGateway userDataAccessObject;
+    private final TaskGateway taskDataAccessObject;
 
-    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyTaskPresenter, TaskGateway userDataAccessObject) {
+    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyTaskPresenter, TaskGateway taskDataAccessObject) {
         this.modifyTaskPresenter = modifyTaskPresenter;
-        this.userDataAccessObject = userDataAccessObject;
+        this.taskDataAccessObject = taskDataAccessObject;
     }
 
-    public void execute(ModifyTaskInputData modifyInputData) {
+    public void execute(ModifyTaskInputData modifyInputData){
 
         String oldTaskName = modifyInputData.getOldTaskName();
         String oldTaskPriority = modifyInputData.getOldPriority();
@@ -47,16 +47,6 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                 return;
             }
 
-
-            final Task modifiedTask = new TaskBuilder()
-                    .setTaskName(newTaskName)
-                    .setDescription(newDescription)
-                    .setDeadline(newDeadlineFormatted)
-                    .setStartTime(newStartTimeFormatted)
-                    .setTaskGroup(newTaskGroup)
-                    .setPriority(newPriorityFormatted)
-                    .setStatus(newTaskStatus).build();
-
             LocalDateTime oldDeadlineFormatted = LocalDateTime.parse(oldDeadline);
             LocalDateTime oldStartTimeFormatted = LocalDateTime.parse(oldStartTimeRaw);
 
@@ -64,12 +54,21 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                     .setTaskName(oldTaskName)
                     .setDescription(oldDescription)
                     .setDeadline(oldDeadlineFormatted)
-                    .setStartTime(oldStartTimeFormatted) // ADDED setStartTime
+                    .setStartTime(oldStartTimeFormatted)
                     .setTaskGroup(oldTaskGroup)
                     .setPriority(oldPriorityFormatted)
                     .setStatus(oldTaskStatus).build();
 
-            ArrayList<Task> taskList = userDataAccessObject.fetchTasks(userID);
+            final Task modifiedTask = oldTask.clone();
+            modifiedTask.setTaskName(newTaskName);
+            modifiedTask.setDescription(newDescription);
+            modifiedTask.setDeadline(newDeadlineFormatted);
+            modifiedTask.setStartTime(newStartTimeFormatted);
+            modifiedTask.setTaskGroup(newTaskGroup);
+            modifiedTask.setPriority(newPriorityFormatted);
+            modifiedTask.setStatus(newTaskStatus);
+
+            ArrayList<Task> taskList = taskDataAccessObject.fetchTasks(userID);
 
             for (Task task : taskList) {
                 if (!task.equals(oldTask) && task.getName().equals(modifiedTask.getName())){
@@ -78,11 +77,11 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                 }
             }
 
-            userDataAccessObject.deleteTask(userID, oldTask);
-            userDataAccessObject.addTask(userID, modifiedTask);
+            taskDataAccessObject.deleteTask(userID, oldTask);
+            taskDataAccessObject.addTask(userID, modifiedTask);
 
 
-            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(userDataAccessObject.fetchTasks(userID)));
+            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(taskDataAccessObject.fetchTasks(userID)));
         } catch (java.time.format.DateTimeParseException d) {
             modifyTaskPresenter.prepareFailView("Invalid date/time format. Use ISO format (e.g., YYYY-MM-DDTHH:MM:SS) for dates.");
         } catch (NumberFormatException n) {

@@ -9,11 +9,11 @@ import java.util.ArrayList;
 
 public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
     private final ModifyHabitOutputBoundary modifyHabitPresenter;
-    private final HabitGateway userDataAccessObject;
+    private final HabitGateway habitDataAccessObject;
 
-    public ModifyHabitInteractor(ModifyHabitOutputBoundary modifyHabitPresenter, HabitGateway userDataAccessObject) {
+    public ModifyHabitInteractor(ModifyHabitOutputBoundary modifyHabitPresenter, HabitGateway habitDataAccessObject) {
         this.modifyHabitPresenter = modifyHabitPresenter;
-        this.userDataAccessObject = userDataAccessObject;
+        this.habitDataAccessObject = habitDataAccessObject;
     }
 
     public void execute(ModifyHabitInputData modifyHabitInputData) {
@@ -45,17 +45,6 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
             int newStreakCountFormatted = Integer.parseInt(newStreakCount);
 
 
-            final Habit modifiedHabit = new HabitBuilder()
-                    .setHabitName(newHabitName)
-                    .setPriority(newPriorityFormatted)
-                    .setStatus(newHabitStatus)
-                    .setStartDateTime(newStartDateTimeFormatted)
-                    .setStreakCount(newStreakCountFormatted)
-                    .setHabitGroup(newHabitGroup)
-                    .setFrequency(newFrequencyFormatted)
-                    .build();
-
-
             final Habit oldHabit = new HabitBuilder()
                     .setHabitName(oldHabitName)
                     .setPriority(Integer.parseInt(oldPriority))
@@ -66,7 +55,17 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
                     .setFrequency(LocalDateTime.parse(oldFrequency))
                     .build();
 
-            ArrayList<Habit> habitList = userDataAccessObject.fetchHabits(userID);
+            final Habit modifiedHabit = oldHabit.clone();
+
+            modifiedHabit.setHabitName(newHabitName);
+            modifiedHabit.setPriority(newPriorityFormatted);
+            modifiedHabit.setStatus(newHabitStatus);
+            modifiedHabit.setStartDateTime(newStartDateTimeFormatted);
+            modifiedHabit.setStreakCount(newStreakCountFormatted);
+            modifiedHabit.setHabitGroup(newHabitGroup);
+            modifiedHabit.setFrequency(newFrequencyFormatted);
+
+            ArrayList<Habit> habitList = habitDataAccessObject.fetchHabits(userID);
             for (Habit habit : habitList) {
                 if (!habit.equals(oldHabit) && habit.getName().equals(modifiedHabit.getName())){
                     modifyHabitPresenter.prepareFailView("Habit already exists");
@@ -74,11 +73,11 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
                 }
             }
 
-            userDataAccessObject.deleteHabit(userID, oldHabit);
-            userDataAccessObject.addHabit(userID, modifiedHabit);
+            habitDataAccessObject.deleteHabit(userID, oldHabit);
+            habitDataAccessObject.addHabit(userID, modifiedHabit);
 
             modifyHabitPresenter.prepareSuccessView(new
-                    ModifyHabitOutputData(userDataAccessObject.fetchHabits(userID)));
+                    ModifyHabitOutputData(habitDataAccessObject.fetchHabits(userID)));
 
         } catch (java.time.format.DateTimeParseException d) {
             modifyHabitPresenter.prepareFailView("Invalid Date/Time Format");
