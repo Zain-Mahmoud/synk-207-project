@@ -20,7 +20,6 @@ public class ViewTasksAndHabitsPresenter implements ViewTasksAndHabitsOutputBoun
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final ViewTasksAndHabitsOutputData outputData = new ViewTasksAndHabitsOutputData();
 
     public ViewTasksAndHabitsPresenter(ViewManagerModel viewManagerModel,
                                        ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel) {
@@ -33,8 +32,8 @@ public class ViewTasksAndHabitsPresenter implements ViewTasksAndHabitsOutputBoun
 
     public void prepareSuccessView(ViewTasksAndHabitsOutputData response) {
         ViewTasksAndHabitsState state = viewTasksAndHabitsViewModel.getState();
-        ArrayList<ArrayList<String>> formattedTasks = outputData.getFormattedTasks();
-        ArrayList<ArrayList<String>> formattedHabits = outputData.getFormattedHabits();
+        ArrayList<ArrayList<String>> formattedTasks = response.getFormattedTasks();
+        ArrayList<ArrayList<String>> formattedHabits = response.getFormattedHabits();
         state.setFormattedTasks(formattedTasks);
         state.setFormattedHabits(formattedHabits);
         state.setErrorMessage(null);

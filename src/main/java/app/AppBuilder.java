@@ -122,6 +122,7 @@ public class AppBuilder {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
         viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel, viewTasksAndHabitsController);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
+        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
     }

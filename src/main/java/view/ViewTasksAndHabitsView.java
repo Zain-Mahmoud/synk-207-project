@@ -22,7 +22,7 @@ import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 
-public class ViewTasksAndHabitsView extends JPanel {
+public class ViewTasksAndHabitsView extends JPanel implements ActionListener, TableModelListener  {
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;
@@ -30,6 +30,11 @@ public class ViewTasksAndHabitsView extends JPanel {
     private ViewManagerModel viewManagerModel;
     private LoggedInViewModel loggedInViewModel;
 
+    private DefaultTableModel taskModel;
+    private DefaultTableModel habitModel;
+
+    private JButton refreshButton;
+    private JButton exitButton;
 
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
                                   ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
@@ -58,9 +63,6 @@ public class ViewTasksAndHabitsView extends JPanel {
         JTable taskTable = new JTable(taskModel);
         JTable habitTable = new JTable(habitModel);
 
-        taskModel.addRow(ViewTasksAndHabitsViewModel.sampleTask);
-        habitModel.addRow(ViewTasksAndHabitsViewModel.sampleHabit);
-
         taskTablePanel.add(taskTableLabel);
         taskTablePanel.add(taskTable);
         habitTablePanel.add(habitTableLabel);
@@ -68,66 +70,64 @@ public class ViewTasksAndHabitsView extends JPanel {
 
         this.add(mainPanel);
 
-        taskModel.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE) {
-
-                int row = e.getFirstRow();
-                int col = e.getColumn();
-
-                Object changedValue = taskModel.getValueAt(row, col);
-
-                String taskName = taskModel.getValueAt(row, 0).toString();
-
-                viewTasksAndHabitsController.execute("task", col, taskName, changedValue);
-
-            }
-        });
-
-        habitModel.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE) {
-                int row = e.getFirstRow();
-                int col = e.getColumn();
-
-                Object changedValue = habitModel.getValueAt(row, col);
-
-                String habitName = habitModel.getValueAt(row, 0).toString();
-
-                viewTasksAndHabitsController.execute("habit", col, habitName, changedValue);
-
-            }
-        });
-
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (evt.getSource().equals(exitButton)) {
-                    viewTasksAndHabitsController.exit();
+                    viewManagerModel.setState("logged in");
+                    viewManagerModel.firePropertyChanged();;
                 }
             }
         });
+    }
 
-        refreshButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if (evt.getSource().equals(refreshButton)) {
-                    viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+    public void actionPerformed(ActionEvent evt) {
+        if (evt.getSource().equals(refreshButton)) {
+            if (viewTasksAndHabitsController != null) {
+                viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
 
-                    ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
+                ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
 
-                    ArrayList<ArrayList<String>> taskList = state.getFormattedTasks();
+                ArrayList<ArrayList<String>> taskList = state.getFormattedTasks();
 
-                    for (ArrayList<String> row : taskList) {
-                        Object[] rowData = row.toArray();
-                        taskModel.addRow(rowData);
-                    }
+                taskModel.setRowCount(0);
+                habitModel.setRowCount(0);
 
-                    ArrayList<ArrayList<String>> habitList = state.getFormattedHabits();
+                for (ArrayList<String> row : taskList) {
+                    Object[] rowData = row.toArray();
+                    taskModel.addRow(rowData);
+                }
 
-                    for (ArrayList<String> row : habitList) {
-                        Object[] rowData = row.toArray();
-                        habitModel.addRow(rowData);
-                    }
+                ArrayList<ArrayList<String>> habitList = state.getFormattedHabits();
+
+                for (ArrayList<String> row : habitList) {
+                    Object[] rowData = row.toArray();
+                    habitModel.addRow(rowData);
                 }
             }
-        });
+        }
+    }
+
+    public void tableChanged(TableModelEvent e) {
+        if ((DefaultTableModel)e.getSource() == taskModel) {
+            int row = e.getFirstRow();
+            int col = e.getColumn();
+
+            Object changedValue = taskModel.getValueAt(row, col);
+
+            String taskName = taskModel.getValueAt(row, 0).toString();
+
+            viewTasksAndHabitsController.execute("task", col, taskName, changedValue);
+        }
+        else {
+            int row = e.getFirstRow();
+            int col = e.getColumn();
+
+            Object changedValue = habitModel.getValueAt(row, col);
+
+            String habitName = habitModel.getValueAt(row, 0).toString();
+
+            viewTasksAndHabitsController.execute("habit", col, habitName, changedValue);
+        }
     }
 
     public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){

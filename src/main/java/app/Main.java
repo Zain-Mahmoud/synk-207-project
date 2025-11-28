@@ -18,6 +18,7 @@ public class Main {
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
+                .addViewTasksAndHabitsUseCase()
                 .addSyncToGoogleCalendarUseCase()
                 .addViewStatsUseCase()
                 .build();
