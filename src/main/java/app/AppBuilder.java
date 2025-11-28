@@ -26,6 +26,9 @@ import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsPresenter;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
@@ -48,6 +51,10 @@ import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputBoundary;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInteractor;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsOutputBoundary;
+import view.*;
 import use_case.view_stats.ViewStatsInputBoundary;
 import use_case.view_stats.ViewStatsInteractor;
 import use_case.view_stats.ViewStatsOutputBoundary;
@@ -73,6 +80,9 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
+    private ViewTasksAndHabitsView viewtasksAndHabitsView;
+    private ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
+    private ViewTasksAndHabitsController viewTasksAndHabitsController;
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
@@ -105,6 +115,14 @@ public class AppBuilder {
         loggedInView = new LoggedInView(loggedInViewModel);
         loggedInView.setViewManagerModel(viewManagerModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addViewTasksAndHabitsView() {
+        viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel, viewTasksAndHabitsController);
+        viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
     }
 
@@ -179,6 +197,16 @@ public class AppBuilder {
         syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by logged-in view
         loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into logged-in view
         loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI updates
+        return this;
+    }
+
+    public AppBuilder addViewTasksAndHabitsUseCase() {
+        final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
+        final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
+                (taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
+
+        ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
+        loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
     }
 

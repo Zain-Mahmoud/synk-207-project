@@ -12,6 +12,7 @@ public class Main {
                 .addSignupView()
                 .addLoggedInView()
                 .addLeaderboardView()
+                .addViewTasksAndHabitsView()
                 .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()

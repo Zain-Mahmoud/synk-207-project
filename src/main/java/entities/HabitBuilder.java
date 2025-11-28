@@ -1,11 +1,13 @@
 package entities;
 
 import java.time.LocalDateTime;
+import java.time.Period;
 
 public class HabitBuilder {
     private String habitName;
     private LocalDateTime startDateTime;
-    private LocalDateTime frequency;
+    private Period frequency;
+    private LocalDateTime lastDateTimeCompleted;
     private String habitGroup;
     private int streakCount = 0;
     private int priority = 0;
@@ -21,8 +23,13 @@ public class HabitBuilder {
         return this;
     }
 
-    public HabitBuilder setFrequency(LocalDateTime frequency) {
+    public HabitBuilder setFrequency(Period frequency) {
         this.frequency = frequency;
+        return this;
+    }
+
+    public HabitBuilder setlastDateTimeCompleted(LocalDateTime LastDateTimeCompleted) {
+        this.lastDateTimeCompleted = lastDateTimeCompleted;
         return this;
     }
 
@@ -53,7 +60,7 @@ public class HabitBuilder {
         if (startDateTime == null) {
             throw new IllegalStateException("startDateTime must not be null");
         }
-        return new Habit(habitName, startDateTime, frequency, habitGroup, streakCount, priority, status);
+        return new Habit(habitName, startDateTime, frequency, lastDateTimeCompleted, habitGroup, streakCount, priority, status);
     }
 
 }
