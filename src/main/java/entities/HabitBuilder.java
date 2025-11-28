@@ -8,8 +8,8 @@ public class HabitBuilder {
     private LocalDateTime frequency;
     private String habitGroup;
     private int streakCount = 0;
-    private int priority = 0; //waiting for modifying after.
-    private boolean status = false; // not sure yet, placeholder.
+    private int priority = 0;
+    private boolean status = false;
 
     public HabitBuilder setHabitName(String habitName) {
         this.habitName = habitName;

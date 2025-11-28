@@ -35,6 +35,9 @@ import interface_adapter.signup.SignupViewModel;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter;
 import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
+import interface_adapter.view_stats.ViewStatsController;
+import interface_adapter.view_stats.ViewStatsPresenter;
+import interface_adapter.view_stats.ViewStatsViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -58,6 +61,10 @@ import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
+import use_case.view_stats.ViewStatsInputBoundary;
+import use_case.view_stats.ViewStatsInteractor;
+import use_case.view_stats.ViewStatsOutputBoundary;
+import view.*;
 
 import view.*;
 import view.LeaderboardView;
@@ -97,6 +104,8 @@ public class AppBuilder {
     private ModifyHabitView modifyHabitView;
     private ModifyHabitController modifyHabitController;
     private ModifyHabitViewModel modifyHabitViewModel;
+    private ViewStatsViewModel viewStatsViewModel;
+    private StatsView statsView;
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
@@ -145,6 +154,14 @@ public class AppBuilder {
         modifyHabitViewModel = new ModifyHabitViewModel();
         modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
         modifyHabitView.setViewManagerModel(viewManagerModel);
+        return this;
+    }
+
+    public AppBuilder addStatsView(){
+        viewStatsViewModel = new ViewStatsViewModel();
+        statsView = new StatsView(viewStatsViewModel);
+        statsView.setViewManager(viewManagerModel);
+        cardPanel.add(statsView, statsView.getViewName());
         return this;
     }
 
@@ -225,6 +242,18 @@ public class AppBuilder {
 
         modifyHabitController = new ModifyHabitController(modifyHabitInteractor, loggedInViewModel);
         modifyHabitView.setModifyHabitController(modifyHabitController);
+        return this;
+    }
+
+    public AppBuilder addViewStatsUseCase(){
+        final ViewStatsOutputBoundary viewStatsOutputBoundary = new ViewStatsPresenter(viewStatsViewModel,
+                viewManagerModel);
+        final ViewStatsInputBoundary viewStatsInteractor = new ViewStatsInteractor(habitDataAccessObject,
+                taskDataAccessObject, viewStatsOutputBoundary);
+
+        ViewStatsController viewStatsController = new ViewStatsController(viewStatsInteractor, loggedInViewModel);
+        loggedInView.setViewStatsController(viewStatsController);
+
         return this;
     }
 
