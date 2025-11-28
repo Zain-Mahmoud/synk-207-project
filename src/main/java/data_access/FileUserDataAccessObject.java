@@ -44,7 +44,13 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
                 String row;
                 while ((row = reader.readLine()) != null) {
+                    if (row.trim().isEmpty()) {
+                        continue; // skip blank lines
+                    }
                     final String[] col = row.split(",");
+                    if (col.length < headers.size()) {
+                        continue; // skip malformed rows
+                    }
                     final String username = String.valueOf(col[headers.get("username")]);
                     final String password = String.valueOf(col[headers.get("password")]);
                     final User user = userFactory.create(username, password);
