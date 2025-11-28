@@ -40,7 +40,7 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
         try {
 
             LocalDateTime newStartDateTimeFormatted = LocalDateTime.parse(newStartDateTime);
-            LocalDateTime newFrequencyFormatted = LocalDateTime.parse(newFrequency);
+            int newFrequencyFormatted = LocalDateTime.parse(newFrequency);
             int newPriorityFormatted = Integer.parseInt(newPriority);
             int newStreakCountFormatted = Integer.parseInt(newStreakCount);
 

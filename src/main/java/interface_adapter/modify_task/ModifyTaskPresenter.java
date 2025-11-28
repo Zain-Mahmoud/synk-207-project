@@ -2,22 +2,22 @@ package interface_adapter.modify_task;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 import use_case.modify_task.ModifyTaskOutputBoundary;
 import use_case.modify_task.ModifyTaskOutputData;
 
 public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
     private ViewManagerModel viewManagerModel;
     private ModifyTaskViewModel modifyTaskViewModel;
-    // TODO uncomment when ready
-    // private ViewTasksAndHabitsModel tasksViewModel;
+    private ViewTasksAndHabitsViewModel tasksViewModel;
 
 
     public ModifyTaskPresenter(ViewManagerModel viewManagerModel,
                                ModifyTaskViewModel modifyTaskViewModel,
-                               LoginViewModel loginViewModel) {
+                               ViewTasksAndHabitsViewModel tasksViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.modifyTaskViewModel = modifyTaskViewModel;
-        // this.tasksViewModel = tasksView mode TODO add to constructor and uncomment
+        this.tasksViewModel = tasksViewModel;
     }
 
     @Override

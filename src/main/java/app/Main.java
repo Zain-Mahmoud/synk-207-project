@@ -14,6 +14,7 @@ public class Main {
                 .addLeaderboardView()
                 .addModifyTaskView()
                 .addModifyHabitView()
+                .addViewTasksAndHabitsView()
                 .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()

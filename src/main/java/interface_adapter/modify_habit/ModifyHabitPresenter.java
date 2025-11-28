@@ -2,6 +2,8 @@ package interface_adapter.modify_habit;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsState;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 import use_case.modify_habit.ModifyHabitInteractor;
 import use_case.modify_habit.ModifyHabitOutputBoundary;
 import use_case.modify_habit.ModifyHabitOutputData;
@@ -10,7 +12,7 @@ import use_case.modify_habit.ModifyHabitOutputData;
 public class ModifyHabitPresenter implements ModifyHabitOutputBoundary {
     private ViewManagerModel viewManagerModel;
     private ModifyHabitViewModel modifyHabitViewModel;
-    // private ViewTasksAndHabitsViewModel habitsViewModel;  TODO uncomment when ready
+    private ViewTasksAndHabitsViewModel habitsViewModel;
 
 
 
@@ -23,11 +25,11 @@ public class ModifyHabitPresenter implements ModifyHabitOutputBoundary {
 
     @Override
     public void prepareSuccessView(ModifyHabitOutputData outputData) {
-        // ViewTasksAndHabitsState currState habitsViewModel.getState();
-        // currState.setHabitsList(outputData.getHabitsList());
-        // habitsViewModel.firePropertyChanged();
+        ViewTasksAndHabitsState currState = habitsViewModel.getState();
+        currState.setFormattedHabits(outputData.getHabitList());
+        habitsViewModel.firePropertyChanged();
 
-        // switchToHabitListView();
+        switchToHabitListView();
     }
 
     @Override
@@ -37,9 +39,7 @@ public class ModifyHabitPresenter implements ModifyHabitOutputBoundary {
     }
 
     public void switchToHabitListView(){
-        // TODO Arya's use case's view
-
-//        viewManagerModel.setState(habitViewModel.getViewName());
-//        viewManagerModel.firePropertyChanged();
+        viewManagerModel.setState(habitsViewModel.getViewName());
+        viewManagerModel.firePropertyChanged();
     }
 }
