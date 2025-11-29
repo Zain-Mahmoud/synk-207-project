@@ -126,7 +126,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 String habitName = habit.getName();
                 LocalDateTime habitStartDateTime = habit.getStartDateTime();
-                Period habitFrequency = habit.getFrequency();
+                int habitFrequency = habit.getFrequency();
                 String habitGroup = habit.getHabitGroup();
                 int habitStreakCount = habit.getStreakCount();
                 int priority = habit.getPriority();
@@ -187,9 +187,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
                         break;
                 }
 
-                formattedHabit.add(Integer.toString(habitFrequency.getYears()) + " Years, " +
-                        Integer.toString(habitFrequency.getMonths()) + " Months, " +
-                        Integer.toString(habitFrequency.getDays()) + " Days");
+                formattedHabit.add(Integer.toString(habitFrequency));
 
                 formattedHabit.add(habitGroup);
 

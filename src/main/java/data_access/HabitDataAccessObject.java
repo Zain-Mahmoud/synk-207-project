@@ -99,9 +99,9 @@ public class HabitDataAccessObject implements HabitGateway {
                 if (!startDateTimeRaw.isBlank()) {
                     startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
                 }
-                Period frequency = null;
+                int frequency = 0;
                 if (!frequencyRaw.isBlank()) {
-                    frequency = Period.parse(frequencyRaw);
+                    frequency = Integer.parseInt(frequencyRaw);
                 }
 
                 Habit habit = new HabitBuilder()
@@ -129,7 +129,7 @@ public class HabitDataAccessObject implements HabitGateway {
                 final String username = entry.getKey();
                 for (Habit habit : entry.getValue()) {
                     final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
-                    final String frequency = habit.getFrequency() == null ? "" : habit.getFrequency().toString();
+                    final String frequency = Integer.toString(habit.getFrequency());
                     final String line = String.join(",",
                             username,
                             safe(habit.getName()),

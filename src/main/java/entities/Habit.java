@@ -2,12 +2,11 @@ package entities;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.time.Period;
 
 public class Habit implements Completable {
     private String habitName;
     private LocalDateTime startDateTime;
-    private Period frequency;
+    private int frequency;
     private String habitGroup;
     private int streakCount;
     private int priority;
@@ -16,8 +15,7 @@ public class Habit implements Completable {
 
     Habit(String habitName,
           LocalDateTime startDateTime,
-          Period frequency,
-          LocalDateTime lastDateTimeCompleted,
+          int frequency,
           String habitGroup,
           int streakCount,
           int priority,
@@ -73,8 +71,8 @@ public class Habit implements Completable {
     public LocalDateTime getStartDateTime() { return this.startDateTime; }
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
 
-    public Period getFrequency() { return this.frequency; }
-    public void setFrequency(Period frequency) { this.frequency = frequency; }
+    public int getFrequency() { return this.frequency; }
+    public void setFrequency(int frequency) { this.frequency = frequency; }
 
     public String getHabitGroup() { return this.habitGroup; }
     public void setHabitGroup(String habitGroup) { this.habitGroup = habitGroup; }
