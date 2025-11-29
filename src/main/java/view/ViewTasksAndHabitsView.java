@@ -1,27 +1,18 @@
 package view;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginState;
-import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsState;
-
-import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Period;
 import java.util.ArrayList;
 
 public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener  {
@@ -35,15 +26,16 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     private DefaultTableModel taskModel;
     private DefaultTableModel habitModel;
 
-    private JButton refreshButton;
-    private JButton exitButton;
+    private final JButton refreshButton;
+    private final JButton exitButton;
 
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
-                                  ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
+                                  ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel) {
+
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
         this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
         this.viewManagerModel = viewManagerModel;
-        this.viewTasksAndHabitsController = viewTasksAndHabitsController;
+        this.loggedInViewModel = loggedInViewModel;
 
         this.taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0) {
             @Override
@@ -59,30 +51,24 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
         };
 
-        this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
-
-        final JPanel mainPanel = new JPanel();
         final JPanel TablePanel = new JPanel();
         final JPanel buttonPanel = new JPanel();
 
-        final JButton exitButton = new JButton("Exit");
-        final JButton refreshButton = new JButton("Refresh");
+        this.exitButton = new JButton("Exit");
+        this.refreshButton = new JButton("Refresh");
 
-        buttonPanel.add(exitButton);
-        buttonPanel.add(refreshButton);
+        buttonPanel.add(this.exitButton);
+        buttonPanel.add(this.refreshButton);
 
         final JLabel TableLabel = new JLabel("Tasks and Habits");
 
-        final DefaultTableModel taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0);
-        final DefaultTableModel habitModel = new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0);
-
         setLayout(new BorderLayout());
 
-        JTable taskTable = new JTable(taskModel);
+        JTable taskTable = new JTable(this.taskModel);
         taskTable.setFillsViewportHeight(true);
         JScrollPane taskScrollPane = new JScrollPane(taskTable);
 
-        JTable habitTable = new JTable(habitModel);
+        JTable habitTable = new JTable(this.habitModel);
         habitTable.setFillsViewportHeight(true);
         JScrollPane habitScrollPane = new JScrollPane(habitTable);
 
@@ -97,31 +83,50 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
         add(tabbedPane, BorderLayout.CENTER);
 
-        exitButton.addActionListener(new ActionListener() {
+
+        this.exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (evt.getSource().equals(exitButton)) {
-                    viewManagerModel.setState("logged in");
-                    viewManagerModel.firePropertyChanged();;
+                    viewManagerModel.setState(loggedInViewModel.getViewName());
+                    viewManagerModel.firePropertyChanged();
                 }
             }
         });
 
-        refreshButton.addActionListener(new ActionListener() {
+        this.refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 if (evt.getSource().equals(refreshButton)) {
-                    ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
-                    ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
-                    ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
-                    updateTable(formattedTasks, formattedHabits);
+
+                    if (viewTasksAndHabitsController != null) {
+                        viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+                    } else {
+                        JOptionPane.showMessageDialog(ViewTasksAndHabitsView.this,
+                                "Initialization in progress. Please wait a moment.",
+                                "Loading", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
         });
+
+
+        if (this.viewTasksAndHabitsController != null && this.loggedInViewModel != null) {
+            this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
+        }
+
     }
 
+    /**
+     * Required method for ActionListener, though typically handled via anonymous classes now.
+     * @param evt the ActionEvent to react to
+     */
     public void actionPerformed(ActionEvent evt) {
+        // Empty
     }
 
+    /**
+     * Clears and updates the JTables with fresh data from the ViewModel.
+     */
     public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
 
         taskModel.setRowCount(0);
@@ -138,8 +143,14 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         }
     }
 
+    /**
+     * Setter for Dependency Injection, used by the main application builder to wire up the controller later.
+     */
     public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
+        if (this.loggedInViewModel != null) {
+            this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
+        }
     }
 
     public String getViewName () {
@@ -150,16 +161,23 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * Reacts to changes in the ViewModel state. This is how the table data is refreshed after a controller call.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
+
+
+            if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+                JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Loading Error", JOptionPane.ERROR_MESSAGE);
+                state.setErrorMessage(null);
+            }
+
             ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
             ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
             updateTable(formattedTasks, formattedHabits);
         }
     }
-
 }
-
-

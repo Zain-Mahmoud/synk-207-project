@@ -186,13 +186,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             final LoggedInState state = (LoggedInState) evt.getNewValue();
             username.setText(state.getUsername());
 
-            // --- NEW: Automatically load tasks/habits when the user logs in ---
+
             if (viewTasksAndHabitsController != null && state.getUsername() != null && !state.getUsername().isEmpty()) {
                 System.out.println("User logged in. Triggering initial task/habit data load for: " + state.getUsername());
                 // The logged-in ViewModel holds the necessary username information
-                viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+                this.viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
             }
-            // -----------------------------------------------------------------
+
 
         }
         else if (evt.getPropertyName().equals("password")) {

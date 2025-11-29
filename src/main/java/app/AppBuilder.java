@@ -80,6 +80,13 @@ import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
 
+import view.*;
+import view.LeaderboardView;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
+
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -146,9 +153,8 @@ public class AppBuilder {
 
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
-        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel, viewTasksAndHabitsController);
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
-        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
     }
@@ -178,7 +184,7 @@ public class AppBuilder {
 
     public AppBuilder addStatsView(){
         viewStatsViewModel = new ViewStatsViewModel();
-        statsView = new StatsView(viewStatsViewModel);
+        statsView = new StatsView(viewStatsViewModel, viewManagerModel);
         statsView.setViewManager(viewManagerModel);
         cardPanel.add(statsView, statsView.getViewName());
         return this;
@@ -264,6 +270,7 @@ public class AppBuilder {
         return this;
     }
 
+
     public AppBuilder addViewTasksAndHabitsUseCase() {
         final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
@@ -271,6 +278,7 @@ public class AppBuilder {
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
     }
 

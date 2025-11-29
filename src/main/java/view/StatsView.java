@@ -11,12 +11,13 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.view_stats.ViewStatsController;
 import interface_adapter.view_stats.ViewStatsState;
 import interface_adapter.view_stats.ViewStatsViewModel;
 
+
 public class StatsView extends JPanel implements ActionListener, PropertyChangeListener {
 
+    private final ViewManagerModel viewManagerModel;
 
     private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 28);
     private static final Font LABEL_FONT = new Font("SansSerif", Font.PLAIN, 14);
@@ -28,10 +29,14 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
     private final JLabel TASKS_COMPLETED_VALUE = new JLabel("0 / 0");
     private final JLabel HABITS_COMPLETED_VALUE = new JLabel("0 / 0");
 
+    private final JButton back = new JButton("Back");
+
     private final String viewName = "view stats";
     private final ViewStatsViewModel viewStatsViewModel;
 
-    public StatsView(ViewStatsViewModel viewStatsViewModel) {
+    public StatsView(ViewStatsViewModel viewStatsViewModel, ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+
         this.viewStatsViewModel = viewStatsViewModel;
         this.viewStatsViewModel.addPropertyChangeListener(this);
 
@@ -39,11 +44,13 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
         this.setBackground(SECONDARY_COLOR);
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
+
         final JLabel title = new JLabel("Your Productivity Dashboard", SwingConstants.CENTER);
         title.setFont(TITLE_FONT);
         title.setForeground(PRIMARY_COLOR.darker());
         title.setBorder(new EmptyBorder(0, 0, 30, 0));
         this.add(title, BorderLayout.NORTH);
+
 
         final JPanel contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(SECONDARY_COLOR);
@@ -65,7 +72,19 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
         gbc.gridy = 0;
         contentPanel.add(createStatCard("Total Habits Completed", HABITS_COMPLETED_VALUE), gbc);
 
+
         this.add(contentPanel, BorderLayout.CENTER);
+
+        back.addActionListener(e -> {
+            viewManagerModel.setState("logged in");
+            viewManagerModel.firePropertyChanged();
+        });
+
+        final JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        backButtonPanel.setBackground(SECONDARY_COLOR);
+        backButtonPanel.add(back);
+
+        this.add(backButtonPanel, BorderLayout.SOUTH);
     }
 
     /**
