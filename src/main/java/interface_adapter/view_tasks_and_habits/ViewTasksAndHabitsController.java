@@ -33,9 +33,6 @@ public class ViewTasksAndHabitsController {
         viewTasksAndHabitsUseCaseInteractor.execute(viewTasksAndHabitsInputData);
     }
 
-    public void exit() {
-    }
-
     public void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel) {
         viewTasksAndHabitsUseCaseInteractor.getFormattedTasksAndHabits(this.loggedInViewModel);
     }

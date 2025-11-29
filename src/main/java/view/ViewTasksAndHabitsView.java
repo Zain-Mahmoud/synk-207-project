@@ -15,6 +15,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 
-public class ViewTasksAndHabitsView extends JPanel implements ActionListener, TableModelListener  {
+public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener  {
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;
@@ -39,6 +40,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Ta
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
                                   ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
+        this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
         this.viewManagerModel = viewManagerModel;
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
 
@@ -49,10 +51,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Ta
         final JButton exitButton = new JButton("Exit");
         final JButton refreshButton = new JButton("Refresh");
 
-        mainPanel.add(taskTablePanel);
-        mainPanel.add(habitTablePanel);
-        mainPanel.add(exitButton);
-        mainPanel.add(refreshButton);
 
         final JLabel taskTableLabel = new JLabel("Task Table");
         final JLabel habitTableLabel = new JLabel("Habit Table");
@@ -68,6 +66,11 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Ta
         habitTablePanel.add(habitTableLabel);
         habitTablePanel.add(habitTable);
 
+        mainPanel.add(taskTablePanel);
+        mainPanel.add(habitTablePanel);
+        mainPanel.add(exitButton);
+        mainPanel.add(refreshButton);
+
         this.add(mainPanel);
 
         exitButton.addActionListener(new ActionListener() {
@@ -81,30 +84,11 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Ta
     }
 
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource().equals(refreshButton)) {
-            if (viewTasksAndHabitsController != null) {
-                viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
-
-                ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
-
-                ArrayList<ArrayList<String>> taskList = state.getFormattedTasks();
-
-                taskModel.setRowCount(0);
-                habitModel.setRowCount(0);
-
-                for (ArrayList<String> row : taskList) {
-                    Object[] rowData = row.toArray();
-                    taskModel.addRow(rowData);
-                }
-
-                ArrayList<ArrayList<String>> habitList = state.getFormattedHabits();
-
-                for (ArrayList<String> row : habitList) {
-                    Object[] rowData = row.toArray();
-                    habitModel.addRow(rowData);
-                }
-            }
-        }
+//        if (evt.getSource().equals(refreshButton)) {
+//            if (viewTasksAndHabitsController != null) {
+//                updateTable();
+//            }
+//        }
     }
 
     public void tableChanged(TableModelEvent e) {
@@ -140,6 +124,30 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Ta
 
     public void setViewManagerModel(ViewManagerModel viewManagerModel) {
         this.viewManagerModel = viewManagerModel;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
+        ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
+        ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
+        updateTable(formattedTasks, formattedHabits);
+    }
+
+    public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
+
+        taskModel.setRowCount(0);
+        habitModel.setRowCount(0);
+
+        for (ArrayList<String> row : taskList) {
+            Object[] rowData = row.toArray();
+            taskModel.addRow(rowData);
+        }
+
+        for (ArrayList<String> row : habitList) {
+            Object[] rowData = row.toArray();
+            habitModel.addRow(rowData);
+        }
     }
 }
 
