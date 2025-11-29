@@ -15,30 +15,28 @@ public class CreateHabitController {
     }
 
     public void execute(String username,
-                        String habitName,
-                        String startDateTimeText,
-                        String frequencyDateTimeText,
-                        String habitGroup,
-                        int streakCount,
-                        int priority) {
+            String habitName,
+            String startDateTimeText,
+            String frequencyText,
+            String habitGroup,
+            int streakCount,
+            int priority) {
 
         LocalDateTime startDateTime;
-        LocalDateTime frequency;
+        int frequency;
 
         try {
             startDateTime = LocalDateTime.parse(startDateTimeText);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException(
-                    "Invalid start date & time format. Use yyyy-MM-dd'T'HH:mm"
-            );
+                    "Invalid start date & time format. Use yyyy-MM-dd'T'HH:mm");
         }
 
         try {
-            frequency = LocalDateTime.parse(frequencyDateTimeText);
-        } catch (DateTimeParseException e) {
+            frequency = Integer.parseInt(frequencyText);
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "Invalid frequency date & time format. Use yyyy-MM-dd'T'HH:mm"
-            );
+                    "Invalid frequency. Must be an integer.");
         }
 
         CreateHabitInputData inputData = new CreateHabitInputData(
@@ -48,8 +46,7 @@ public class CreateHabitController {
                 frequency,
                 habitGroup,
                 streakCount,
-                priority
-        );
+                priority);
 
         interactor.execute(inputData);
     }

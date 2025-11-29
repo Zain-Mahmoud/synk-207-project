@@ -14,7 +14,7 @@ import java.beans.PropertyChangeListener;
 
 /**
  * Swing View for Create Habit.
- * Frequency is input as a LocalDateTime string, no longer using count/unit.
+ * Frequency is input as an integer (e.g., days).
  */
 public class CreateHabitView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -96,7 +96,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         formPanel.add(new JLabel(CreateHabitViewModel.FREQUENCY_LABEL + ":"), gbc);
 
         gbc.gridx = 1;
-        frequencyField.setToolTipText("Next reminder time, same format as above");
+        frequencyField.setToolTipText("Frequency in days (integer)");
         formPanel.add(frequencyField, gbc);
         row++;
 
@@ -166,7 +166,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
         // Get data from view
         String habitName = habitNameField.getText().trim();
         String startDateTimeText = startDateTimeField.getText().trim();
-        String frequencyDateTimeText = frequencyField.getText().trim();
+        String frequencyText = frequencyField.getText().trim();
         String habitGroup = habitGroupField.getText().trim();
         String streakText = streakCountField.getText().trim();
         String priorityText = priorityField.getText().trim();
@@ -200,7 +200,7 @@ public class CreateHabitView extends JPanel implements ActionListener, PropertyC
                     username,
                     habitName,
                     startDateTimeText,
-                    frequencyDateTimeText,
+                    frequencyText,
                     habitGroup,
                     streakCount,
                     priority);

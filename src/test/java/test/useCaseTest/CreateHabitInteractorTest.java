@@ -62,7 +62,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "Exercise",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -92,7 +92,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -118,7 +118,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "Exercise",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -152,7 +152,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "Exercise",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -163,6 +163,7 @@ class CreateHabitInteractorTest {
         // Assert
         assertTrue(presenter.failMessage.contains("Failed to create habit: Database error"));
     }
+
     @Test
     void createHabit_failsWhenNameIsNull() {
         // Arrange
@@ -175,7 +176,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 null,
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -200,7 +201,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "   ",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
@@ -234,7 +235,7 @@ class CreateHabitInteractorTest {
                 "roy",
                 "Exercise",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 2, 10, 0),
+                1,
                 "Health",
                 0,
                 5);
