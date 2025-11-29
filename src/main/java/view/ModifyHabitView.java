@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
+
 
 public class ModifyHabitView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "modify habit";
@@ -55,15 +55,10 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
         JLabel habitPriorityLabel = new JLabel("Habit priority");
         JLabel streakCountLabel = new JLabel("Streak count");
 
-        newHabitName.setText(currState.getOldHabitName());
-        newFrequency.setText(currState.getOldFrequency());
-        newHabitPriority.setText(currState.getOldPriority());
-        newStreakCount.setText(currState.getOldStreakCount());
-        newHabitGroup.setText(currState.getOldHabitGroup());
-        newStartDateTime.setText(currState.getOldStartDateTime());
 
 
-        if (currState.getOldStatus()){
+
+        if (currState.getStatus()){
             habitCompleted.setSelected(true);
         } else{
             habitCompleted.setSelected(true);
@@ -313,13 +308,18 @@ public class ModifyHabitView extends JPanel implements ActionListener, PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final ModifyHabitState state = (ModifyHabitState) evt.getNewValue();
-        newHabitName.setText(state.getHabitName());
-        newStartDateTime.setText(state.getStartDateTime());
-        newFrequency.setText(state.getFrequency());
-        newHabitGroup.setText(state.getHabitGroup());
-        newHabitPriority.setText(state.getPriority());
-        newStreakCount.setText(state.getStreakCount());
+        final ModifyHabitState currState = (ModifyHabitState) evt.getNewValue();
+        newHabitName.setText(currState.getOldHabitName());
+        newFrequency.setText(currState.getOldFrequency());
+        newHabitPriority.setText(currState.getOldPriority());
+        newStreakCount.setText(currState.getOldStreakCount());
+        newHabitGroup.setText(currState.getOldHabitGroup());
+        newStartDateTime.setText(currState.getOldStartDateTime());
+        if (currState.getOldStatus()){
+            habitCompleted.setSelected(true);
+        } else {
+            habitCompleted.setSelected(false);
+        }
     }
 
     public String getViewName() {

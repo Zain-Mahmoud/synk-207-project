@@ -153,7 +153,8 @@ public class AppBuilder {
 
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
-        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel,
+                loggedInViewModel, modifyHabitViewModel, modifyTaskViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
@@ -179,6 +180,7 @@ public class AppBuilder {
         modifyHabitViewModel = new ModifyHabitViewModel();
         modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
         modifyHabitView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyHabitView, modifyHabitView.getViewName());
         return this;
     }
 
@@ -261,7 +263,7 @@ public class AppBuilder {
 
     public AppBuilder addModifyHabitUseCase(){
         final ModifyHabitOutputBoundary modifyHabitOutputBoundary = new ModifyHabitPresenter(viewManagerModel,
-                modifyHabitViewModel, loginViewModel);
+                modifyHabitViewModel, viewTasksAndHabitsViewModel);
         final ModifyHabitInputBoundary modifyHabitInteractor = new ModifyHabitInteractor(modifyHabitOutputBoundary,
                 habitDataAccessObject);
 

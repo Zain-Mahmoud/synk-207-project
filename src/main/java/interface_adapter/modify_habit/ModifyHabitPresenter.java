@@ -18,9 +18,10 @@ public class ModifyHabitPresenter implements ModifyHabitOutputBoundary {
 
     public ModifyHabitPresenter(ViewManagerModel viewManagerModel,
                                 ModifyHabitViewModel modifyHabitViewModel,
-                                LoginViewModel loginViewModel) {
+                                ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.modifyHabitViewModel = modifyHabitViewModel;
+        this.habitsViewModel = viewTasksAndHabitsViewModel;
     }
 
     @Override
