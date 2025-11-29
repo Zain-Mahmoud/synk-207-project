@@ -71,8 +71,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         buttonPanel.add(exitButton);
         buttonPanel.add(refreshButton);
 
-        final JLabel taskTableLabel = new JLabel("Tasks and Habits");
-        final JLabel habitTableLabel = new JLabel("");
+        final JLabel TableLabel = new JLabel("Tasks and Habits");
 
         final DefaultTableModel taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0);
         final DefaultTableModel habitModel = new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0);
@@ -87,26 +86,16 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         habitTable.setFillsViewportHeight(true);
         JScrollPane habitScrollPane = new JScrollPane(habitTable);
 
-        TablePanel.add(taskTableLabel);
-        add(taskTablePanel, BorderLayout.PAGE_START);
-        TablePanel.add(habitTableLabel);
-        habitTablePanel.add(habitTable);
-        add(habitTablePanel, BorderLayout.PAGE_END);
-
+        add(TablePanel, BorderLayout.SOUTH);
+        add(TableLabel, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.EAST);
 
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setPreferredSize(new Dimension(1200, 500));
         tabbedPane.addTab("Tasks", taskScrollPane);
         tabbedPane.addTab("Habits", habitScrollPane);
 
-        taskTablePanel.add(tabbedPane);
-
-        mainPanel.add(taskTablePanel);
-        mainPanel.add(habitTablePanel);
-        mainPanel.add(exitButton);
-        mainPanel.add(refreshButton);
-
-        this.add(mainPanel);
+        add(tabbedPane, BorderLayout.CENTER);
 
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -125,13 +114,28 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
                     ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
                     ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
                     updateTable(formattedTasks, formattedHabits);
-                    viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
                 }
             }
         });
     }
 
     public void actionPerformed(ActionEvent evt) {
+    }
+
+    public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
+
+        taskModel.setRowCount(0);
+        habitModel.setRowCount(0);
+
+        for (ArrayList<String> row : taskList) {
+            Object[] rowData = row.toArray();
+            taskModel.addRow(rowData);
+        }
+
+        for (ArrayList<String> row : habitList) {
+            Object[] rowData = row.toArray();
+            habitModel.addRow(rowData);
+        }
     }
 
     public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){
@@ -150,31 +154,12 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
-            if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
-                JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Error", JOptionPane.ERROR_MESSAGE);
-                state.setErrorMessage(null);
-            }
             ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
             ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
             updateTable(formattedTasks, formattedHabits);
         }
     }
 
-    public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
-
-        taskModel.setRowCount(0);
-        habitModel.setRowCount(0);
-
-        for (ArrayList<String> row : taskList) {
-            Object[] rowData = row.toArray();
-            taskModel.addRow(rowData);
-        }
-
-        for (ArrayList<String> row : habitList) {
-            Object[] rowData = row.toArray();
-            habitModel.addRow(rowData);
-        }
-    }
 }
 
 
