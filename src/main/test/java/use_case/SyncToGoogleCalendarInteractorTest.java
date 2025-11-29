@@ -20,10 +20,17 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 
+/**
+ * Unit tests for {@link use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor}.
+ * See @ link for more details of the tested class
+ */
+
+
+
 public class SyncToGoogleCalendarInteractorTest {
 
     /**
-     * Verifies tasks sync when a credential already exists and no authentication is needed.
+     * Verifies task sync when a credential already exists and no authentication is needed.
      */
     @Test
     void syncsWithExistingCredential() {
