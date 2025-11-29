@@ -60,6 +60,13 @@ import use_case.view_stats.ViewStatsInteractor;
 import use_case.view_stats.ViewStatsOutputBoundary;
 import view.*;
 
+import view.*;
+import view.LeaderboardView;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
+
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -120,7 +127,7 @@ public class AppBuilder {
 
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
-        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel, viewTasksAndHabitsController);
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
@@ -200,6 +207,7 @@ public class AppBuilder {
         return this;
     }
 
+
     public AppBuilder addViewTasksAndHabitsUseCase() {
         final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
@@ -207,6 +215,7 @@ public class AppBuilder {
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
     }
 

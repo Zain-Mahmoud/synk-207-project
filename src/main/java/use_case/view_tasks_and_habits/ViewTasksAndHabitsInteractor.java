@@ -24,10 +24,9 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
     public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess, FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter){
         this.presenter = presenter;
         this.userDataAccess = userDataAccess;
-        this.taskDataAccess = new TaskDataAccessObject();
-        this.habitDataAccess = new HabitDataAccessObject();
+        this.taskDataAccess = taskDataAccess;
+        this.habitDataAccess = habitDataAccess;
     }
-
 
     @Override
     public void execute(ViewTasksAndHabitsInputData InputData) {
