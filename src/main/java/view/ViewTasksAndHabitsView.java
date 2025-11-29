@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -22,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.awt.*;
 
 public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener  {
 
@@ -32,133 +32,106 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     private ViewManagerModel viewManagerModel;
     private LoggedInViewModel loggedInViewModel;
 
-    private DefaultTableModel taskModel; // Now initialized in constructor
-    private DefaultTableModel habitModel; // Now initialized in constructor
+    private DefaultTableModel taskModel;
+    private DefaultTableModel habitModel;
 
     private JButton refreshButton;
     private JButton exitButton;
 
-    // Table Column Headers for initialization
-    private static final String[] TASK_HEADERS = {"Name", "Deadline", "Start Time", "Group", "Priority", "Status", "Description"};
-    private static final String[] HABIT_HEADERS = {"Name", "Start Date", "Frequency", "Group", "Priority", "Status", "Description"};
-
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
                                   ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
-
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
+        this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
         this.viewManagerModel = viewManagerModel;
-        this.loggedInViewModel = loggedInViewModel;
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
 
-        // FIX: Initialize taskModel and habitModel to prevent NullPointerException
-        this.taskModel = new DefaultTableModel(TASK_HEADERS, 0);
-        this.habitModel = new DefaultTableModel(HABIT_HEADERS, 0);
+        this.taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0) {
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
+
+        this.habitModel = new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0) {
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
 
         this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
 
-        // --- Layout Setup ---
+        final JPanel mainPanel = new JPanel();
+        final JPanel TablePanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
+
+        final JButton exitButton = new JButton("Exit");
+        final JButton refreshButton = new JButton("Refresh");
+
+        buttonPanel.add(exitButton);
+        buttonPanel.add(refreshButton);
+
+        final JLabel taskTableLabel = new JLabel("Tasks and Habits");
+        final JLabel habitTableLabel = new JLabel("");
+
+        final DefaultTableModel taskModel = new DefaultTableModel(viewTasksAndHabitsViewModel.taskCols, 0);
+        final DefaultTableModel habitModel = new DefaultTableModel(viewTasksAndHabitsViewModel.habitCols, 0);
+
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("Your Tasks and Habits", SwingConstants.CENTER);
-        title.setFont(new Font("Serif", Font.BOLD, 24));
-        add(title, BorderLayout.NORTH);
-
-        // --- Tasks Table Setup ---
         JTable taskTable = new JTable(taskModel);
         taskTable.setFillsViewportHeight(true);
         JScrollPane taskScrollPane = new JScrollPane(taskTable);
 
-        // Add Table Model Listener for modifying tasks
-        taskModel.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
-                    int row = e.getFirstRow();
-                    int col = e.getColumn();
-                    Object changedValue = taskModel.getValueAt(row, col);
-
-                    String taskName = taskModel.getValueAt(row, 0).toString();
-
-                    viewTasksAndHabitsController.execute("task", col, taskName, changedValue);
-                }
-            }
-        });
-
-        // --- Habits Table Setup ---
         JTable habitTable = new JTable(habitModel);
         habitTable.setFillsViewportHeight(true);
         JScrollPane habitScrollPane = new JScrollPane(habitTable);
 
-        // Add Table Model Listener for modifying habits
-        habitModel.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
-                    int row = e.getFirstRow();
-                    int col = e.getColumn();
-                    Object changedValue = habitModel.getValueAt(row, col);
+        TablePanel.add(taskTableLabel);
+        add(taskTablePanel, BorderLayout.PAGE_START);
+        TablePanel.add(habitTableLabel);
+        habitTablePanel.add(habitTable);
+        add(habitTablePanel, BorderLayout.PAGE_END);
 
-                    String habitName = habitModel.getValueAt(row, 0).toString();
+        add(buttonPanel, BorderLayout.EAST);
 
-                    viewTasksAndHabitsController.execute("habit", col, habitName, changedValue);
-                }
-            }
-        });
-
-        // Use a JTabbedPane to display Tasks and Habits
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Tasks", taskScrollPane);
         tabbedPane.addTab("Habits", habitScrollPane);
 
-        add(tabbedPane, BorderLayout.CENTER);
+        taskTablePanel.add(tabbedPane);
 
-        // --- Buttons Panel ---
-        refreshButton = new JButton("Refresh Data");
-        exitButton = new JButton("Back to Main");
+        mainPanel.add(taskTablePanel);
+        mainPanel.add(habitTablePanel);
+        mainPanel.add(exitButton);
+        mainPanel.add(refreshButton);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(refreshButton);
-        buttonPanel.add(exitButton);
+        this.add(mainPanel);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (evt.getSource().equals(exitButton)) {
+                    viewManagerModel.setState("logged in");
+                    viewManagerModel.firePropertyChanged();;
+                }
+            }
+        });
 
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 if (evt.getSource().equals(refreshButton)) {
-                    // Call the use case to fetch and format data
+                    ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
+                    ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
+                    ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
+                    updateTable(formattedTasks, formattedHabits);
                     viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
                 }
             }
         });
-
-        exitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                // Assuming "logged in" is the main view name
-                viewManagerModel.setState(loggedInViewModel.getViewName());
-                viewManagerModel.firePropertyChanged();
-            }
-        });
     }
 
-    // This method handles refreshing the table data
-    public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
-        // Clear existing rows
-        taskModel.setRowCount(0);
-        habitModel.setRowCount(0);
-
-        // Add new task rows
-        for (ArrayList<String> row : taskList) {
-            Object[] rowData = row.toArray();
-            taskModel.addRow(rowData);
-        }
-
-        // Add new habit rows
-        for (ArrayList<String> row : habitList) {
-            Object[] rowData = row.toArray();
-            habitModel.addRow(rowData);
-        }
+    public void actionPerformed(ActionEvent evt) {
     }
 
     public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){
@@ -174,22 +147,34 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        // Not used as listeners are attached directly in the constructor
-    }
-
-    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
-            // Handle error message if present
             if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
                 JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Error", JOptionPane.ERROR_MESSAGE);
-                state.setErrorMessage(null); // Clear the error after showing
+                state.setErrorMessage(null);
             }
             ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
             ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
             updateTable(formattedTasks, formattedHabits);
         }
     }
+
+    public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
+
+        taskModel.setRowCount(0);
+        habitModel.setRowCount(0);
+
+        for (ArrayList<String> row : taskList) {
+            Object[] rowData = row.toArray();
+            taskModel.addRow(rowData);
+        }
+
+        for (ArrayList<String> row : habitList) {
+            Object[] rowData = row.toArray();
+            habitModel.addRow(rowData);
+        }
+    }
 }
+
+

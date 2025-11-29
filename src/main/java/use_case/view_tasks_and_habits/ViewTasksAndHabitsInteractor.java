@@ -28,7 +28,6 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
         this.habitDataAccess = habitDataAccess;
     }
 
-
     @Override
     public void execute(ViewTasksAndHabitsInputData InputData) {
 
