@@ -136,7 +136,7 @@ public class AppBuilder {
 
     public AppBuilder addStatsView(){
         viewStatsViewModel = new ViewStatsViewModel();
-        statsView = new StatsView(viewStatsViewModel);
+        statsView = new StatsView(viewStatsViewModel, viewManagerModel);
         statsView.setViewManager(viewManagerModel);
         cardPanel.add(statsView, statsView.getViewName());
         return this;
