@@ -99,9 +99,9 @@ public class HabitDataAccessObject implements HabitGateway {
                 if (!startDateTimeRaw.isBlank()) {
                     startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
                 }
-                int frequency = null;
+                int frequency = 0;
                 if (!frequencyRaw.isBlank()) {
-                    frequency = Period.parse(frequencyRaw);
+                    frequency = Integer.parseInt(frequencyRaw);
                 }
 
                 Habit habit = new HabitBuilder()
