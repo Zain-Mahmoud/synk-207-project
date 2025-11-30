@@ -1,6 +1,6 @@
 # Contributing to CSC207 SYNK
 
-Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue or assessing improvements and features.
+Following these guidelines helps to communicate that you respect the time of the developers managing and developing this project. In return, they should reciprocate that respect in addressing your issue or assessing improvements and features.
 
 ## Table of Contents
 
