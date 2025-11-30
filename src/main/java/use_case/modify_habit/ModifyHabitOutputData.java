@@ -4,11 +4,14 @@ import entities.Habit;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class ModifyHabitOutputData {
 
     private final ArrayList<Habit> habitList;
+    // Define the ISO format used by the Habit entity's internal representation
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public ModifyHabitOutputData(ArrayList<Habit> habitList) {
         this.habitList = habitList;
@@ -32,7 +35,16 @@ public class ModifyHabitOutputData {
 
             formattedHabit.add(habitName);
 
-            String habitStartDateTimeToString = habitStartDateTime.toString();
+            // FIX: Explicitly format LocalDateTime to ensure seconds are present,
+            // which guarantees the correct string length and position for subsequent substring operations.
+            String habitStartDateTimeToString = habitStartDateTime.format(ISO_FORMATTER);
+
+            // Substring logic expects yyyy-MM-ddTHH:mm:ss (length 19)
+            // Indices:
+            // Year: (0, 4) -> 2026
+            // Month: (5, 7) -> 02
+            // Day: (8, 10) -> 01
+            // Time (HH:mm): (11, 16) -> 06:00
             switch (habitStartDateTimeToString.substring(5, 7)) {
                 case "01":
                     formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " January, " +
