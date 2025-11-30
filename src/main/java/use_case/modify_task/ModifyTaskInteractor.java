@@ -1,7 +1,10 @@
 package use_case.modify_task;
 
+import entities.Completable;
+import entities.Habit;
 import entities.Task;
 import entities.TaskBuilder;
+import strategy.SortingStrategy;
 import use_case.gateways.TaskGateway;
 
 import java.time.LocalDateTime;
@@ -12,10 +15,12 @@ import java.util.Locale;
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyTaskPresenter;
     private final TaskGateway taskDataAccessObject;
+    private final SortingStrategy sortingStrategy;
 
-    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyTaskPresenter, TaskGateway taskDataAccessObject) {
+    public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyTaskPresenter, TaskGateway taskDataAccessObject, SortingStrategy sortingStrategy) {
         this.modifyTaskPresenter = modifyTaskPresenter;
         this.taskDataAccessObject = taskDataAccessObject;
+        this.sortingStrategy = sortingStrategy;
     }
 
     public void execute(ModifyTaskInputData modifyInputData){
@@ -80,8 +85,11 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             taskDataAccessObject.deleteTask(userID, oldTask);
             taskDataAccessObject.addTask(userID, modifiedTask);
 
+            ArrayList<Task> taskListClone = (ArrayList<Task>) taskDataAccessObject.fetchTasks(userID).clone();
 
-            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(taskDataAccessObject.fetchTasks(userID)));
+            sortingStrategy.sortTask(taskListClone);
+
+            modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(taskListClone));
         } catch (java.time.format.DateTimeParseException d) {
             modifyTaskPresenter.prepareFailView("Invalid date/time format. Use ISO format (e.g., YYYY-MM-DDTHH:MM:SS) for dates.");
         } catch (NumberFormatException n) {

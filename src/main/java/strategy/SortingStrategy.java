@@ -1,15 +1,24 @@
 package strategy;
 
-import entities.Completable;
+import entities.Habit;
+import entities.Task;
 
 import java.util.ArrayList;
 
 public interface SortingStrategy {
+
     /**
-     * Sorts the completablesList in-place in descending order based on a defined strategy
+     * Sorts the list of tasks in-place in descending order based on a defined strategy
      * @param completablesList
      * @return
      */
-    void sort(ArrayList<Completable> completablesList);
+    void sortTask(ArrayList<Task> completablesList);
+
+    /**
+     * Sorts the list of tasks in-place in descending order based on a defined strategy
+     * @param completablesList
+     * @return
+     */
+    void sortHabit(ArrayList<Habit> completablesList);
 
 }

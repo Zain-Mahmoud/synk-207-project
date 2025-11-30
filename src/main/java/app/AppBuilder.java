@@ -41,6 +41,8 @@ import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
 import interface_adapter.view_stats.ViewStatsController;
 import interface_adapter.view_stats.ViewStatsPresenter;
 import interface_adapter.view_stats.ViewStatsViewModel;
+import strategy.SortByPriorityStrategy;
+import strategy.SortingStrategy;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -123,6 +125,7 @@ public class AppBuilder {
     private ModifyHabitViewModel modifyHabitViewModel;
     private ViewStatsViewModel viewStatsViewModel;
     private StatsView statsView;
+    private SortingStrategy sortingStrategy = new SortByPriorityStrategy();
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
@@ -254,7 +257,7 @@ public class AppBuilder {
         final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel,
                 modifyTaskViewModel, viewTasksAndHabitsViewModel);
         final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
-                taskDataAccessObject);
+                taskDataAccessObject, sortingStrategy);
 
         modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
         modifyTaskView.setModifyTaskController(modifyTaskController);
