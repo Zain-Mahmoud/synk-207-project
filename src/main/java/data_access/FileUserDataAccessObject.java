@@ -2,7 +2,6 @@ package data_access;
 
 import entities.User;
 import entities.UserFactory;
-import use_case.change_password.ChangePasswordUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 import use_case.update_profile.UpdateProfileUserDataAccessInterface;
@@ -17,7 +16,6 @@ import java.util.Map;
  */
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                                                  LoginUserDataAccessInterface,
-                                                 ChangePasswordUserDataAccessInterface,
                                                  UpdateProfileUserDataAccessInterface {
 
     private static final String HEADER = "uid,username,avatarpath,password";
@@ -73,7 +71,10 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
             for (User user : usersByUid.values()) {
                 final String line = String.format("%s,%s,%s,%s",
-                        user.getUid(), user.getUsername(), user.getAvatarPath(), user.getPassword());
+                        user.getUid(),
+                        user.getUsername(),
+                        user.getAvatarPath(),
+                        user.getPassword());
                 writer.write(line);
                 writer.newLine();
             }
@@ -123,11 +124,4 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         return usersByName.containsKey(identifier);
     }
 
-    @Override
-    public void changePassword(User user) {
-        // Replace the User object in the map
-        usersByName.put(user.getUsername(), user);
-        usersByUid.put(user.getUid(), user);
-        save();
-    }
 }

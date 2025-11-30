@@ -3,7 +3,6 @@ package view;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.ViewModel;
 import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.update_profile.ChangePasswordController;
 import interface_adapter.update_profile.UpdateProfileController;
 import interface_adapter.update_profile.UpdateProfileState;
 import interface_adapter.update_profile.UpdateProfileViewModel;
@@ -26,7 +25,6 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private final String viewName = "updateprofile";
     private final UpdateProfileViewModel updateProfileViewModel;
-    private ChangePasswordController changePasswordController = null;
     private UpdateProfileController updateProfileController = null;
         private ViewManagerModel viewManagerModel;
 
@@ -38,8 +36,6 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     private final JButton chooseAvatarButton;
     private final JLabel avatarPreviewLabel = new JLabel();
 
-
-    private final JButton changePassword;
     private final JButton saveButton;
     private final JButton cancelButton;
 
@@ -59,30 +55,13 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
                 new JLabel(UpdateProfileViewModel.PASSWORD_LABEL), passwordInputField);
 
         final JPanel buttons = new JPanel();
-        changePassword = new JButton(UpdateProfileViewModel.PASSWORD_LABEL);
-        buttons.add(changePassword);
+
         chooseAvatarButton = new JButton(UpdateProfileViewModel.AVATAR_LABEL);
         buttons.add(chooseAvatarButton);
         saveButton = new JButton(UpdateProfileViewModel.SAVE_BUTTON_LABEL);
         buttons.add(saveButton);
         cancelButton = new JButton(UpdateProfileViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
-
-        changePassword.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
-                evt -> {
-                    if (evt.getSource().equals(changePassword)) {
-                        final UpdateProfileState currentState = updateProfileViewModel.getState();
-
-                        this.changePasswordController.execute(
-                                currentState.getUid(),
-                                currentState.getUsername(),
-                                currentState.getAvatarPath(),
-                                currentState.getPassword()
-                        );
-                    }
-                }
-        );
 
         chooseAvatarButton.addActionListener(evt -> {
             if (evt.getSource().equals(chooseAvatarButton)) {
@@ -136,7 +115,8 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
                 updateProfileController.execute(
                         currentState.getUid(),
                         currentState.getUsername(),
-                        currentState.getAvatarPath()
+                        currentState.getAvatarPath(),
+                        currentState.getPassword()
                 );
             }
         });
@@ -228,6 +208,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private void setFields(UpdateProfileState state) {
         usernameInputField.setText(state.getUsername());
+        passwordInputField.setText(state.getPassword());
         updateAvatarPreview(state.getAvatarPath());
     }
 
@@ -247,10 +228,6 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     public void setUpdateProfileController(UpdateProfileController updateProfileController) {
         this.updateProfileController = updateProfileController;
-    }
-
-    public void setChangePasswordController(ChangePasswordController changePasswordController) {
-        this.changePasswordController = changePasswordController;
     }
 
     public void setCurrentUid(String currentUid) {

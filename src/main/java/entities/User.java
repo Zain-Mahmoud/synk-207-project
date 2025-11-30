@@ -49,6 +49,8 @@ public class User {
         this.avatarpath = url;
     }
 
+    public void setPassword(String password) {this.password = password;}
+
 }
 
 

@@ -3,15 +3,13 @@ package interface_adapter.update_profile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
-import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.change_password.ChangePasswordOutputData;
 import use_case.update_profile.UpdateProfileOutputBoundary;
 import use_case.update_profile.UpdateProfileOutputData;
 
 /**
  * The Presenter for the Update Profile Use Case.
  */
-public class UpdateProfilePresenter implements UpdateProfileOutputBoundary, ChangePasswordOutputBoundary {
+public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
 
     private final ViewManagerModel viewManagerModel;
     private final UpdateProfileViewModel updateProfileViewModel;
@@ -33,6 +31,7 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary, Chan
         state.setUid(response.getUid());
         state.setUsername(response.getUsername());
         state.setAvatarPath(response.getAvatarPath());
+        state.setPassword(response.getPassword());
         state.setUsernameError(null);
         state.setAvatarError(null);
         state.setSuccessMessage("Profile updated successfully.");
@@ -44,17 +43,12 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary, Chan
         loggedInState.setUid(response.getUid());
         loggedInState.setUsername(response.getUsername());
         loggedInState.setAvatarPath(response.getAvatarPath());
+        loggedInState.setPassword(response.getPassword());
         loggedInViewModel.setState(loggedInState);
         loggedInViewModel.firePropertyChanged();
 
         viewManagerModel.setState(loggedInViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
-    }
-
-    @Override
-    public void prepareSuccessView(ChangePasswordOutputData outputData) {
-        // TODO update the viewmodel!
-        updateProfileViewModel.firePropertyChanged("password");
     }
 
     @Override

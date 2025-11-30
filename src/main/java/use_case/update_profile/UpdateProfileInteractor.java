@@ -22,6 +22,7 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
         String uid = inputData.getUid();
         String newUsername = inputData.getNewUsername();
         String newAvatarPath = inputData.getNewAvatarPath();
+        String newPassword = inputData.getNewPassword();
 
         if (!userDataAccess.existsByUid(uid)) {
             presenter.prepareFailView("User does not exist.");
@@ -51,12 +52,23 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
             user.setAvatarPath(newAvatarPath);
         }
 
+        if (newPassword != null && !newPassword.isBlank()) {
+            String trimmed = newPassword.trim();
+            if (trimmed.length() < 6) {
+                presenter.prepareFailView("Password must be longer than 6 characters.");
+                return;
+            }
+
+            user.setPassword(trimmed);
+        }
+
         userDataAccess.save(user);
 
         UpdateProfileOutputData outputData = new UpdateProfileOutputData(
                 user.getUid(),
                 user.getUsername(),
                 user.getAvatarPath(),
+                user.getPassword(),
                 false
         );
 

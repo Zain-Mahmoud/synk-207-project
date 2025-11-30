@@ -15,7 +15,6 @@ public class Main {
                 .addUpdateProfileView()
                 .addSignupUseCase()
                 .addLoginUseCase()
-                .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
                 .addUpdateProfileUseCase()
                 .build();

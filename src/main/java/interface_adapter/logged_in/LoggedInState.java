@@ -7,11 +7,13 @@ public class LoggedInState {
     private String uid;
     private String username = "";
     private String avatarPath = "";
+    private String password = "";
 
     public LoggedInState(LoggedInState copy) {
         uid = copy.uid;
         username = copy.username;
         avatarPath = copy.avatarPath;
+        password = copy.password;
     }
 
     // Because of the previous copy constructor, the default constructor must be explicit.
@@ -35,7 +37,7 @@ public class LoggedInState {
 
     public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
 
+    public String getPassword() { return password; }
 
-
-
+    public void setPassword(String password) {this.password = password; }
 }

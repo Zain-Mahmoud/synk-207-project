@@ -39,8 +39,6 @@ public class UpdateProfileState {
         this.password = password;
     }
 
-
-
     public String getAvatarPath() {
         return avatarPath;
     }
@@ -85,6 +83,7 @@ public class UpdateProfileState {
                 + "uid='" + uid + '\''
                 + ", username='" + username + '\''
                 + ", avatarPath='" + avatarPath + '\''
+                + ", passwords='" + password + '\''
                 + '}';
     }
 }
