@@ -45,8 +45,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            "New Task Name", "5", FUTURE_DATETIME, "", true, "Personal", "New Description",
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), null, oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task Name", "5", FUTURE_DATETIME, "", true, "Personal", "New Description",
                 USER_ID
         );
 
@@ -95,15 +95,23 @@ public class ModifyTaskInteractorTest {
     @Test
     void successTest_ModifyingOtherFieldsButKeepingName() {
         TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
-        Task oldTask = createInitialTask(); // Name: "Old Task Name", Priority: 1
-        taskGateway.addTask(USER_ID, oldTask);
+        Task oldTask = new TaskBuilder()
+                .setTaskName("Old Task Name")
+                .setPriority(1)
+                .setDeadline(LocalDateTime.parse(OLD_DEADLINE, INPUT_FORMAT))
+                .setStartTime(LocalDateTime.parse(OLD_DEADLINE, INPUT_FORMAT))
+                .setStatus(false)
+                .setTaskGroup("Work")
+                .setDescription("Initial Description")
+                .build();
+           taskGateway.addTask(USER_ID, oldTask);
 
         // Input data keeps the same name but changes priority and status
         String UNCHANGED_NAME = oldTask.getName();
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            UNCHANGED_NAME, "10", FUTURE_DATETIME, "", true, "Personal", "New Description",
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), oldTask.getStartTime().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                UNCHANGED_NAME, "10", FUTURE_DATETIME, OLD_DEADLINE, true, "Personal", "New Description",
                 USER_ID
         );
 
@@ -149,8 +157,8 @@ public class ModifyTaskInteractorTest {
         final DateTimeFormatter CUSTOM_FORMAT = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm", Locale.ENGLISH);
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            "New Task Name Custom", "4", NEW_CUSTOM_DATETIME_STRING, "", true, "Personal", "New Description",
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task Name Custom", "4", NEW_CUSTOM_DATETIME_STRING, NEW_CUSTOM_DATETIME_STRING, true, "Personal", "New Description",
                 USER_ID
         );
 
@@ -178,6 +186,100 @@ public class ModifyTaskInteractorTest {
             }
         };
 
+
+        ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(successPresenter, taskGateway);
+        interactor.execute(inputData);
+    }
+
+    /**
+     * New test case to ensure modification succeeds when newStartDateTime is an empty string.
+     */
+    @Test
+    void successTest_NewStartDateTimeIsBlank() {
+        TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
+        Task oldTask = createInitialTask();
+        taskGateway.addTask(USER_ID, oldTask);
+
+        String BLANK_START_TIME = ""; // The input to test
+
+        ModifyTaskInputData inputData = new ModifyTaskInputData(
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "Task with Blank Start Time", "2", FUTURE_DATETIME, BLANK_START_TIME, true, "School", "Description updated for blank start time",
+                USER_ID
+        );
+
+        ModifyTaskOutputBoundary successPresenter = new ModifyTaskOutputBoundary() {
+            @Override
+            public void prepareSuccessView(ModifyTaskOutputData outputData) {
+                ArrayList<Task> tasks = taskGateway.fetchTasks(USER_ID);
+                assertEquals(1, tasks.size());
+                Task modifiedTask = tasks.get(0);
+
+                // Assert that other fields were modified successfully and no failure occurred
+                assertEquals("Task with Blank Start Time", modifiedTask.getName());
+                assertEquals(2, modifiedTask.getPriority());
+                assertTrue(modifiedTask.getStatus());
+                assertEquals("School", modifiedTask.getTaskGroup());
+                assertEquals(LocalDateTime.parse(FUTURE_DATETIME, INPUT_FORMAT), modifiedTask.getDueDate());
+            }
+
+            @Override
+            public void prepareFailView(String errorMessage) {
+                fail("Modification should have succeeded when newStartDateTime is blank: " + errorMessage);
+            }
+
+            @Override
+            public void switchToTaskListView() {
+                // Pass
+            }
+        };
+
+        ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(successPresenter, taskGateway);
+        interactor.execute(inputData);
+    }
+
+    /**
+     * New test case to ensure modification succeeds when newStartDateTime is null.
+     */
+    @Test
+    void successTest_NewStartDateTimeIsNull() {
+        TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
+        Task oldTask = createInitialTask();
+        taskGateway.addTask(USER_ID, oldTask);
+
+        String NULL_START_TIME = null; // The input to test
+
+        ModifyTaskInputData inputData = new ModifyTaskInputData(
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "Task with Null Start Time", "3", FUTURE_DATETIME, NULL_START_TIME, false, "Home", "Description for null start time",
+                USER_ID
+        );
+
+        ModifyTaskOutputBoundary successPresenter = new ModifyTaskOutputBoundary() {
+            @Override
+            public void prepareSuccessView(ModifyTaskOutputData outputData) {
+                ArrayList<Task> tasks = taskGateway.fetchTasks(USER_ID);
+                assertEquals(1, tasks.size());
+                Task modifiedTask = tasks.get(0);
+
+                // Assert that other fields were modified successfully and no failure occurred
+                assertEquals("Task with Null Start Time", modifiedTask.getName());
+                assertEquals(3, modifiedTask.getPriority());
+                assertFalse(modifiedTask.getStatus());
+                assertEquals("Home", modifiedTask.getTaskGroup());
+                assertEquals(LocalDateTime.parse(FUTURE_DATETIME, INPUT_FORMAT), modifiedTask.getDueDate());
+            }
+
+            @Override
+            public void prepareFailView(String errorMessage) {
+                fail("Modification should have succeeded when newStartDateTime is null: " + errorMessage);
+            }
+
+            @Override
+            public void switchToTaskListView() {
+                // Pass
+            }
+        };
 
         ModifyTaskInputBoundary interactor = new ModifyTaskInteractor(successPresenter, taskGateway);
         interactor.execute(inputData);
@@ -223,8 +325,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            "New Task", "1", "2025/11/27", "", false, "Group", "Desc",
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task", "1", "2025/11/27", "", false, "Group", "Desc",
                 USER_ID
         );
 
@@ -261,8 +363,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            "New Task", "High", FUTURE_DATETIME, "", false, "Group", "Desc",
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task", "High", FUTURE_DATETIME, "", false, "Group", "Desc",
                 USER_ID
         );
 
@@ -298,7 +400,7 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), "5", oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                oldTask.getName(), "5", oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
                 "New Task", "High", FUTURE_DATETIME, "", false, "Group", "Desc",
                 USER_ID
         );
@@ -334,9 +436,9 @@ public class ModifyTaskInteractorTest {
 
         // 2. Define Input Data with a deadline in the past
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
-            "Past Task", "1", PAST_DATETIME, "", false, "Group", "Desc",
-            USER_ID
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDueDate().toString(), "", oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "Past Task", "1", PAST_DATETIME, "", false, "Group", "Desc",
+                USER_ID
         );
 
         // 3. Mock Fail Presenter
@@ -392,9 +494,9 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-            oldTaskToModify.getName(), Integer.toString(oldTaskToModify.getPriority()), oldTaskToModify.getDueDate().toString(), "", oldTaskToModify.getStatus(), oldTaskToModify.getTaskGroup(), oldTaskToModify.getDescription(), existingTask.getName(), "3", FUTURE_DATETIME, "",
-            true, "Group", "Desc",
-            USER_ID
+                oldTaskToModify.getName(), Integer.toString(oldTaskToModify.getPriority()), oldTaskToModify.getDueDate().toString(), "", oldTaskToModify.getStatus(), oldTaskToModify.getTaskGroup(), oldTaskToModify.getDescription(), existingTask.getName(), "3", FUTURE_DATETIME, "",
+                true, "Group", "Desc",
+                USER_ID
         );
 
 

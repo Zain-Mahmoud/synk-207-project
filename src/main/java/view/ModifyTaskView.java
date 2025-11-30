@@ -266,6 +266,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         if (state.getTaskError() != null){
             JOptionPane.showMessageDialog(this, state.getTaskError());
+            state.setTaskError(null);
         } else {
 
             newTaskName.setText(state.getNewTaskName());

@@ -358,11 +358,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
 
 
-            if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
-                JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Loading Error", JOptionPane.ERROR_MESSAGE);
-                state.setErrorMessage(null);
-            }
-
             ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
             ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
             updateTable(formattedTasks, formattedHabits);
