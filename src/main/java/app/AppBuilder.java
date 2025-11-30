@@ -17,7 +17,6 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardController;
 import interface_adapter.leaderboard.ViewLeaderboardPresenter;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
-import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
@@ -35,9 +34,9 @@ import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
 import interface_adapter.view_stats.ViewStatsController;
 import interface_adapter.view_stats.ViewStatsPresenter;
 import interface_adapter.view_stats.ViewStatsViewModel;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
+import interface_adapter.update_profile.UpdateProfileController;
+import interface_adapter.update_profile.UpdateProfilePresenter;
+import interface_adapter.update_profile.UpdateProfileViewModel;
 import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
@@ -45,6 +44,9 @@ import use_case.login.LoginOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.update_profile.UpdateProfileBoundary;
+import use_case.update_profile.UpdateProfileInteractor;
+import use_case.update_profile.UpdateProfileOutputBoundary;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputBoundary;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
@@ -97,6 +99,9 @@ public class AppBuilder {
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
     private ViewStatsViewModel viewStatsViewModel;
     private StatsView statsView;
+    private UpdateProfileViewModel updateProfileViewModel;
+    private UpdateProfileView updateProfileView;
+
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
@@ -141,6 +146,14 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addUpdateProfileView() {
+        updateProfileViewModel = new  UpdateProfileViewModel();
+        updateProfileView = new  UpdateProfileView(updateProfileViewModel);
+        updateProfileView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(updateProfileView, updateProfileView.getViewName());
+        return this;
+    }
+
     public AppBuilder addStatsView(){
         viewStatsViewModel = new ViewStatsViewModel();
         statsView = new StatsView(viewStatsViewModel, viewManagerModel);
@@ -162,24 +175,12 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
+                loggedInViewModel, loginViewModel, updateProfileViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
-        return this;
-    }
-
-    public AppBuilder addChangePasswordUseCase() {
-        final ChangePasswordOutputBoundary changePasswordOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel);
-
-        final ChangePasswordInputBoundary changePasswordInteractor =
-                new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
-
-        ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
         return this;
     }
 
@@ -190,6 +191,18 @@ public class AppBuilder {
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
+        return this;
+    }
+
+    public AppBuilder addUpdateProfileUseCase() {
+        final UpdateProfileOutputBoundary updateProfileOutputBoundary =
+                new UpdateProfilePresenter(viewManagerModel, updateProfileViewModel, loggedInViewModel);
+
+        final UpdateProfileBoundary updateProfileInteractor =
+                new UpdateProfileInteractor(userDataAccessObject, updateProfileOutputBoundary);
+
+        UpdateProfileController updateProfileController = new UpdateProfileController(updateProfileInteractor);
+        updateProfileView.setUpdateProfileController(updateProfileController);
         return this;
     }
 
