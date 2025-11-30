@@ -16,16 +16,13 @@ public class ModifyTaskInteractorTest {
     private final String USER_ID = "testUser";
     private final String FUTURE_DATETIME = LocalDateTime.now().plusDays(5).withNano(0).toString();
     private final String OLD_DEADLINE = LocalDateTime.now().plusDays(10).withNano(0).toString();
-    private final String OLD_START_TIME = LocalDateTime.now().plusDays(8).withNano(0).toString();
     private final String PAST_DATETIME = LocalDateTime.now().minusDays(5).withNano(0).toString();
-    private final String VALID_DATETIME = LocalDateTime.now().plusDays(5).withNano(0).toString();
 
     private Task createInitialTask() {
         return new TaskBuilder()
                 .setTaskName("Old Task Name")
                 .setPriority(1)
                 .setDeadline(LocalDateTime.parse(OLD_DEADLINE))
-                .setStartTime(LocalDateTime.parse(OLD_START_TIME))
                 .setStatus(false)
                 .setTaskGroup("Work")
                 .setDescription("Initial Description")
@@ -42,8 +39,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
-                "New Task Name", "5", FUTURE_DATETIME, true, "Personal", "New Description", FUTURE_DATETIME,
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task Name", "5", FUTURE_DATETIME, true, "Personal", "New Description",
                 USER_ID
         );
 
@@ -63,7 +60,6 @@ public class ModifyTaskInteractorTest {
                 assertTrue(modifiedTask.getStatus());
                 assertEquals("Personal", modifiedTask.getTaskGroup());
                 assertEquals("New Description", modifiedTask.getDescription());
-                assertEquals(LocalDateTime.parse(FUTURE_DATETIME), modifiedTask.getStartTime());
                 assertEquals(1, outputData.getTaskList().toArray().length);
             }
 
@@ -124,8 +120,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
-                "New Task", "1", "2025/11/27", false, "Group", "Desc", FUTURE_DATETIME,
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task", "1", "2025/11/27", false, "Group", "Desc",
                 USER_ID
         );
 
@@ -161,8 +157,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
-                "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc", FUTURE_DATETIME,
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc",
                 USER_ID
         );
 
@@ -198,8 +194,8 @@ public class ModifyTaskInteractorTest {
 
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), "5", oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
-                "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc", FUTURE_DATETIME,
+                oldTask.getName(), "5", oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "New Task", "High", FUTURE_DATETIME, false, "Group", "Desc",
                 USER_ID
         );
 
@@ -234,8 +230,8 @@ public class ModifyTaskInteractorTest {
 
         // 2. Define Input Data with a deadline in the past
         ModifyTaskInputData inputData = new ModifyTaskInputData(
-                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(), oldTask.getStartTime().toString(),
-                "Past Task", "1", PAST_DATETIME, false, "Group", "Desc", VALID_DATETIME,
+                oldTask.getName(), Integer.toString(oldTask.getPriority()), oldTask.getDeadline().toString(), oldTask.getStatus(), oldTask.getTaskGroup(), oldTask.getDescription(),
+                "Past Task", "1", PAST_DATETIME, false, "Group", "Desc",
                 USER_ID
         );
 
@@ -270,7 +266,6 @@ public class ModifyTaskInteractorTest {
                 .setTaskName("Existing Task Name")
                 .setPriority(2)
                 .setDeadline(LocalDateTime.parse(FUTURE_DATETIME))
-                .setStartTime(LocalDateTime.parse(FUTURE_DATETIME))
                 .setStatus(false)
                 .setTaskGroup("Other Group")
                 .setDescription("Already exists")
@@ -280,7 +275,6 @@ public class ModifyTaskInteractorTest {
                 .setTaskName("Existing Task Name2")
                 .setPriority(2)
                 .setDeadline(LocalDateTime.parse(FUTURE_DATETIME))
-                .setStartTime(LocalDateTime.parse(FUTURE_DATETIME))
                 .setStatus(false)
                 .setTaskGroup("Other Group")
                 .setDescription("Already exists")
@@ -293,9 +287,8 @@ public class ModifyTaskInteractorTest {
 
         ModifyTaskInputData inputData = new ModifyTaskInputData(
                 oldTaskToModify.getName(), Integer.toString(oldTaskToModify.getPriority()), oldTaskToModify.getDeadline().toString(),
-                oldTaskToModify.getStatus(), oldTaskToModify.getTaskGroup(), oldTaskToModify.getDescription(),
-                oldTaskToModify.getStartTime().toString(), existingTask.getName(), "3", FUTURE_DATETIME,
-                true, "Group", "Desc", FUTURE_DATETIME,
+                oldTaskToModify.getStatus(), oldTaskToModify.getTaskGroup(), oldTaskToModify.getDescription(), existingTask.getName(), "3", FUTURE_DATETIME,
+                true, "Group", "Desc",
                 USER_ID
         );
 

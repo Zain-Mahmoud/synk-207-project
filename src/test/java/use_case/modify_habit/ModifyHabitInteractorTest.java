@@ -22,9 +22,9 @@ public class ModifyHabitInteractorTest {
     void successTest(){
         ModifyHabitInputData inputData = new ModifyHabitInputData("Programming",
                 "1", true, "2025-11-27T00:00:00", "1",
-                "Programming", "2025-11-27T00:00:00", "Programming", "2",
+                "Programming", "1", "Programming", "2",
                 true, "2025-11-27T00:00:00", "5",
-                "Programming", "2025-11-27T00:00:00", "Zain");
+                "Programming", "1", "Zain");
 
         UserGateway userGateway = new InMemoryUserDataAccessObject();
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
@@ -35,7 +35,7 @@ public class ModifyHabitInteractorTest {
         User user = userFactory.create("Zain", "12345");
         Habit oldHabit = habitBuilder.setHabitName("Programming")
                 .setHabitGroup("Programming")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(1)
                 .setStatus(true)
@@ -43,7 +43,7 @@ public class ModifyHabitInteractorTest {
                 .build();
         Habit newHabit = habitBuilder.setHabitName("Programming")
                 .setHabitGroup("Programming")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(2)
                 .setStatus(true)
@@ -87,7 +87,7 @@ public class ModifyHabitInteractorTest {
         User user = userFactory.create("Zain", "12345");
         Habit oldHabit = habitBuilder.setHabitName("Programming")
                 .setHabitGroup("Programming")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(1)
                 .setStatus(true)
@@ -122,9 +122,9 @@ public class ModifyHabitInteractorTest {
     void failTestDate(){
         ModifyHabitInputData inputData = new ModifyHabitInputData("Programming",
                 "1", true, "2025-11-27T00:00:00", "1",
-                "Programming", "2025-11-27T00:00:00", "Programming", "2",
+                "Programming", "1", "Programming", "2",
                 true, "2025-11-2700:00:00", "5",
-                "Programming", "2025-11-2700:00:00", "Zain");
+                "Programming", "1", "Zain");
 
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
 
@@ -154,9 +154,9 @@ public class ModifyHabitInteractorTest {
     void failTestTime(){
         ModifyHabitInputData inputData = new ModifyHabitInputData("Programming",
                 "1", true, "2025-11-27T00:00:00", "1",
-                "Programming", "2025-11-27T00:00:00", "Programming", "2",
+                "Programming", "1", "Programming", "2",
                 true, "2025-11-27T00:00:00", "wrong format",
-                "Programming", "2025-11-27T00:00:00", "Zain");
+                "Programming", "1", "Zain");
 
 
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
@@ -187,9 +187,9 @@ public class ModifyHabitInteractorTest {
     void failRepeatTaskName(){
         ModifyHabitInputData inputData = new ModifyHabitInputData("Programming",
                 "1", true, "2025-11-27T00:00:00", "1",
-                "Programming", "2025-11-27T00:00:00", "Studying", "2",
+                "Programming", "1", "Studying", "2",
                 true, "2025-11-27T00:00:00", "5",
-                "Programming", "2025-11-27T00:00:00", "Zain");
+                "Programming", "1", "Zain");
 
 
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
@@ -198,7 +198,7 @@ public class ModifyHabitInteractorTest {
         Habit differentHabit = habitBuilder
                 .setHabitName("Studying")
                 .setHabitGroup("Studying")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(2)
                 .setStatus(true)
@@ -207,7 +207,7 @@ public class ModifyHabitInteractorTest {
         Habit differentHabit2 = habitBuilder
                 .setHabitName("Face care")
                 .setHabitGroup("Face care")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(2)
                 .setStatus(true)
