@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
 import entities.Completable;
+import entities.Task;
 import use_case.gateways.CalendarGateway;
 
 
@@ -41,6 +44,7 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     private static final String APPLICATION_NAME = "CSC-207-SYNK";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TIME_ZONE_ID = "America/Toronto";
     private static final List<String> SCOPES =
             Collections.singletonList(CalendarScopes.CALENDAR); // Changed to Write access
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
@@ -221,18 +225,30 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
                     .setDescription(task.getDescription())
                     ;
 
-            // START TIME (Assuming Task has a startDate, otherwise defaulting to NOW for prototype)
-            DateTime startDateTime = new DateTime(System.currentTimeMillis());
+            // Derive start/end from the task (fallback to now/+1h if absent)
+            LocalDateTime startTime = null;
+            if (task instanceof Task) {
+                startTime = ((Task) task).getStartTime();
+            }
+            if (startTime == null) {
+                startTime = LocalDateTime.now();
+            }
+
+            LocalDateTime endTime = task.getDueDate();
+            if (endTime == null) {
+                endTime = startTime.plusHours(1);
+            }
+
+            DateTime startDateTime = toGoogleDateTime(startTime);
             EventDateTime start = new EventDateTime()
                     .setDateTime(startDateTime)
-                    .setTimeZone("America/Toronto"); // Hardcoded for now, ideally passed in
+                    .setTimeZone(TIME_ZONE_ID); // Hardcoded for now, ideally passed in
             event.setStart(start);
 
-            // END TIME (Defaulting to +1 hour for prototype)
-            DateTime endDateTime = new DateTime(System.currentTimeMillis() + 3600000);
+            DateTime endDateTime = toGoogleDateTime(endTime);
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime)
-                    .setTimeZone("America/Toronto");
+                    .setTimeZone(TIME_ZONE_ID);
             event.setEnd(end);
 
             // EXECUTE API CALL
@@ -338,6 +354,10 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         } catch (IOException e) {
             throw new RuntimeException("Failed to authenticate user for calendar", e); // surface auth errors to caller
         }
+    }
+
+    private DateTime toGoogleDateTime(LocalDateTime dateTime) {
+        return new DateTime(dateTime.atZone(ZoneId.of(TIME_ZONE_ID)).toInstant().toEpochMilli());
     }
 
 }
