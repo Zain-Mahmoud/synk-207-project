@@ -23,6 +23,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
     private final JTextField newTaskName = new JTextField(10);
     private final JTextField newTaskDeadline = new JTextField(10);
+    private final JTextField newStartDateTime = new JTextField(10);
     private final JRadioButton taskCompleted = new JRadioButton("Completed");
     private final JRadioButton taskNotCompleted = new JRadioButton("Not completed");
     private final ButtonGroup newTaskStatus = new ButtonGroup();
@@ -47,6 +48,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         newTaskName.setText(modifyTaskState.getOldTaskName());
         newTaskDeadline.setText(modifyTaskState.getOldDeadline());
+        newStartDateTime.setText(modifyTaskState.getOldStartDateTime());
 
         if (modifyTaskState.getStatus()){
             taskCompleted.setSelected(true);
@@ -65,6 +67,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         JLabel taskNameLabel = new JLabel("Task name");
         JLabel taskDeadlineLabel = new JLabel("Task deadline (YYYY-MM-DDTHH:MM:SS)");
+        JLabel taskStartTimeLabel = new JLabel("Start time (YYYY-MM-DDTHH:MM:SS)");
         JLabel taskStatusLabel = new JLabel("Task status");
         JLabel taskPriorityLabel = new JLabel("Task priority (Number)");
         JLabel taskDescriptionLabel = new JLabel("Description");
@@ -84,6 +87,15 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
         newTaskDeadline.getDocument().addDocumentListener(new DocumentListener() {
             private void documentStateHelper() {
                 modifyTaskViewModel.getState().setDeadline(newTaskDeadline.getText());
+            }
+            @Override public void insertUpdate(DocumentEvent e) { documentStateHelper(); }
+            @Override public void removeUpdate(DocumentEvent e) { documentStateHelper(); }
+            @Override public void changedUpdate(DocumentEvent e) { documentStateHelper(); }
+        });
+
+        newStartDateTime.getDocument().addDocumentListener(new DocumentListener() {
+            private void documentStateHelper() {
+                modifyTaskViewModel.getState().setStartDateTime(newStartDateTime.getText());
             }
             @Override public void insertUpdate(DocumentEvent e) { documentStateHelper(); }
             @Override public void removeUpdate(DocumentEvent e) { documentStateHelper(); }
@@ -146,6 +158,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         JPanel taskName = new JPanel();
         JPanel taskDeadline = new JPanel();
+        JPanel taskStartTime = new JPanel();
         JPanel taskStatus = new JPanel();
         JPanel taskPriority = new JPanel();
         JPanel taskDescription = new JPanel();
@@ -163,6 +176,9 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         taskDeadline.add(taskDeadlineLabel);
         taskDeadline.add(newTaskDeadline);
+            taskStartTime.add(taskStartTimeLabel);
+            taskStartTime.add(newStartDateTime);
+            taskStartTime.setLayout(new BoxLayout(taskStartTime, BoxLayout.X_AXIS));
         taskDeadline.setLayout(new BoxLayout(taskDeadline, BoxLayout.X_AXIS));
 
         taskPriority.add(taskPriorityLabel);
@@ -191,6 +207,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
         this.add(taskName);
         this.add(taskDeadline);
+        this.add(taskStartTime);
         // Removed: this.add(taskStartTime);
         this.add(taskDescription);
         this.add(taskGroup);
@@ -211,6 +228,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
                 String oldTaskName = currentState.getOldTaskName();
                 String oldPriority = currentState.getOldPriority();
                 String oldDeadline = currentState.getOldDeadline();
+                String oldStartDateTime = currentState.getOldStartDateTime();
                 boolean oldStatus = currentState.getOldStatus();
                 String oldTaskGroup = currentState.getOldTaskGroup();
                 String oldDescription = currentState.getOldDescription();
@@ -219,12 +237,14 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
                         oldTaskName,
                         oldPriority,
                         oldDeadline,
+                        oldStartDateTime,
                         oldStatus,
                         oldTaskGroup,
                         oldDescription,
                         currentState.getNewTaskName(),
                         currentState.getPriority(),
                         currentState.getDeadline(),
+                        currentState.getStartDateTime(),
                         currentState.getStatus(),
                         currentState.getTaskGroup(),
                         currentState.getDescription()
@@ -250,6 +270,7 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
             newTaskName.setText(state.getNewTaskName());
             newTaskDeadline.setText(state.getDeadline());
+            newStartDateTime.setText(state.getStartDateTime());
             newTaskPriority.setText(state.getPriority());
             taskCompleted.setSelected(state.getStatus());
             taskNotCompleted.setSelected(!state.getStatus());

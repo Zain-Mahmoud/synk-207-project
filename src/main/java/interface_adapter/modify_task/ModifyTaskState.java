@@ -5,6 +5,7 @@ public class ModifyTaskState {
     private String newTaskName = "";
     private String priority = "";
     private String deadline = "";
+    private String startDateTime = "";
     private boolean status = false;
     private String taskGroup = "";
     private String description = "";
@@ -12,6 +13,7 @@ public class ModifyTaskState {
     private String oldTaskName = "";
     private String oldPriority = "";
     private String oldDeadline = "";
+    private String oldStartDateTime = "";
     private boolean oldStatus = false;
     private String oldTaskGroup = "";
     private String oldDescription = "";
@@ -40,6 +42,14 @@ public class ModifyTaskState {
 
     public void setDeadline(String deadline) {
         this.deadline = deadline;
+    }
+
+    public String getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(String startDateTime) {
+        this.startDateTime = startDateTime;
     }
 
     public boolean getStatus() {
@@ -97,6 +107,14 @@ public class ModifyTaskState {
 
     public void setOldDeadline(String oldDeadline) {
         this.oldDeadline = oldDeadline;
+    }
+
+    public String getOldStartDateTime() {
+        return oldStartDateTime;
+    }
+
+    public void setOldStartDateTime(String oldStartDateTime) {
+        this.oldStartDateTime = oldStartDateTime;
     }
 
     public boolean getOldStatus() {

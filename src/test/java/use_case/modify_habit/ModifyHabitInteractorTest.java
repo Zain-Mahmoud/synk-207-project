@@ -48,7 +48,7 @@ public class ModifyHabitInteractorTest {
                 oldHabit.getName(),
                 Integer.toString(oldHabit.getPriority()),
                 oldHabit.getStatus(),
-                oldHabit.getStartDateTime().format(ISO_FORMATTER), // FIX: Use explicit format
+                oldHabit.getStartTime().format(ISO_FORMATTER), // FIX: Use explicit format
                 Integer.toString(oldHabit.getStreakCount()),
                 oldHabit.getHabitGroup(),
                 Integer.toString(oldHabit.getFrequency()),
@@ -115,7 +115,7 @@ public class ModifyHabitInteractorTest {
                 oldHabit.getName(),
                 Integer.toString(oldHabit.getPriority()),
                 oldHabit.getStatus(),
-                oldHabit.getStartDateTime().format(ISO_FORMATTER), // FIX: Use explicit format
+                oldHabit.getStartTime().format(ISO_FORMATTER), // FIX: Use explicit format
                 Integer.toString(oldHabit.getStreakCount()),
                 oldHabit.getHabitGroup(),
                 UNCHANGED_FREQUENCY,
@@ -188,7 +188,7 @@ public class ModifyHabitInteractorTest {
         habitGateway.addHabit(USER_ID, oldHabit);
 
         ModifyHabitInputData inputData = new ModifyHabitInputData(
-                oldHabit.getName(), "1", true, oldHabit.getStartDateTime().format(ISO_FORMATTER), "1", "Programming", "1", // FIX: Use explicit format for old date
+                oldHabit.getName(), "1", true, oldHabit.getStartTime().format(ISO_FORMATTER), "1", "Programming", "1", // FIX: Use explicit format for old date
                 "New Habit", "2", true, "2025-11-2700:00:00", "5", // Invalid format for new date
                 "Programming", "1", USER_ID);
 
@@ -248,7 +248,7 @@ public class ModifyHabitInteractorTest {
         habitGateway.addHabit(USER_ID, oldHabit);
 
         ModifyHabitInputData inputData = new ModifyHabitInputData(
-                oldHabit.getName(), "1", true, oldHabit.getStartDateTime().format(ISO_FORMATTER), "1", "Programming", "1", // FIX: Use explicit format
+                oldHabit.getName(), "1", true, oldHabit.getStartTime().format(ISO_FORMATTER), "1", "Programming", "1", // FIX: Use explicit format
                 "New Habit", "wrong format", true, FUTURE_ISO_DATETIME, "5", // Invalid Priority
                 "Programming", "1", USER_ID);
 
@@ -296,7 +296,7 @@ public class ModifyHabitInteractorTest {
                 oldHabitToModify.getName(),
                 Integer.toString(oldHabitToModify.getPriority()),
                 oldHabitToModify.getStatus(),
-                oldHabitToModify.getStartDateTime().format(ISO_FORMATTER), // FIX: Use explicit format
+                oldHabitToModify.getStartTime().format(ISO_FORMATTER), // FIX: Use explicit format
                 Integer.toString(oldHabitToModify.getStreakCount()),
                 oldHabitToModify.getHabitGroup(),
                 Integer.toString(oldHabitToModify.getFrequency()),

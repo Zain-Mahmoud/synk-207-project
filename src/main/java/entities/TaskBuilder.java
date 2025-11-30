@@ -10,7 +10,6 @@ public class TaskBuilder {
     private boolean status = false;
     private int priority = 0;
     private String description;
-    private LocalDateTime startTime;
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
@@ -44,11 +43,6 @@ public class TaskBuilder {
 
     public TaskBuilder setDescription(String description) {
         this.description = description;
-        return this;
-    }
-
-    public TaskBuilder setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
         return this;
     }
 

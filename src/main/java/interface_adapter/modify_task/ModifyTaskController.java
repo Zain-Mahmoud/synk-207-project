@@ -23,7 +23,6 @@ public class ModifyTaskController {
      * @param oldStatus
      * @param oldTaskGroup
      * @param oldDescription
-     * @param oldStartTime
      * @param newTaskName
      * @param newPriority
      * @param newDeadline
@@ -31,15 +30,15 @@ public class ModifyTaskController {
      * @param newTaskGroup
      * @param newDescription
      */
-    public void execute(String oldTaskName, String oldPriority, String oldDeadline, boolean oldStatus,
+    public void execute(String oldTaskName, String oldPriority, String oldDeadline, String oldStartDateTime, boolean oldStatus,
                         String oldTaskGroup, String oldDescription,
-                        String newTaskName, String newPriority, String newDeadline, boolean newStatus,
+                        String newTaskName, String newPriority, String newDeadline, String newStartDateTime, boolean newStatus,
                         String newTaskGroup, String newDescription){
 
         String username = loggedInViewModel.getState().getUsername();
-        ModifyTaskInputData modifyTaskInputData = new ModifyTaskInputData(oldTaskName, oldPriority, oldDeadline, oldStatus,
+        ModifyTaskInputData modifyTaskInputData = new ModifyTaskInputData(oldTaskName, oldPriority, oldDeadline, oldStartDateTime, oldStatus,
                 oldTaskGroup, oldDescription,
-                newTaskName, newPriority, newDeadline, newStatus,
+            newTaskName, newPriority, newDeadline, newStartDateTime, newStatus,
                 newTaskGroup, newDescription,
                 username);
 

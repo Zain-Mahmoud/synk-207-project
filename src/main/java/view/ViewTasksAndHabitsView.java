@@ -102,11 +102,12 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
 
                 String taskName = taskModel.getValueAt(clickedRow, 0).toString();
-                String taskDueDateTime = taskModel.getValueAt(clickedRow, 1).toString(); // Back to Index 1
-                String taskGroup = taskModel.getValueAt(clickedRow, 2).toString(); // Back to Index 2
-                String taskStatusText = taskModel.getValueAt(clickedRow, 3).toString(); // Back to Index 3
-                String taskPriority = taskModel.getValueAt(clickedRow, 4).toString(); // Back to Index 4
-                String taskDescription = taskModel.getValueAt(clickedRow, 5).toString(); // Back to Index 5
+                String taskStartTime = taskModel.getValueAt(clickedRow, 1).toString();
+                String taskDueDateTime = taskModel.getValueAt(clickedRow, 2).toString(); // Back to Index 1 shifted
+                String taskGroup = taskModel.getValueAt(clickedRow, 3).toString(); // Back to Index 2 shifted
+                String taskStatusText = taskModel.getValueAt(clickedRow, 4).toString(); // Back to Index 3 shifted
+                String taskPriority = taskModel.getValueAt(clickedRow, 5).toString(); // Back to Index 4 shifted
+                String taskDescription = taskModel.getValueAt(clickedRow, 6).toString(); // Back to Index 5 shifted
 
                 boolean taskStatus;
                 if (taskStatusText.equals("Complete")){
@@ -118,6 +119,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
                 ModifyTaskState taskState = modifyTaskViewModel.getState();
 
                 taskState.setOldTaskName(taskName);
+                taskState.setOldStartDateTime(taskStartTime);
                 taskState.setOldDeadline(taskDueDateTime);
                 taskState.setOldPriority(taskPriority);
                 taskState.setOldStatus(taskStatus);
@@ -125,6 +127,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
                 taskState.setOldDescription(taskDescription);
 
                 taskState.setNewTaskName(taskName);
+                taskState.setStartDateTime(taskStartTime);
                 taskState.setDeadline(taskDueDateTime);
                 taskState.setPriority(taskPriority);
                 taskState.setStatus(taskStatus);

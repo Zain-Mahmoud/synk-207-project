@@ -9,7 +9,7 @@ import interface_adapter.ViewModel;
  */
 public class ViewTasksAndHabitsViewModel extends ViewModel<ViewTasksAndHabitsState> {
 
-    public static final String[] taskCols = {"Task", "Deadline", "Task Group", "Status", "Priority", "Description"};
+    public static final String[] taskCols = {"Task", "Start time", "Deadline", "Task Group", "Status", "Priority", "Description"};
     public static final String[] habitCols = {"Habit", "Start time", "Frequency", "Habit Group", "Streak count", "Priority", "Status", "Description"};
 
     public ViewTasksAndHabitsViewModel() {

@@ -59,6 +59,8 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
         String oldTaskPriority = modifyInputData.getOldPriority();
         boolean oldTaskStatus = modifyInputData.getOldTaskStatus();
         String oldDeadline = modifyInputData.getOldDeadline();
+        String oldStartDateTime = null;
+        try { oldStartDateTime = modifyInputData.getOldStartDateTime(); } catch (Exception ignored) {}
         String oldTaskGroup = modifyInputData.getOldTaskGroup();
         String oldDescription = modifyInputData.getOldDescription();
 
@@ -66,6 +68,8 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
         String newTaskPriority = modifyInputData.getNewPriority();
         boolean newTaskStatus = modifyInputData.getNewTaskStatus();
         String newDeadline = modifyInputData.getNewDeadline();
+        String newStartDateTime = null;
+        try { newStartDateTime = modifyInputData.getNewStartDateTime(); } catch (Exception ignored) {}
         String newTaskGroup = modifyInputData.getNewTaskGroup();
         String newDescription = modifyInputData.getNewDescription();
         String userID = modifyInputData.getUserID();
@@ -82,11 +86,16 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             }
 
             LocalDateTime oldDeadlineFormatted = parseFlexibleDateTime(oldDeadline);
+            LocalDateTime oldStartFormatted = null;
+            if (oldStartDateTime != null && !oldStartDateTime.isBlank()) {
+                oldStartFormatted = parseFlexibleDateTime(oldStartDateTime);
+            }
 
             // 2. Build the 'Old' Task for Deletion/Comparison
-            final Task oldTask = new TaskBuilder()
+                final Task oldTask = new TaskBuilder()
                     .setTaskName(oldTaskName)
                     .setDescription(oldDescription)
+                    .setStartTime(oldStartFormatted)
                     .setDeadline(oldDeadlineFormatted)
                     .setTaskGroup(oldTaskGroup)
                     .setPriority(oldPriorityFormatted)
@@ -96,6 +105,10 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             modifiedTask.setTaskName(newTaskName);
             modifiedTask.setDescription(newDescription);
             modifiedTask.setDeadline(newDeadlineFormatted);
+            if (newStartDateTime != null && !newStartDateTime.isBlank()) {
+                LocalDateTime newStartFormatted = parseFlexibleDateTime(newStartDateTime);
+                modifiedTask.setStartTime(newStartFormatted);
+            }
             modifiedTask.setTaskGroup(newTaskGroup);
             modifiedTask.setPriority(newPriorityFormatted);
             modifiedTask.setStatus(newTaskStatus);

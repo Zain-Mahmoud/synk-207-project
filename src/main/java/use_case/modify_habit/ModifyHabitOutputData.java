@@ -25,7 +25,7 @@ public class ModifyHabitOutputData {
             ArrayList<String> formattedHabit = new ArrayList<>();
 
             String habitName = habit.getName();
-            LocalDateTime habitStartDateTime = habit.getStartDateTime();
+            LocalDateTime habitStartDateTime = habit.getStartTime();
             int habitFrequency = habit.getFrequency();
             String habitGroup = habit.getHabitGroup();
             int habitStreakCount = habit.getStreakCount();
