@@ -1,4 +1,4 @@
-package use_case;
+package use_case.sync_to_google_calendar;
 
 import com.google.api.services.calendar.model.Event;
 import entities.Task;
@@ -6,10 +6,6 @@ import entities.TaskBuilder;
 import org.junit.jupiter.api.Test;
 import use_case.gateways.CalendarGateway;
 import use_case.gateways.TaskGateway;
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputData;
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor;
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
-import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

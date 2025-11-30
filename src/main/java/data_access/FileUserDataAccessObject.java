@@ -31,7 +31,7 @@ public class FileUserDataAccessObject implements UserGateway {
         headers.put("password", 3);
 
         if (csvFile.length() == 0) {
-            save();
+            create();
         }
         else {
 
@@ -58,7 +58,7 @@ public class FileUserDataAccessObject implements UserGateway {
         }
     }
 
-    private void save() {
+    private void create() {
         final BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(csvFile));
@@ -127,6 +127,6 @@ public class FileUserDataAccessObject implements UserGateway {
     public void save(User user) {
         usersByName.put(user.getUsername(), user);
         usersByUid.put(user.getUid(), user);
-        this.save();
+        this.create();
     }
 }

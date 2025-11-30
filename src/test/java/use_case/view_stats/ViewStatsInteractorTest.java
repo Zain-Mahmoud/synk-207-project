@@ -1,4 +1,4 @@
-package use_case;
+package use_case.view_stats;
 import data_access.InMemoryHabitDataAccessObject;
 import data_access.InMemoryTaskDataAccessObject;
 import data_access.InMemoryUserDataAccessObject;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import use_case.gateways.HabitGateway;
 import use_case.gateways.TaskGateway;
 import use_case.gateways.UserGateway;
-import use_case.view_stats.*;
 
 public class ViewStatsInteractorTest {
 
@@ -25,7 +24,7 @@ public class ViewStatsInteractorTest {
 
         Habit habit = habitBuilder.setHabitName("Not programming")
                 .setHabitGroup("Programming")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(1)
                 .setStatus(true)
@@ -33,7 +32,7 @@ public class ViewStatsInteractorTest {
                 .build();
         Habit habit2 = habitBuilder.setHabitName("Programming")
                 .setHabitGroup("Programming")
-                .setFrequency(LocalDateTime.parse( "2025-11-27T00:00:00"))
+                .setFrequency(1)
                 .setStartDateTime(LocalDateTime.parse( "2025-11-27T00:00:00"))
                 .setPriority(4)
                 .setStatus(false)
@@ -56,7 +55,7 @@ public class ViewStatsInteractorTest {
                 .build();
 
         User zain = userFactory.create("zain", "123");
-        userDAO.createUser(zain);
+        userDAO.save(zain);
 
         habitDAO.addHabit("zain", habit2);
         habitDAO.addHabit("zain", habit);
@@ -97,7 +96,7 @@ public class ViewStatsInteractorTest {
         UserFactory userFactory = new UserFactory();
 
         User user = userFactory.create("zain", "123");
-        userDAO.createUser(user);
+        userDAO.save(user);
 
 
 

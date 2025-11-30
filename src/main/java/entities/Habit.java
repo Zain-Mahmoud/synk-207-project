@@ -3,7 +3,7 @@ package entities;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Habit implements Completable {
+public class Habit implements Completable, Cloneable {
     private String habitName;
     private LocalDateTime startDateTime;
     private int frequency;
@@ -78,8 +78,7 @@ public class Habit implements Completable {
 
     public void setPriority(int priority) { this.priority = priority; }
 
-    // Implement by default, same convention from other entity.
-    // Not necessary, logically being covered by isCompleted.
+
     public boolean getStatus() { return this.status; }
     public void setStatus( boolean status) { this.status = status; }
 
@@ -88,7 +87,10 @@ public class Habit implements Completable {
         if (this == o) return true;
         if (!(o instanceof Habit)) return false;
         Habit habit = (Habit) o;
-        return Objects.equals(habit.habitName, habitName) && Objects.equals(habit.startDateTime, startDateTime);
+        return Objects.equals(habit.habitName, habitName) && Objects.equals(habit.startDateTime, startDateTime) &&
+                Objects.equals(habit.frequency, frequency) && Objects.equals(habit.habitGroup, habitGroup) &&
+                Objects.equals(habit.description, description) && Objects.equals(habit.status, status) &&
+                Objects.equals(habit.priority, priority) && Objects.equals(habit.streakCount, streakCount);
     }
 
     @Override
@@ -106,5 +108,14 @@ public class Habit implements Completable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public Habit clone(){
+        try{
+            return (Habit) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return this;
+        }
     }
 }

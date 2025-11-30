@@ -85,9 +85,6 @@ public class TaskDataAccessObject implements TaskGateway {
                 }
                 final String[] columns = line.split(",", -1);
 
-                if (columns.length < 8) {
-                    continue;
-                }
 
                 final String userId = columns[0].trim();
                 final String taskName = columns[1].trim();
