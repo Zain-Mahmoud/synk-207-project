@@ -25,6 +25,15 @@ import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsPresenter;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarController;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarPresenter;
+import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
+import interface_adapter.view_stats.ViewStatsController;
+import interface_adapter.view_stats.ViewStatsPresenter;
+import interface_adapter.view_stats.ViewStatsViewModel;
 import interface_adapter.update_profile.UpdateProfileController;
 import interface_adapter.update_profile.UpdateProfilePresenter;
 import interface_adapter.update_profile.UpdateProfileViewModel;
@@ -38,10 +47,27 @@ import use_case.signup.SignupOutputBoundary;
 import use_case.update_profile.UpdateProfileBoundary;
 import use_case.update_profile.UpdateProfileInteractor;
 import use_case.update_profile.UpdateProfileOutputBoundary;
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputBoundary;
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor;
+import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInputBoundary;
 import use_case.view_leaderboard.ViewLeaderboardInteractor;
 import use_case.view_leaderboard.ViewLeaderboardOutputBoundary;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputBoundary;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsInteractor;
+import use_case.view_tasks_and_habits.ViewTasksAndHabitsOutputBoundary;
 import view.*;
+import use_case.view_stats.ViewStatsInputBoundary;
+import use_case.view_stats.ViewStatsInteractor;
+import use_case.view_stats.ViewStatsOutputBoundary;
+import view.*;
+
+import view.*;
+import view.LeaderboardView;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
 
 
 public class AppBuilder {
@@ -63,9 +89,16 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
+    private ViewTasksAndHabitsView viewtasksAndHabitsView;
+    private ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
+    private ViewTasksAndHabitsController viewTasksAndHabitsController;
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //View model carrying sync status updates
+    private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private ViewStatsViewModel viewStatsViewModel;
+    private StatsView statsView;
     private UpdateProfileViewModel updateProfileViewModel;
     private UpdateProfileView updateProfileView;
 
@@ -97,6 +130,14 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addViewTasksAndHabitsView() {
+        viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
+        viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
+        return this;
+    }
+
     public AppBuilder addLeaderboardView() {
         viewLeaderboardViewModel = new ViewLeaderboardViewModel();
         leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
@@ -113,6 +154,14 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addStatsView(){
+        viewStatsViewModel = new ViewStatsViewModel();
+        statsView = new StatsView(viewStatsViewModel, viewManagerModel);
+        statsView.setViewManager(viewManagerModel);
+        cardPanel.add(statsView, statsView.getViewName());
+        return this;
+    }
+
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
                 signupViewModel, loginViewModel);
@@ -126,7 +175,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel, updateProfileViewModel);
+                loggedInViewModel, loginViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
@@ -154,6 +203,44 @@ public class AppBuilder {
 
         UpdateProfileController updateProfileController = new UpdateProfileController(updateProfileInteractor);
         updateProfileView.setUpdateProfileController(updateProfileController);
+        return this;
+    }
+
+    public AppBuilder addSyncToGoogleCalendarUseCase() { // Wire sync-to-calendar use case components together
+        if (syncToGoogleCalendarViewModel == null) {
+            syncToGoogleCalendarViewModel = new SyncToGoogleCalendarViewModel();
+        }
+        SyncToGoogleCalendarOutputBoundary syncOutputBoundary =
+                new SyncToGoogleCalendarPresenter(syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
+        SyncToGoogleCalendarInputBoundary syncInteractor =
+                new SyncToGoogleCalendarInteractor(taskDataAccessObject, calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
+        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by logged-in view
+        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into logged-in view
+        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI updates
+        return this;
+    }
+
+
+    public AppBuilder addViewTasksAndHabitsUseCase() {
+        final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
+        final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
+                (taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
+
+        ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
+        loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
+        return this;
+    }
+
+    public AppBuilder addViewStatsUseCase(){
+        final ViewStatsOutputBoundary viewStatsOutputBoundary = new ViewStatsPresenter(viewStatsViewModel,
+                viewManagerModel);
+        final ViewStatsInputBoundary viewStatsInteractor = new ViewStatsInteractor(habitDataAccessObject,
+                taskDataAccessObject, viewStatsOutputBoundary);
+
+        ViewStatsController viewStatsController = new ViewStatsController(viewStatsInteractor, loggedInViewModel);
+        loggedInView.setViewStatsController(viewStatsController);
+
         return this;
     }
 

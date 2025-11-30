@@ -1,15 +1,17 @@
 package entities;
 
 import java.time.LocalDateTime;
+import java.time.Period;
 
 public class HabitBuilder {
     private String habitName;
     private LocalDateTime startDateTime;
-    private LocalDateTime frequency;
+    private int frequency;
+    private LocalDateTime lastDateTimeCompleted;
     private String habitGroup;
     private int streakCount = 0;
-    private int priority = 0; //waiting for modifying after.
-    private boolean status = false; // not sure yet, placeholder.
+    private int priority = 0;
+    private boolean status = false;
 
     public HabitBuilder setHabitName(String habitName) {
         this.habitName = habitName;
@@ -21,7 +23,7 @@ public class HabitBuilder {
         return this;
     }
 
-    public HabitBuilder setFrequency(LocalDateTime frequency) {
+    public HabitBuilder setFrequency(int frequency) {
         this.frequency = frequency;
         return this;
     }

@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Habit implements Completable {
     private String habitName;
     private LocalDateTime startDateTime;
-    private LocalDateTime frequency;
+    private int frequency;
     private String habitGroup;
     private int streakCount;
     private int priority;
@@ -15,7 +15,7 @@ public class Habit implements Completable {
 
     Habit(String habitName,
           LocalDateTime startDateTime,
-          LocalDateTime frequency,
+          int frequency,
           String habitGroup,
           int streakCount,
           int priority,
@@ -50,16 +50,8 @@ public class Habit implements Completable {
      * @return
      */
     @Override
-    public String getTitle() {
-        return "";
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public Object getDueDate() {
-        return null;
+    public LocalDateTime getDueDate() {
+        return this.getDueDate();
     }
 
 
@@ -68,11 +60,11 @@ public class Habit implements Completable {
 
     public void setHabitName(String habitName) { this.habitName = habitName; }
 
-    public LocalDateTime getStartDateTime() { return this.startDateTime; }
+    public LocalDateTime getStartTime() { return this.startDateTime; }
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
 
-    public LocalDateTime getFrequency() { return this.frequency; }
-    public void setFrequency(LocalDateTime frequency) { this.frequency = frequency; }
+    public int getFrequency() { return this.frequency; }
+    public void setFrequency(int frequency) { this.frequency = frequency; }
 
     public String getHabitGroup() { return this.habitGroup; }
     public void setHabitGroup(String habitGroup) { this.habitGroup = habitGroup; }
@@ -81,6 +73,9 @@ public class Habit implements Completable {
     public void setStreakCount(int streakCount) { this.streakCount = streakCount; }
 
     public int getPriority() { return this.priority; }
+
+
+
     public void setPriority(int priority) { this.priority = priority; }
 
     // Implement by default, same convention from other entity.

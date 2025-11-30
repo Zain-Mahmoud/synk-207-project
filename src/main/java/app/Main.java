@@ -12,10 +12,14 @@ public class Main {
                 .addSignupView()
                 .addLoggedInView()
                 .addLeaderboardView()
-                .addUpdateProfileView()
+                .addViewTasksAndHabitsView()
+                .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addViewLeaderboardUseCase()
+                .addViewTasksAndHabitsUseCase()
+                .addSyncToGoogleCalendarUseCase()
+                .addViewStatsUseCase()
                 .addUpdateProfileUseCase()
                 .build();
 
