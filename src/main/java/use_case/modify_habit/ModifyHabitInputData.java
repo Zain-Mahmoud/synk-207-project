@@ -20,10 +20,10 @@ public class ModifyHabitInputData {
     private final String newFrequency;
 
     public ModifyHabitInputData(String oldHabitName, String oldPriority, Boolean oldHabitStatus, 
-                                 String oldStartDateTime, String oldStreakCount, String oldHabitGroup, String oldFrequency,
-                                 String newHabitName, String newPriority, Boolean newHabitStatus, 
-                                 String newStartDateTime, String newStreakCount, String newHabitGroup, String newFrequency,
-                                 String userID) {
+                                String oldStartDateTime, String oldStreakCount, String oldHabitGroup,
+                                String oldFrequency, String newHabitName, String newPriority, Boolean newHabitStatus,
+                                String newStartDateTime, String newStreakCount, String newHabitGroup,
+                                String newFrequency, String userID) {
 
         this.oldHabitName = oldHabitName;
         this.oldPriority = oldPriority;
@@ -32,7 +32,6 @@ public class ModifyHabitInputData {
         this.oldStreakCount = oldStreakCount;
         this.oldHabitGroup = oldHabitGroup;
         this.oldFrequency = oldFrequency;
-        
 
         this.newHabitName = newHabitName;
         this.newPriority = newPriority;
@@ -44,7 +43,6 @@ public class ModifyHabitInputData {
         
         this.userID = userID;
     }
-
 
     public String getOldHabitName() {
         return oldHabitName;
@@ -73,7 +71,6 @@ public class ModifyHabitInputData {
     public String getOldFrequency() {
         return oldFrequency;
     }
-
 
     public String getNewPriority() {
         return newPriority;

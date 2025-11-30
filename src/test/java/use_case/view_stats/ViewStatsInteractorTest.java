@@ -55,7 +55,7 @@ public class ViewStatsInteractorTest {
                 .build();
 
         User zain = userFactory.create("zain", "123");
-        userDAO.createUser(zain);
+        userDAO.save(zain);
 
         habitDAO.addHabit("zain", habit2);
         habitDAO.addHabit("zain", habit);
@@ -96,7 +96,7 @@ public class ViewStatsInteractorTest {
         UserFactory userFactory = new UserFactory();
 
         User user = userFactory.create("zain", "123");
-        userDAO.createUser(user);
+        userDAO.save(user);
 
 
 

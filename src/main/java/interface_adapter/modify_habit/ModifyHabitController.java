@@ -4,7 +4,6 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import use_case.modify_habit.ModifyHabitInputBoundary;
 import use_case.modify_habit.ModifyHabitInputData;
 
-
 public class ModifyHabitController {
     private final ModifyHabitInputBoundary modifyHabitUseCaseInteractor;
     private final LoggedInViewModel loggedInViewModel;
@@ -14,43 +13,45 @@ public class ModifyHabitController {
         this.loggedInViewModel = loggedInViewModel;
     }
 
-
     /***
-     * Executes modify habit use case
-     * @param oldHabitName
-     * @param oldPriority
-     * @param oldStatus
-     * @param oldStartDateTime
-     * @param oldStreakCount
-     * @param oldHabitGroup
-     * @param oldHabitFrequency
-     * @param newHabitName
-     * @param newPriority
-     * @param newStatus
-     * @param newStartDateTime
-     * @param newStreakCount
-     * @param newHabitGroup
-     * @param newHabitFrequency
+     * Executes modify habit use case.
+     * @param oldHabitName old habit name
+     * @param oldPriority old habit priority
+     * @param oldStatus old habit status
+     * @param oldStartDateTime old habit start date time
+     * @param oldStreakCount old habit streak count
+     * @param oldHabitGroup old habit group
+     * @param oldHabitFrequency old habit frequency
+     * @param newHabitName old habit name
+     * @param newPriority new habit priority
+     * @param newStatus new habit status
+     * @param newStartDateTime new habit start time
+     * @param newStreakCount new habit streak count
+     * @param newHabitGroup new habit group
+     * @param newHabitFrequency new habit frequency
      */
     public void execute(String oldHabitName, String oldPriority, boolean oldStatus, 
                         String oldStartDateTime, String oldStreakCount, 
                         String oldHabitGroup, String oldHabitFrequency,
                         String newHabitName, String newPriority, boolean newStatus, 
                         String newStartDateTime, String newStreakCount, 
-                        String newHabitGroup, String newHabitFrequency){
+                        String newHabitGroup, String newHabitFrequency) {
 
-        String username = loggedInViewModel.getState().getUsername();
-        ModifyHabitInputData modifyHabitInputData = new ModifyHabitInputData(
-                oldHabitName, oldPriority, oldStatus, oldStartDateTime, oldStreakCount, oldHabitGroup, oldHabitFrequency,
-                newHabitName, newPriority, newStatus, newStartDateTime, newStreakCount, newHabitGroup, newHabitFrequency,
-                username
+        final String username = loggedInViewModel.getState().getUsername();
+        final ModifyHabitInputData modifyHabitInputData = new ModifyHabitInputData(
+                oldHabitName, oldPriority, oldStatus, oldStartDateTime, oldStreakCount, oldHabitGroup,
+                oldHabitFrequency, newHabitName, newPriority, newStatus, newStartDateTime,
+                newStreakCount, newHabitGroup, newHabitFrequency, username
         );
 
         this.modifyHabitUseCaseInteractor.execute(modifyHabitInputData);
 
     }
 
-    public void switchToHabitListView(){
+    /**
+     * Switches to habit list view.
+     */
+    public void switchToHabitListView() {
         this.modifyHabitUseCaseInteractor.switchToHabitListView();
     }
 

@@ -150,12 +150,4 @@ public class ModifyHabitState {
     public void setOldStatus(boolean oldStatus) {
         this.oldStatus = oldStatus;
     }
-
-    public String getOldDescription() {
-        return oldDescription;
-    }
-
-    public void setOldDescription(String oldDescription) {
-        this.oldDescription = oldDescription;
-    }
 }

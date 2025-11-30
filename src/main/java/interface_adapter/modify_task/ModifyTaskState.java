@@ -1,12 +1,11 @@
 package interface_adapter.modify_task;
 
-
 public class ModifyTaskState {
     private String newTaskName = "";
     private String priority = "";
     private String deadline = "";
     private String startDateTime = "";
-    private boolean status = false;
+    private boolean status;
     private String taskGroup = "";
     private String description = "";
     private String taskError;
@@ -14,11 +13,9 @@ public class ModifyTaskState {
     private String oldPriority = "";
     private String oldDeadline = "";
     private String oldStartDateTime = "";
-    private boolean oldStatus = false;
+    private boolean oldStatus;
     private String oldTaskGroup = "";
     private String oldDescription = "";
-
-
 
     public String getNewTaskName() {
         return newTaskName;
@@ -75,7 +72,6 @@ public class ModifyTaskState {
     public void setDescription(String description) {
         this.description = description;
     }
-
 
     public String getTaskError() {
         return taskError;

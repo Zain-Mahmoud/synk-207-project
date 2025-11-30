@@ -11,7 +11,6 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
     private ModifyTaskViewModel modifyTaskViewModel;
     private ViewTasksAndHabitsViewModel tasksViewModel;
 
-
     public ModifyTaskPresenter(ViewManagerModel viewManagerModel,
                                ModifyTaskViewModel modifyTaskViewModel,
                                ViewTasksAndHabitsViewModel tasksViewModel) {
@@ -22,11 +21,11 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
 
     @Override
     public void prepareSuccessView(ModifyTaskOutputData outputData) {
-         ViewTasksAndHabitsState currState = tasksViewModel.getState();
-         currState.setFormattedTasks(outputData.getTaskList());
-         tasksViewModel.firePropertyChanged();
+        final ViewTasksAndHabitsState currState = tasksViewModel.getState();
+        currState.setFormattedTasks(outputData.getTaskList());
+        tasksViewModel.firePropertyChanged();
 
-         switchToTaskListView();
+        switchToTaskListView();
     }
 
     @Override
@@ -36,7 +35,10 @@ public class ModifyTaskPresenter implements ModifyTaskOutputBoundary {
         modifyTaskViewModel.firePropertyChanged();
     }
 
-    public void switchToTaskListView(){
+    /**
+     * Switches to task list view.
+     */
+    public void switchToTaskListView() {
         viewManagerModel.setState(tasksViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }

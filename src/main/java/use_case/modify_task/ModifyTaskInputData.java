@@ -1,6 +1,7 @@
 package use_case.modify_task;
 
 public class ModifyTaskInputData {
+
     private final String userID;
     private final String oldTaskName;
     private final String oldPriority;
@@ -17,11 +18,11 @@ public class ModifyTaskInputData {
     private final String newTaskGroup;
     private final String newDescription;
 
-    public ModifyTaskInputData(String oldTaskName, String oldPriority, String oldDeadline, String oldStartDateTime, Boolean oldTaskStatus,
-                               String oldTaskGroup, String oldDescription,
-                               String newTaskName, String newPriority, String newDeadline, String newStartDateTime, Boolean newTaskStatus,
-                               String newTaskGroup, String newDescription,
-                               String userID) {
+    public ModifyTaskInputData(String oldTaskName, String oldPriority,
+                               String oldDeadline, String oldStartDateTime, Boolean oldTaskStatus, String oldTaskGroup,
+                               String oldDescription, String newTaskName, String newPriority, String newDeadline,
+                               String newStartDateTime, Boolean newTaskStatus,
+                               String newTaskGroup, String newDescription, String userID) {
         this.oldTaskName = oldTaskName;
         this.oldPriority = oldPriority;
         this.oldDeadline = oldDeadline;
@@ -66,9 +67,6 @@ public class ModifyTaskInputData {
     public String getOldDescription() {
         return oldDescription;
     }
-
-
-
 
     public String getNewPriority() {
         return newPriority;

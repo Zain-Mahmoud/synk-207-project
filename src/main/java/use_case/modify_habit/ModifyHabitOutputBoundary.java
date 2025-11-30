@@ -3,6 +3,7 @@ package use_case.modify_habit;
 public interface ModifyHabitOutputBoundary {
     /**
      * Prepares the success view for the Login Use Case.
+     * @param outputData the output data
      */
     void prepareSuccessView(ModifyHabitOutputData outputData);
 

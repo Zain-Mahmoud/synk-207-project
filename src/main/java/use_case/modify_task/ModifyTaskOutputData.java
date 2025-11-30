@@ -17,7 +17,6 @@ public class ModifyTaskOutputData{
     public ArrayList<ArrayList<String>> getTaskList() {
         ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
 
-        // ISO format used for guaranteed substring indices (yyyy-MM-dd'T'HH:mm:ss)
         final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         for (Task task : taskList) {

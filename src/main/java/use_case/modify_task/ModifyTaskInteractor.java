@@ -1,15 +1,15 @@
 package use_case.modify_task;
 
-import entities.Task;
-import entities.TaskBuilder;
-import use_case.gateways.TaskGateway;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import entities.Task;
+import entities.TaskBuilder;
+import use_case.gateways.TaskGateway;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyTaskPresenter;
@@ -30,69 +30,69 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
      * @throws java.time.format.DateTimeParseException if parsing fails for all formats.
      */
     private LocalDateTime parseFlexibleDateTime(String deadline) throws java.time.format.DateTimeParseException {
-        // 1. Custom format: "01 February, 2026 06:00"
-        final DateTimeFormatter CUSTOM_FORMAT = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm", Locale.ENGLISH);
+        final DateTimeFormatter customFormat = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm", Locale.ENGLISH);
 
-        // 2. Flexible ISO format: "2026-02-01T06:00" or "2026-02-01T06:00:00"
-        final DateTimeFormatter ISO_FLEXIBLE_FORMAT = new DateTimeFormatterBuilder()
+        final DateTimeFormatter isoFlexibleFormat = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd'T'HH:mm")
-                .appendOptional(new DateTimeFormatterBuilder().appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).toFormatter())
+                .appendOptional(new DateTimeFormatterBuilder().appendLiteral(':')
+                        .appendValue(ChronoField.SECOND_OF_MINUTE, 2).toFormatter())
                 .toFormatter();
 
-        DateTimeFormatter[] formatters = {CUSTOM_FORMAT, ISO_FLEXIBLE_FORMAT};
+        final DateTimeFormatter[] formatters = {customFormat, isoFlexibleFormat};
 
         for (DateTimeFormatter formatter : formatters) {
             try {
                 return LocalDateTime.parse(deadline, formatter);
-            } catch (java.time.format.DateTimeParseException ignored) {
+            }
+            catch (java.time.format.DateTimeParseException ignoredException) {
                 // Ignore and try the next formatter
             }
         }
 
-        // If all fail, throw the final exception
         throw new java.time.format.DateTimeParseException("Unable to parse date: " + deadline, deadline, 0);
     }
 
-    public void execute(ModifyTaskInputData modifyInputData){
+    /**
+     * Executes the ModifyTask use case.
+     * @param modifyInputData the input data
+     */
+    public void execute(ModifyTaskInputData modifyInputData) {
 
-        String oldTaskName = modifyInputData.getOldTaskName();
-        String oldTaskPriority = modifyInputData.getOldPriority();
-        boolean oldTaskStatus = modifyInputData.getOldTaskStatus();
-        String oldDeadline = modifyInputData.getOldDeadline();
-        String oldStartDateTime = null;
-        try { oldStartDateTime = modifyInputData.getOldStartDateTime(); } catch (Exception ignored) {}
-        String oldTaskGroup = modifyInputData.getOldTaskGroup();
-        String oldDescription = modifyInputData.getOldDescription();
+        final String oldTaskName = modifyInputData.getOldTaskName();
+        final String oldTaskPriority = modifyInputData.getOldPriority();
+        final boolean oldTaskStatus = modifyInputData.getOldTaskStatus();
+        final String oldDeadline = modifyInputData.getOldDeadline();
+        final String oldStartDateTime = modifyInputData.getOldStartDateTime();
 
-        String newTaskName = modifyInputData.getNewTaskName();
-        String newTaskPriority = modifyInputData.getNewPriority();
-        boolean newTaskStatus = modifyInputData.getNewTaskStatus();
-        String newDeadline = modifyInputData.getNewDeadline();
-        String newStartDateTime = null;
-        try { newStartDateTime = modifyInputData.getNewStartDateTime(); } catch (Exception ignored) {}
-        String newTaskGroup = modifyInputData.getNewTaskGroup();
-        String newDescription = modifyInputData.getNewDescription();
-        String userID = modifyInputData.getUserID();
+        final String oldTaskGroup = modifyInputData.getOldTaskGroup();
+        final String oldDescription = modifyInputData.getOldDescription();
 
-        try{
-            // 1. Validate and Parse Input
-            LocalDateTime newDeadlineFormatted = parseFlexibleDateTime(newDeadline);
-            int newPriorityFormatted = Integer.parseInt(newTaskPriority);
-            int oldPriorityFormatted = Integer.parseInt(oldTaskPriority);
+        final String newTaskName = modifyInputData.getNewTaskName();
+        final String newTaskPriority = modifyInputData.getNewPriority();
+        final boolean newTaskStatus = modifyInputData.getNewTaskStatus();
+        final String newDeadline = modifyInputData.getNewDeadline();
+        final String newStartDateTime = modifyInputData.getNewStartDateTime();
+        final String newTaskGroup = modifyInputData.getNewTaskGroup();
+        final String newDescription = modifyInputData.getNewDescription();
+        final String userID = modifyInputData.getUserID();
+
+        try {
+            final LocalDateTime newDeadlineFormatted = parseFlexibleDateTime(newDeadline);
+            final int newPriorityFormatted = Integer.parseInt(newTaskPriority);
+            final int oldPriorityFormatted = Integer.parseInt(oldTaskPriority);
 
             if (newDeadlineFormatted.isBefore(LocalDateTime.now())) {
                 modifyTaskPresenter.prepareFailView("New deadline cannot be in the past.");
                 return;
             }
 
-            LocalDateTime oldDeadlineFormatted = parseFlexibleDateTime(oldDeadline);
+            final LocalDateTime oldDeadlineFormatted = parseFlexibleDateTime(oldDeadline);
             LocalDateTime oldStartFormatted = null;
             if (oldStartDateTime != null && !oldStartDateTime.isBlank()) {
                 oldStartFormatted = parseFlexibleDateTime(oldStartDateTime);
             }
 
-            // 2. Build the 'Old' Task for Deletion/Comparison
-                final Task oldTask = new TaskBuilder()
+            final Task oldTask = new TaskBuilder()
                     .setTaskName(oldTaskName)
                     .setDescription(oldDescription)
                     .setStartTime(oldStartFormatted)
@@ -106,17 +106,17 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             modifiedTask.setDescription(newDescription);
             modifiedTask.setDeadline(newDeadlineFormatted);
             if (newStartDateTime != null && !newStartDateTime.isBlank()) {
-                LocalDateTime newStartFormatted = parseFlexibleDateTime(newStartDateTime);
+                final LocalDateTime newStartFormatted = parseFlexibleDateTime(newStartDateTime);
                 modifiedTask.setStartTime(newStartFormatted);
             }
             modifiedTask.setTaskGroup(newTaskGroup);
             modifiedTask.setPriority(newPriorityFormatted);
             modifiedTask.setStatus(newTaskStatus);
 
-            ArrayList<Task> taskList = taskDataAccessObject.fetchTasks(userID);
+            final ArrayList<Task> taskList = taskDataAccessObject.fetchTasks(userID);
 
             for (Task task : taskList) {
-                if (task.getName().equals(modifiedTask.getName()) && !task.equals(oldTask)){
+                if (task.getName().equals(modifiedTask.getName()) && !task.equals(oldTask)) {
                     modifyTaskPresenter.prepareFailView("Task already exists");
                     return;
                 }
@@ -126,12 +126,14 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             taskDataAccessObject.deleteTask(userID, oldTask);
             taskDataAccessObject.addTask(userID, modifiedTask);
 
-
             modifyTaskPresenter.prepareSuccessView(new ModifyTaskOutputData(taskDataAccessObject.fetchTasks(userID)));
-        } catch (java.time.format.DateTimeParseException d) {
-            // Updated error message to list the supported formats
-            modifyTaskPresenter.prepareFailView("Invalid date/time format. Supported formats are: 'dd MMMM, yyyy HH:mm' (e.g., 01 February, 2026 06:00) or 'YYYY-MM-DDTHH:MM[:SS]' (e.g., 2026-02-01T06:00:00).");
-        } catch (NumberFormatException n) {
+        }
+        catch (java.time.format.DateTimeParseException dateTimeParseException) {
+            modifyTaskPresenter.prepareFailView("Invalid date/time format. "
+                    + "Supported formats are: 'dd MMMM, yyyy HH:mm' (e.g., 01 February, 2026 06:00) "
+                    + "or 'YYYY-MM-DDTHH:MM[:SS]' (e.g., 2026-02-01T06:00:00).");
+        }
+        catch (NumberFormatException numberFormatException) {
             modifyTaskPresenter.prepareFailView("Invalid Priority. Must be a whole number.");
         }
     }
