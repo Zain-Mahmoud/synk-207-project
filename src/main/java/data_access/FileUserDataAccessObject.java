@@ -2,9 +2,7 @@ package data_access;
 
 import entities.User;
 import entities.UserFactory;
-import use_case.login.LoginUserDataAccessInterface;
-import use_case.signup.SignupUserDataAccessInterface;
-import use_case.update_profile.UpdateProfileUserDataAccessInterface;
+import use_case.gateways.UserGateway;
 
 import java.io.*;
 import java.util.HashMap;
@@ -14,9 +12,7 @@ import java.util.Map;
 /**
  * DAO for user data implemented using a File to persist the data.
  */
-public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
-                                                 LoginUserDataAccessInterface,
-                                                 UpdateProfileUserDataAccessInterface {
+public class FileUserDataAccessObject implements UserGateway {
 
     private static final String HEADER = "uid,username,avatarpath,password";
 
@@ -93,8 +89,28 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
+    public boolean existsByName(String identifier) {
+        return usersByName.containsKey(identifier);
+    }
+
+    @Override
+    public void updateUser(String oldUID, User user) {
+
+    }
+
+    @Override
+    public void deleteUser(String uid) {
+
+    }
+
+    @Override
     public User getByUid(String uid) {
         return usersByUid.get(uid);
+    }
+
+    @Override
+    public User getByName(String username) {
+        return usersByName.get(username);
     }
 
     @Override
@@ -113,15 +129,4 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         usersByUid.put(user.getUid(), user);
         this.save();
     }
-
-    @Override
-    public User get(String username) {
-        return usersByName.get(username);
-    }
-
-    @Override
-    public boolean existsByName(String identifier) {
-        return usersByName.containsKey(identifier);
-    }
-
 }

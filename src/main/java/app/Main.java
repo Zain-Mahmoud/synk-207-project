@@ -13,6 +13,7 @@ public class Main {
                 .addLoggedInView()
                 .addLeaderboardView()
                 .addViewTasksAndHabitsView()
+                .addUpdateProfileView()
                 .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()

@@ -1,6 +1,7 @@
 package use_case.update_profile;
 
 import entities.User;
+import use_case.gateways.UserGateway;
 
 /**
  * The Interactor for the Update Profile Use Case.
@@ -8,10 +9,10 @@ import entities.User;
  */
 public class UpdateProfileInteractor implements UpdateProfileBoundary {
 
-    private final UpdateProfileUserDataAccessInterface userDataAccess;
+    private final UserGateway userDataAccess;
     private final UpdateProfileOutputBoundary presenter;
 
-    public UpdateProfileInteractor(UpdateProfileUserDataAccessInterface userDataAccess,
+    public UpdateProfileInteractor(UserGateway userDataAccess,
                                    UpdateProfileOutputBoundary presenter) {
         this.userDataAccess = userDataAccess;
         this.presenter = presenter;
