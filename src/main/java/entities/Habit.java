@@ -60,7 +60,7 @@ public class Habit implements Completable, Cloneable {
 
     public void setHabitName(String habitName) { this.habitName = habitName; }
 
-    public LocalDateTime getStartDateTime() { return this.startDateTime; }
+    public LocalDateTime getStartTime() { return this.startDateTime; }
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
 
     public int getFrequency() { return this.frequency; }
@@ -73,6 +73,9 @@ public class Habit implements Completable, Cloneable {
     public void setStreakCount(int streakCount) { this.streakCount = streakCount; }
 
     public int getPriority() { return this.priority; }
+
+
+
     public void setPriority(int priority) { this.priority = priority; }
 
 

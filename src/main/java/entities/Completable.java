@@ -23,4 +23,6 @@ public interface Completable {
 
     Completable clone();
 
+    LocalDateTime getStartTime();
+
 }

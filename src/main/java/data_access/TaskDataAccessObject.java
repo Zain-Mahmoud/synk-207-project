@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class TaskDataAccessObject implements TaskGateway {
 
-    private static final String TASK_HEADER = "userId,taskName,description,deadline,taskGroup,status,priority";
+    private static final String TASK_HEADER = "userId,taskName,description,startTime,deadline,taskGroup,status,priority";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private final File taskCsvFile;
@@ -85,27 +85,28 @@ public class TaskDataAccessObject implements TaskGateway {
                 }
                 final String[] columns = line.split(",", -1);
 
-                if (columns.length < 6) {
+                if (columns.length < 8) {
                     continue;
                 }
 
                 final String userId = columns[0].trim();
                 final String taskName = columns[1].trim();
                 final String description = columns[2].trim();
-                final String deadlineRaw = columns[3].trim();
-                final String taskGroup = columns[4].trim();
+                final String startTimeRaw = columns[3].trim();
+                final String deadlineRaw = columns[4].trim();
+                final String taskGroup = columns[5].trim();
                 final boolean status;
                 final int priority;
 
                 try {
-                    status = Boolean.parseBoolean(columns[5].trim());
+                    status = Boolean.parseBoolean(columns[6].trim());
                 } catch (Exception e) {
                     continue;
                 }
 
                 String priorityStr = "";
-                if (columns.length >= 7) {
-                    priorityStr = columns[6].trim();
+                if (columns.length > 7) {
+                    priorityStr = columns[7].trim();
                 }
 
                 try {
@@ -114,7 +115,14 @@ public class TaskDataAccessObject implements TaskGateway {
                     continue;
                 }
 
-
+                LocalDateTime startTime = null;
+                if (!startTimeRaw.isBlank()) {
+                    try {
+                        startTime = LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+                    } catch (DateTimeParseException e) {
+                        continue;
+                    }
+                }
 
                 LocalDateTime deadline = null;
                 if (!deadlineRaw.isBlank()) {
@@ -128,6 +136,7 @@ public class TaskDataAccessObject implements TaskGateway {
                 Task task = new TaskBuilder()
                         .setTaskName(taskName)
                         .setDescription(description)
+                        .setStartTime(startTime)
                         .setDeadline(deadline)
                         .setTaskGroup(taskGroup)
                         .setStatus(status)
@@ -150,11 +159,13 @@ public class TaskDataAccessObject implements TaskGateway {
             for (Map.Entry<String, ArrayList<Task>> entry : userTasks.entrySet()) {
                 final String userId = entry.getKey();
                 for (Task task : entry.getValue()) {
-                    final String deadline = task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline());
+                    final String startTime = task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime());
+                    final String deadline = task.getDueDate() == null ? "" : DATE_FORMATTER.format(task.getDueDate());
                     final String line = String.join(",",
                             userId,
                             safe(task.getName()),
                             safe(task.getDescription()),
+                            startTime,
                             deadline,
                             safe(task.getTaskGroup()),
                             Boolean.toString(task.getStatus()),

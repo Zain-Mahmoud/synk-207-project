@@ -40,7 +40,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
                 ArrayList<String> formattedTask = new ArrayList<>();
 
                 String taskName = task.getName();
-                LocalDateTime taskDeadline = task.getDeadline();
+                LocalDateTime taskDeadline = task.getDueDate();
                 String taskGroup = task.getTaskGroup();
                 boolean status = task.getStatus();
                 int priority = task.getPriority();
@@ -122,7 +122,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
                 ArrayList<String> formattedHabit = new ArrayList<>();
 
                 String habitName = habit.getName();
-                LocalDateTime habitStartDateTime = habit.getStartDateTime();
+                LocalDateTime habitStartDateTime = habit.getStartTime();
                 int habitFrequency = habit.getFrequency();
                 String habitGroup = habit.getHabitGroup();
                 int habitStreakCount = habit.getStreakCount();

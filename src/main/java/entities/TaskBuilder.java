@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class TaskBuilder {
     private String taskName;
+    private LocalDateTime startTime;
     private LocalDateTime deadline;
     private String taskGroup;
     private boolean status = false;
@@ -13,6 +14,11 @@ public class TaskBuilder {
 
     public TaskBuilder setTaskName(String taskName) {
         this.taskName = taskName;
+        return this;
+    }
+
+    public TaskBuilder setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
         return this;
     }
 
@@ -50,6 +56,6 @@ public class TaskBuilder {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalStateException("taskName must not be null or empty");
         }
-        return new Task(taskName, deadline, taskGroup, status, priority, description);
+        return new Task(taskName, startTime, deadline, taskGroup, status, priority, description);
     }
 }

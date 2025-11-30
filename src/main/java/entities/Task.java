@@ -14,8 +14,9 @@ public class Task implements Completable, Cloneable {
     private LocalDateTime startTime;
 
     // LocalDateTime startTime this.startTime = startTime;
-    Task(String taskName, LocalDateTime deadline, String taskGroup, boolean status, int priority, String description) {
+    Task(String taskName, LocalDateTime startTime, LocalDateTime deadline, String taskGroup, boolean status, int priority, String description) {
         this.taskName = taskName;
+        this.startTime = startTime;
         this.deadline = deadline;
         this.taskGroup = taskGroup;
         this.status = status;
@@ -33,7 +34,7 @@ public class Task implements Completable, Cloneable {
     public String getName() { return taskName; }
     public void setTaskName(String taskName) { this.taskName = taskName; }
 
-    public LocalDateTime getDeadline() { return deadline; }
+    public LocalDateTime getDueDate() { return deadline; }
     public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
 
     public LocalDateTime getStartTime() { return startTime; }
@@ -87,13 +88,7 @@ public class Task implements Completable, Cloneable {
         return description;
     }
 
-    /**
-     * @return
-     */
-    @Override
-    public LocalDateTime getDueDate() {
-        return this.deadline;
-    }
+
 
     public void setDescription(String description) {
         this.description = description;
