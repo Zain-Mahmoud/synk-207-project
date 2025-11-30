@@ -8,6 +8,10 @@ import java.util.Locale;
 
 import entities.Habit;
 import entities.HabitBuilder;
+import entities.Task;
+import strategy.HabitValidationStrategy;
+import strategy.TaskValidationStrategy;
+import strategy.ValidationStrategy;
 import use_case.gateways.HabitGateway;
 
 public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
@@ -19,9 +23,12 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
     private final ModifyHabitOutputBoundary modifyHabitPresenter;
     private final HabitGateway habitDataAccessObject;
 
+    private final ValidationStrategy<Habit> habitValidation;
+
     public ModifyHabitInteractor(ModifyHabitOutputBoundary modifyHabitPresenter, HabitGateway habitDataAccessObject) {
         this.modifyHabitPresenter = modifyHabitPresenter;
         this.habitDataAccessObject = habitDataAccessObject;
+        this.habitValidation = new HabitValidationStrategy(habitDataAccessObject);
     }
 
     /**
@@ -93,19 +100,18 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
             modifiedHabit.setHabitGroup(newHabitGroup);
             modifiedHabit.setFrequency(newFrequencyFormatted);
 
-            final ArrayList<Habit> habitList = habitDataAccessObject.fetchHabits(userID);
-            for (Habit habit : habitList) {
-                if (habit.getName().equals(modifiedHabit.getName()) && !habit.equals(oldHabit)) {
-                    modifyHabitPresenter.prepareFailView("Habit already exists");
-                    return;
-                }
+            String validation = habitValidation.validate(userID, oldHabit, modifiedHabit);
+            if (validation == null ) {
+                habitDataAccessObject.deleteHabit(userID, oldHabit);
+                habitDataAccessObject.addHabit(userID, modifiedHabit);
+
+                modifyHabitPresenter.prepareSuccessView(new
+                        ModifyHabitOutputData(habitDataAccessObject.fetchHabits(userID)));
+            } else {
+                modifyHabitPresenter.prepareFailView(validation);
             }
 
-            habitDataAccessObject.deleteHabit(userID, oldHabit);
-            habitDataAccessObject.addHabit(userID, modifiedHabit);
 
-            modifyHabitPresenter.prepareSuccessView(new
-                    ModifyHabitOutputData(habitDataAccessObject.fetchHabits(userID)));
 
         }
         catch (DateTimeParseException dateParseException) {

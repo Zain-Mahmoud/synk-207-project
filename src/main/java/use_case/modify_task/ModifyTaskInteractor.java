@@ -9,15 +9,19 @@ import java.util.Locale;
 
 import entities.Task;
 import entities.TaskBuilder;
+import strategy.TaskValidationStrategy;
+import strategy.ValidationStrategy;
 import use_case.gateways.TaskGateway;
 
 public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
     private final ModifyTaskOutputBoundary modifyTaskPresenter;
     private final TaskGateway taskDataAccessObject;
+    private final ValidationStrategy<Task> taskValidation;
 
     public ModifyTaskInteractor(ModifyTaskOutputBoundary modifyTaskPresenter, TaskGateway taskDataAccessObject) {
         this.modifyTaskPresenter = modifyTaskPresenter;
         this.taskDataAccessObject = taskDataAccessObject;
+        this.taskValidation = new TaskValidationStrategy(taskDataAccessObject);
     }
 
     /**
@@ -45,7 +49,6 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
                 return LocalDateTime.parse(deadline, formatter);
             }
             catch (java.time.format.DateTimeParseException ignoredException) {
-                // Ignore and try the next formatter
             }
         }
 
