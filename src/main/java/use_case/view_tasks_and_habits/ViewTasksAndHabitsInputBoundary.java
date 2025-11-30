@@ -11,6 +11,5 @@ public interface ViewTasksAndHabitsInputBoundary {
     void execute(ViewTasksAndHabitsInputData createInputData);
 
     void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel);
-    void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel, String taskSort, String habitSort);
 
 }

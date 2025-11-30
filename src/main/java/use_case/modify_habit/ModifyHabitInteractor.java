@@ -83,7 +83,6 @@ public class ModifyHabitInteractor implements ModifyHabitInputBoundary {
                     .setFrequency(oldFrequencyFormatted)
                     .build();
 
-            // 3. Build Modified Habit
             final Habit modifiedHabit = oldHabit.clone();
             modifiedHabit.setHabitName(newHabitName);
             modifiedHabit.setPriority(newPriorityFormatted);

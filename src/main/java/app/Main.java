@@ -21,7 +21,6 @@ public class Main {
                 .addLoginUseCase()
                 .addModifyTaskUseCase()
                 .addModifyHabitUseCase()
-                .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
                 .addViewTasksAndHabitsUseCase()
                 .addSyncToGoogleCalendarUseCase()
