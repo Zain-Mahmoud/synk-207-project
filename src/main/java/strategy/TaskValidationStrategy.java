@@ -26,7 +26,7 @@ public class TaskValidationStrategy implements ValidationStrategy<Task> {
 
         for (Task task : taskList) {
             if (!task.getName().equals(oldTask.getName()) && task.getName().equals(modifiedTask.getName())) {
-                return "Task already";
+                return "Task already exists";
             }
         }
 

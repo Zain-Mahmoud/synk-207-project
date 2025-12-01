@@ -115,15 +115,12 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
             modifiedTask.setPriority(newPriorityFormatted);
             modifiedTask.setStatus(newTaskStatus);
 
-            final ArrayList<Task> taskList = taskDataAccessObject.fetchTasks(userID);
 
-            for (Task task : taskList) {
-                if (task.getName().equals(modifiedTask.getName()) && !task.equals(oldTask)) {
-                    modifyTaskPresenter.prepareFailView("Task already exists");
-                    return;
-                }
+            String response  = taskValidation.validate(userID, oldTask, modifiedTask);
+            if (response != null) {
+                modifyTaskPresenter.prepareFailView(response);
+                return;
             }
-
             // 5. Execute Modification (Delete original, Add modified)
             taskDataAccessObject.deleteTask(userID, oldTask);
             taskDataAccessObject.addTask(userID, modifiedTask);
