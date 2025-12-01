@@ -22,6 +22,12 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.modify_habit.ModifyHabitController;
+import interface_adapter.modify_habit.ModifyHabitPresenter;
+import interface_adapter.modify_habit.ModifyHabitViewModel;
+import interface_adapter.modify_task.ModifyTaskController;
+import interface_adapter.modify_task.ModifyTaskPresenter;
+import interface_adapter.modify_task.ModifyTaskViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -41,6 +47,13 @@ import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.modify_habit.ModifyHabitInputBoundary;
+import use_case.modify_habit.ModifyHabitInteractor;
+import use_case.modify_habit.ModifyHabitOutputBoundary;
+import use_case.modify_habit.ModifyHabitOutputData;
+import use_case.modify_task.ModifyTaskInputBoundary;
+import use_case.modify_task.ModifyTaskInteractor;
+import use_case.modify_task.ModifyTaskOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -93,6 +106,13 @@ import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
 
+import view.*;
+import view.LeaderboardView;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
+
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -120,6 +140,12 @@ public class AppBuilder {
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
     private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // View model carrying sync status updates
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private ModifyTaskViewModel modifyTaskViewModel;
+    private ModifyTaskView modifyTaskView;
+    private ModifyTaskController modifyTaskController;
+    private ModifyHabitView modifyHabitView;
+    private ModifyHabitController modifyHabitController;
+    private ModifyHabitViewModel modifyHabitViewModel;
     private ViewStatsViewModel viewStatsViewModel;
     private StatsView statsView;
     private CreateTaskViewModel createTaskViewModel;
@@ -164,7 +190,7 @@ public class AppBuilder {
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
         viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel,
-                loggedInViewModel);
+                loggedInViewModel, modifyHabitViewModel, modifyTaskViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
@@ -183,6 +209,22 @@ public class AppBuilder {
         updateProfileView = new  UpdateProfileView(updateProfileViewModel);
         updateProfileView.setViewManagerModel(viewManagerModel);
         cardPanel.add(updateProfileView, updateProfileView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyTaskView() {
+        modifyTaskViewModel = new ModifyTaskViewModel();
+        modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
+        modifyTaskView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyHabitView(){
+        modifyHabitViewModel = new ModifyHabitViewModel();
+        modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
+        modifyHabitView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyHabitView, modifyHabitView.getViewName());
         return this;
     }
 
@@ -289,6 +331,28 @@ public class AppBuilder {
                                                                                         // logged-in view
         loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI
                                                                                       // updates
+        return this;
+    }
+
+    public AppBuilder addModifyTaskUseCase() {
+        final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel,
+                modifyTaskViewModel, viewTasksAndHabitsViewModel);
+        final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
+                taskDataAccessObject);
+
+        modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
+        modifyTaskView.setModifyTaskController(modifyTaskController);
+        return this;
+    }
+
+    public AppBuilder addModifyHabitUseCase(){
+        final ModifyHabitOutputBoundary modifyHabitOutputBoundary = new ModifyHabitPresenter(viewManagerModel,
+                modifyHabitViewModel, viewTasksAndHabitsViewModel);
+        final ModifyHabitInputBoundary modifyHabitInteractor = new ModifyHabitInteractor(modifyHabitOutputBoundary,
+                habitDataAccessObject);
+
+        modifyHabitController = new ModifyHabitController(modifyHabitInteractor, loggedInViewModel);
+        modifyHabitView.setModifyHabitController(modifyHabitController);
         return this;
     }
 

@@ -9,7 +9,9 @@ import entities.Habit;
 import interface_adapter.logged_in.LoggedInViewModel;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoundary {
     private FileUserDataAccessObject userDataAccess;
@@ -41,6 +43,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 String taskName = task.getName();
                 LocalDateTime taskDeadline = task.getDueDate();
+                LocalDateTime taskStartTime = task.getStartTime();
                 String taskGroup = task.getTaskGroup();
                 boolean status = task.getStatus();
                 int priority = task.getPriority();
@@ -48,6 +51,8 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedTask.add(taskName);
 
+                final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm", Locale.ENGLISH);
+                formattedTask.add(taskStartTime.format(OUTPUT_FORMAT));
                 String taskDeadlineToString = taskDeadline.toString();
                 switch (taskDeadlineToString.substring(5, 7)) {
                     case "01":
@@ -202,6 +207,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
                 formattedHabit.add("N/A");
 
                 formattedHabit.add(habitGroup);
+                formattedHabit.add(Integer.toString(habitStreakCount));
 
                 formattedHabit.add(Integer.toString(habitStreakCount));
 
