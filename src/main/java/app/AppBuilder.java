@@ -287,8 +287,9 @@ public class AppBuilder {
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor(
                 taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
-        ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(
-                viewTasksAndHabitsInteractor, loggedInViewModel);
+        this.viewTasksAndHabitsController =
+                new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
+
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
@@ -311,7 +312,7 @@ public class AppBuilder {
             createTaskViewModel = new CreateTaskViewModel("create task");
         }
         final CreateTaskOutputBoundary createTaskOutputBoundary = new CreateTaskPresenter(createTaskViewModel,
-                loggedInViewModel, viewManagerModel);
+                loggedInViewModel, viewManagerModel, viewTasksAndHabitsController);
         final CreateTaskInputBoundary createTaskInteractor = new CreateTaskInteractor(taskDataAccessObject,
                 createTaskOutputBoundary);
         final CreateTaskController createTaskController = new CreateTaskController(createTaskInteractor);
@@ -323,21 +324,32 @@ public class AppBuilder {
         if (deleteTaskViewModel == null) {
             deleteTaskViewModel = new DeleteTaskViewModel("delete task");
         }
-        final DeleteTaskOutputBoundary deleteTaskOutputBoundary = new DeleteTaskPresenter(deleteTaskViewModel,
-                viewManagerModel);
-        final DeleteTaskInputBoundary deleteTaskInteractor = new DeleteTaskInteractor(deleteTaskOutputBoundary,
-                taskDataAccessObject);
-        final DeleteTaskController deleteTaskController = new DeleteTaskController(deleteTaskInteractor);
+
+        final DeleteTaskOutputBoundary deleteTaskOutputBoundary =
+                new DeleteTaskPresenter(
+                        deleteTaskViewModel,
+                        viewManagerModel,
+                        loggedInViewModel,
+                        viewTasksAndHabitsController
+                );
+
+        final DeleteTaskInputBoundary deleteTaskInteractor =
+                new DeleteTaskInteractor(deleteTaskOutputBoundary, taskDataAccessObject);
+
+        final DeleteTaskController deleteTaskController =
+                new DeleteTaskController(deleteTaskInteractor);
+
         deleteTaskView.setDeleteTaskController(deleteTaskController);
         return this;
     }
+
 
     public AppBuilder addCreateHabitUseCase() {
         if (createHabitViewModel == null) {
             createHabitViewModel = new CreateHabitViewModel("create habit");
         }
         final CreateHabitOutputBoundary createHabitOutputBoundary = new CreateHabitPresenter(createHabitViewModel,
-                loggedInViewModel, viewManagerModel);
+                loggedInViewModel, viewManagerModel, viewTasksAndHabitsController);
         final CreateHabitInputBoundary createHabitInteractor = new CreateHabitInteractor(habitDataAccessObject,
                 createHabitOutputBoundary);
         final CreateHabitController createHabitController = new CreateHabitController(createHabitInteractor);
@@ -349,14 +361,25 @@ public class AppBuilder {
         if (deleteHabitViewModel == null) {
             deleteHabitViewModel = new DeleteHabitViewModel("delete habit");
         }
-        final DeleteHabitOutputBoundary deleteHabitOutputBoundary = new DeleteHabitPresenter(deleteHabitViewModel,
-                viewManagerModel);
-        final DeleteHabitInputBoundary deleteHabitInteractor = new DeleteHabitInteractor(deleteHabitOutputBoundary,
-                habitDataAccessObject);
-        final DeleteHabitController deleteHabitController = new DeleteHabitController(deleteHabitInteractor);
+
+        final DeleteHabitOutputBoundary deleteHabitOutputBoundary =
+                new DeleteHabitPresenter(
+                        deleteHabitViewModel,
+                        viewManagerModel,
+                        loggedInViewModel,
+                        viewTasksAndHabitsController
+                );
+
+        final DeleteHabitInputBoundary deleteHabitInteractor =
+                new DeleteHabitInteractor(deleteHabitOutputBoundary, habitDataAccessObject);
+
+        final DeleteHabitController deleteHabitController =
+                new DeleteHabitController(deleteHabitInteractor);
+
         deleteHabitView.setDeleteHabitController(deleteHabitController);
         return this;
     }
+
 
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");

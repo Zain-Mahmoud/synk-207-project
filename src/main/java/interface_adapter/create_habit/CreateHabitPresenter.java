@@ -2,6 +2,7 @@ package interface_adapter.create_habit;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import use_case.create_habit.CreateHabitOutputBoundary;
 import use_case.create_habit.CreateHabitOutputData;
 
@@ -10,13 +11,15 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
     private final CreateHabitViewModel createHabitViewModel;
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
+    private final ViewTasksAndHabitsController viewTasksAndHabitsController;
 
     public CreateHabitPresenter(CreateHabitViewModel createHabitViewModel,
-            LoggedInViewModel loggedInViewModel,
-            ViewManagerModel viewManagerModel) {
+                                LoggedInViewModel loggedInViewModel,
+                                ViewManagerModel viewManagerModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.createHabitViewModel = createHabitViewModel;
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
+        this.viewTasksAndHabitsController = viewTasksAndHabitsController;
     }
 
     @Override
@@ -38,9 +41,9 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
         createHabitViewModel.setState(state);
         createHabitViewModel.firePropertyChanged();
 
-        // If you want to switch back to LoggedIn page after success, uncomment:
-        // viewManagerModel.setActiveView(loggedInViewModel.getViewName());
-        // viewManagerModel.firePropertyChanged();
+        if (viewTasksAndHabitsController != null) {
+            viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+        }
     }
 
     @Override
