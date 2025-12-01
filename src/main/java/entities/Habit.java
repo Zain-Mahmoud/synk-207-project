@@ -2,12 +2,11 @@ package entities;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.time.Period;
 
-public class Habit implements Completable {
+public class Habit implements Completable, Cloneable {
     private String habitName;
     private LocalDateTime startDateTime;
-    private Period frequency;
+    private int frequency;
     private String habitGroup;
     private int streakCount;
     private int priority;
@@ -16,8 +15,7 @@ public class Habit implements Completable {
 
     Habit(String habitName,
           LocalDateTime startDateTime,
-          Period frequency,
-          LocalDateTime lastDateTimeCompleted,
+          int frequency,
           String habitGroup,
           int streakCount,
           int priority,
@@ -52,16 +50,8 @@ public class Habit implements Completable {
      * @return
      */
     @Override
-    public String getTitle() {
-        return "";
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public Object getDueDate() {
-        return null;
+    public LocalDateTime getDueDate() {
+        return this.getDueDate();
     }
 
 
@@ -70,11 +60,11 @@ public class Habit implements Completable {
 
     public void setHabitName(String habitName) { this.habitName = habitName; }
 
-    public LocalDateTime getStartDateTime() { return this.startDateTime; }
+    public LocalDateTime getStartTime() { return this.startDateTime; }
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
 
-    public Period getFrequency() { return this.frequency; }
-    public void setFrequency(Period frequency) { this.frequency = frequency; }
+    public int getFrequency() { return this.frequency; }
+    public void setFrequency(int frequency) { this.frequency = frequency; }
 
     public String getHabitGroup() { return this.habitGroup; }
     public void setHabitGroup(String habitGroup) { this.habitGroup = habitGroup; }
@@ -83,10 +73,12 @@ public class Habit implements Completable {
     public void setStreakCount(int streakCount) { this.streakCount = streakCount; }
 
     public int getPriority() { return this.priority; }
+
+
+
     public void setPriority(int priority) { this.priority = priority; }
 
-    // Implement by default, same convention from other entity.
-    // Not necessary, logically being covered by isCompleted.
+
     public boolean getStatus() { return this.status; }
     public void setStatus( boolean status) { this.status = status; }
 
@@ -95,7 +87,10 @@ public class Habit implements Completable {
         if (this == o) return true;
         if (!(o instanceof Habit)) return false;
         Habit habit = (Habit) o;
-        return Objects.equals(habit.habitName, habitName) && Objects.equals(habit.startDateTime, startDateTime);
+        return Objects.equals(habit.habitName, habitName) && Objects.equals(habit.startDateTime, startDateTime) &&
+                Objects.equals(habit.frequency, frequency) && Objects.equals(habit.habitGroup, habitGroup) &&
+                Objects.equals(habit.description, description) && Objects.equals(habit.status, status) &&
+                Objects.equals(habit.priority, priority) && Objects.equals(habit.streakCount, streakCount);
     }
 
     @Override
@@ -113,5 +108,14 @@ public class Habit implements Completable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public Habit clone(){
+        try{
+            return (Habit) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return this;
+        }
     }
 }

@@ -1,62 +1,110 @@
 package use_case.view_tasks_and_habits;
 
+import data_access.FileUserDataAccessObject;
+import data_access.HabitDataAccessObject;
+import data_access.TaskDataAccessObject;
+import entities.Task;
+import entities.Habit;
+
+import interface_adapter.logged_in.LoggedInViewModel;
+
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-
-import entities.Habit;
-import entities.Task;
-import interface_adapter.logged_in.LoggedInViewModel;
-import use_case.gateways.HabitGateway;
-import use_case.gateways.TaskGateway;
+import java.util.Locale;
 
 public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoundary {
-    private final TaskGateway taskDataAccess;
-    private final HabitGateway habitDataAccess;
-    private final ViewTasksAndHabitsOutputBoundary presenter;
+    private FileUserDataAccessObject userDataAccess;
+    private TaskDataAccessObject taskDataAccess;
+    private HabitDataAccessObject habitDataAccess;
+    private ViewTasksAndHabitsOutputBoundary presenter;
 
-    public ViewTasksAndHabitsInteractor(TaskGateway taskDataAccess, HabitGateway habitDataAccess,
-                                        ViewTasksAndHabitsOutputBoundary presenter) {
+    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess,
+            FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter) {
         this.presenter = presenter;
+        this.userDataAccess = userDataAccess;
         this.taskDataAccess = taskDataAccess;
         this.habitDataAccess = habitDataAccess;
     }
 
-    /**
-     * Fetches tasks and habist using the data access objects and formats them into ArrayLists of Strings,
-     * sending them to the presenter.
-     * @param loggedInViewModel the Logged In View Modek
-     */
     public void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel) {
         try {
-            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yy, HH:mm");
+            ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(loggedInViewModel.getState().getUsername());
 
-            final ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(loggedInViewModel.getState().getUsername());
-
-            final ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
+            ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
 
             for (Task task : taskList) {
-                final ArrayList<String> formattedTask = new ArrayList<>();
+                ArrayList<String> formattedTask = new ArrayList<>();
 
-                final String taskName = task.getName();
-                final LocalDateTime taskDeadline = task.getDeadline();
-                final String taskGroup = task.getTaskGroup();
-                final boolean status = task.getStatus();
-                final int priority = task.getPriority();
-                final String description = task.getDescription();
+                String taskName = task.getName();
+                LocalDateTime taskDeadline = task.getDueDate();
+                LocalDateTime taskStartTime = task.getStartTime();
+                String taskGroup = task.getTaskGroup();
+                boolean status = task.getStatus();
+                int priority = task.getPriority();
+                String description = task.getDescription();
 
                 formattedTask.add(taskName);
 
-                final String taskDeadlineToString = taskDeadline.format(formatter);
-                formattedTask.add(taskDeadlineToString);
+                final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm", Locale.ENGLISH);
+                formattedTask.add(taskStartTime.format(OUTPUT_FORMAT));
+                String taskDeadlineToString = taskDeadline.toString();
+                switch (taskDeadlineToString.substring(5, 7)) {
+                    case "01":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " January, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "02":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " February, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "03":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " March, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "04":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " April, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "05":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " May, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "06":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " June, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "07":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " July, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "08":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " August, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "09":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " September, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "10":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " October, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "11":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " November, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                    case "12":
+                        formattedTask.add(taskDeadlineToString.substring(8, 10) + " December, " +
+                                taskDeadlineToString.substring(0, 4) + " " + taskDeadlineToString.substring(11, 16));
+                        break;
+                }
 
                 formattedTask.add(taskGroup);
 
-                if (status) {
+                if (status == true) {
                     formattedTask.add("Complete");
-                }
-                else {
+                } else {
                     formattedTask.add("Incomplete");
                 }
 
@@ -66,32 +114,89 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedTasks.add(formattedTask);
             }
-            final ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(
-                    loggedInViewModel.getState().getUsername());
+            ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(loggedInViewModel.getState().getUsername());
 
-            final ArrayList<ArrayList<String>> formattedHabits = new ArrayList<>();
+            ArrayList<ArrayList<String>> formattedHabits = new ArrayList<>();
 
             for (Habit habit : habitList) {
-                final ArrayList<String> formattedHabit = new ArrayList<>();
+                ArrayList<String> formattedHabit = new ArrayList<>();
 
-                final String habitName = habit.getName();
-                final LocalDateTime habitStartDateTime = habit.getStartDateTime();
-                final Period habitFrequency = habit.getFrequency();
-                final String habitGroup = habit.getHabitGroup();
-                final int habitStreakCount = habit.getStreakCount();
-                final int priority = habit.getPriority();
-                final boolean status = habit.getStatus();
-                final String description = habit.getDescription();
+                String habitName = habit.getName();
+                LocalDateTime habitStartDateTime = habit.getStartTime();
+                int habitFrequency = habit.getFrequency();
+                String habitGroup = habit.getHabitGroup();
+                int habitStreakCount = habit.getStreakCount();
+                int priority = habit.getPriority();
+                boolean status = habit.getStatus();
+                String description = habit.getDescription();
 
                 formattedHabit.add(habitName);
 
-                final String habitStartDateTimeToString = habitStartDateTime.format(formatter);
+                String habitStartDateTimeToString = habitStartDateTime.toString();
+                switch (habitStartDateTimeToString.substring(5, 7)) {
+                    case "01":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " January, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "02":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " February, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "03":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " March, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "04":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " April, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "05":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " May, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "06":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " June, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "07":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " July, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "08":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " August, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "09":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " September, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "10":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " October, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "11":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " November, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                    case "12":
+                        formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " December, " +
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
+                        break;
+                }
 
-                formattedHabit.add(habitStartDateTimeToString);
-
-                formattedHabit.add(Integer.toString(habitFrequency.getYears()) + " Years, "
-                        + Integer.toString(habitFrequency.getMonths()) + " Months, "
-                        + Integer.toString(habitFrequency.getDays()) + " Days");
+                formattedHabit.add(Integer.toString(habitFrequency));
 
                 formattedHabit.add(habitGroup);
 
@@ -99,10 +204,9 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedHabit.add(Integer.toString(priority));
 
-                if (status) {
+                if (status == true) {
                     formattedHabit.add("Complete");
-                }
-                else {
+                } else {
                     formattedHabit.add("Incomplete");
                 }
 
@@ -110,11 +214,9 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedHabits.add(formattedHabit);
             }
-            final ViewTasksAndHabitsOutputData outputData = new ViewTasksAndHabitsOutputData(
-                    formattedTasks, formattedHabits);
+            ViewTasksAndHabitsOutputData outputData = new ViewTasksAndHabitsOutputData(formattedTasks, formattedHabits);
             presenter.prepareSuccessView(outputData);
-        }
-        catch (Exception exception) {
+        } catch (Exception e) {
             presenter.prepareFailView("Failed to load task and habit data");
         }
     }

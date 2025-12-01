@@ -1,3 +1,2 @@
-username,password
-arya,1234
-z,z
+uid,username,avatarpath,password
+d6a1db3e-4ffd-422d-83c8-69260f39dafe,admin,avatars\tmp.jpg,password

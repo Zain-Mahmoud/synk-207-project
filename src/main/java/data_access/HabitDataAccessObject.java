@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +37,9 @@ public class HabitDataAccessObject implements HabitGateway {
     public HabitDataAccessObject(Path habitCsvPath) {
         this.habitCsvFile = habitCsvPath.toFile();
         initializeFileIfNeeded(habitCsvFile, HABIT_HEADER);
-        loadHabitsFromCsv();
+        // FIX: Removed initial load from constructor. The data will now be loaded
+        // immediately before any read operation (fetch/get).
+        // loadHabitsFromCsv();
     }
 
     private void initializeFileIfNeeded(File csvFile, String header) {
@@ -71,6 +72,7 @@ public class HabitDataAccessObject implements HabitGateway {
         try (BufferedReader reader = new BufferedReader(new FileReader(habitCsvFile))) {
             final String headerLine = reader.readLine();
             if (headerLine == null) {
+                // Also ensures the header is written if the file was just cleared/opened empty
                 writeHeader(habitCsvFile, HABIT_HEADER);
                 return;
             }
@@ -86,22 +88,48 @@ public class HabitDataAccessObject implements HabitGateway {
                 if (columns.length < 8) {
                     continue;
                 }
-                final String username = columns[0];
-                final String habitName = columns[1];
-                final int streakCount = columns[2].isBlank() ? 0 : Integer.parseInt(columns[2]);
-                final String startDateTimeRaw = columns[3];
-                final String frequencyRaw = columns[4];
-                final String habitGroup = columns[5];
-                final int priority = columns[6].isBlank() ? 0 : Integer.parseInt(columns[6]);
-                final boolean status = Boolean.parseBoolean(columns[7]);
 
+                final String username = columns[0].trim();
+                final String habitName = columns[1].trim();
+                final String startDateTimeRaw = columns[3].trim();
+                final String frequencyRaw = columns[4].trim();
+                final String habitGroup = columns[5].trim();
+
+                int streakCount;
+                int priority;
+                boolean status;
+
+                // --- Robust Integer Parsing (StreakCount, Priority) ---
+                try {
+                    // columns[2] is StreakCount
+                    streakCount = columns[2].trim().isBlank() ? 0 : Integer.parseInt(columns[2].trim());
+                    // columns[6] is Priority
+                    priority = columns[6].trim().isBlank() ? 0 : Integer.parseInt(columns[6].trim());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+
+                // --- Robust Boolean Parsing (Status) ---
+                // Boolean.parseBoolean is safe, but we capture it here for flow consistency
+                try {
+                    // columns[7] is Status
+                    status = Boolean.parseBoolean(columns[7].trim());
+                } catch (Exception e) {
+                    continue;
+                }
+
+                // --- Robust LocalDateTime Parsing (StartDateTime) ---
                 LocalDateTime startDateTime = null;
                 if (!startDateTimeRaw.isBlank()) {
-                    startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
+                    try {
+                        startDateTime = LocalDateTime.parse(startDateTimeRaw, DATE_FORMATTER);
+                    } catch (Exception e) {
+                        continue;
+                    }
                 }
-                Period frequency = null;
+                int frequency = 0;
                 if (!frequencyRaw.isBlank()) {
-                    frequency = Period.parse(frequencyRaw);
+                    frequency = Integer.parseInt(frequencyRaw);
                 }
 
                 Habit habit = new HabitBuilder()
@@ -128,8 +156,8 @@ public class HabitDataAccessObject implements HabitGateway {
             for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
                 final String username = entry.getKey();
                 for (Habit habit : entry.getValue()) {
-                    final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
-                    final String frequency = habit.getFrequency() == null ? "" : habit.getFrequency().toString();
+                    final String startDateTime = habit.getStartTime() == null ? "" : DATE_FORMATTER.format(habit.getStartTime());
+                    final String frequency = Integer.toString(habit.getFrequency());
                     final String line = String.join(",",
                             username,
                             safe(habit.getName()),
@@ -153,9 +181,10 @@ public class HabitDataAccessObject implements HabitGateway {
         return value == null ? "" : value;
     }
 
-    // ========== HABIT GATEWAY METHODS (Stand-in) ==========
-
+    @Override
     public String addHabit(String userId, Habit habit) {
+        loadHabitsFromCsv();
+
         ArrayList<Habit> habitsForUser = userHabits.computeIfAbsent(userId, key -> new ArrayList<>());
 
         try {
@@ -168,7 +197,11 @@ public class HabitDataAccessObject implements HabitGateway {
         return "Habit Added Successfully";
     }
 
+    @Override
     public ArrayList<Habit> fetchHabits(String userId) {
+        // FIX: Reload data from CSV to reflect manual changes
+        loadHabitsFromCsv();
+
         ArrayList<Habit> habits = userHabits.get(userId);
 
         if (habits == null) {
@@ -178,7 +211,38 @@ public class HabitDataAccessObject implements HabitGateway {
         return habits;
     }
 
+    @Override
+    public List<String> getAllUsernames() {
+        loadHabitsFromCsv();
+        return new ArrayList<>(userHabits.keySet());
+    }
+
+    @Override
+    public List<Habit> getHabitsForUser(String username) {
+        loadHabitsFromCsv();
+
+        ArrayList<Habit> habits = userHabits.get(username);
+        if (habits == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(habits);
+    }
+
+    @Override
+    public Map<String, List<Habit>> getAllUsersWithHabits() {
+        loadHabitsFromCsv();
+
+        Map<String, List<Habit>> result = new HashMap<>();
+        for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
+            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return result;
+    }
+
+    @Override
     public boolean deleteHabit(String userId, Habit habit) {
+        loadHabitsFromCsv();
+
         ArrayList<Habit> habits = userHabits.get(userId);
         if (habits == null) {
             return false;
@@ -190,30 +254,5 @@ public class HabitDataAccessObject implements HabitGateway {
             return removed;
         }
         return false;
-    }
-
-
-
-    @Override
-    public List<String> getAllUsernames() {
-        return new ArrayList<>(userHabits.keySet());
-    }
-
-    @Override
-    public List<Habit> getHabitsForUser(String username) {
-        ArrayList<Habit> habits = userHabits.get(username);
-        if (habits == null) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(habits);
-    }
-
-    @Override
-    public Map<String, List<Habit>> getAllUsersWithHabits() {
-        Map<String, List<Habit>> result = new HashMap<>();
-        for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
-            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-        }
-        return result;
     }
 }

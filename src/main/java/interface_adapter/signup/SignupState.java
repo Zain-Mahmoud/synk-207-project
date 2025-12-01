@@ -4,12 +4,22 @@ package interface_adapter.signup;
  * The state for the Signup View Model.
  */
 public class SignupState {
+    private String uid = "";
+    private String uidError;
     private String username = "";
     private String usernameError;
     private String password = "";
     private String passwordError;
     private String repeatPassword = "";
     private String repeatPasswordError;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getUidError() {
+        return uidError;
+    }
 
     public String getUsername() {
         return username;
@@ -34,6 +44,12 @@ public class SignupState {
     public String getRepeatPasswordError() {
         return repeatPasswordError;
     }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public void setUidError(String uidError) {this.uidError = uidError;}
 
     public void setUsername(String username) {
         this.username = username;

@@ -2,16 +2,17 @@ package use_case.signup;
 
 import entities.User;
 import entities.UserFactory;
+import use_case.gateways.UserGateway;
 
 /**
  * The Signup Interactor.
  */
 public class SignupInteractor implements SignupInputBoundary {
-    private final SignupUserDataAccessInterface userDataAccessObject;
+    private final UserGateway userDataAccessObject;
     private final SignupOutputBoundary userPresenter;
     private final UserFactory userFactory;
 
-    public SignupInteractor(SignupUserDataAccessInterface signupDataAccessInterface,
+    public SignupInteractor(UserGateway signupDataAccessInterface,
                             SignupOutputBoundary signupOutputBoundary,
                             UserFactory userFactory) {
         this.userDataAccessObject = signupDataAccessInterface;
@@ -33,7 +34,8 @@ public class SignupInteractor implements SignupInputBoundary {
             final User user = userFactory.create(signupInputData.getUsername(), signupInputData.getPassword());
             userDataAccessObject.save(user);
 
-            final SignupOutputData signupOutputData = new SignupOutputData(user.getName(), false);
+            final SignupOutputData signupOutputData =
+                    new SignupOutputData(user.getUid(), user.getUsername(), false);
             userPresenter.prepareSuccessView(signupOutputData);
         }
     }

@@ -17,12 +17,17 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.leaderboard.ViewLeaderboardController;
 import interface_adapter.leaderboard.ViewLeaderboardPresenter;
 import interface_adapter.leaderboard.ViewLeaderboardViewModel;
-import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.modify_habit.ModifyHabitController;
+import interface_adapter.modify_habit.ModifyHabitPresenter;
+import interface_adapter.modify_habit.ModifyHabitViewModel;
+import interface_adapter.modify_task.ModifyTaskController;
+import interface_adapter.modify_task.ModifyTaskPresenter;
+import interface_adapter.modify_task.ModifyTaskViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -35,16 +40,26 @@ import interface_adapter.sync_to_google_calendar.SyncToGoogleCalendarViewModel;
 import interface_adapter.view_stats.ViewStatsController;
 import interface_adapter.view_stats.ViewStatsPresenter;
 import interface_adapter.view_stats.ViewStatsViewModel;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
+import interface_adapter.update_profile.UpdateProfileController;
+import interface_adapter.update_profile.UpdateProfilePresenter;
+import interface_adapter.update_profile.UpdateProfileViewModel;
 import use_case.gateways.CalendarGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.modify_habit.ModifyHabitInputBoundary;
+import use_case.modify_habit.ModifyHabitInteractor;
+import use_case.modify_habit.ModifyHabitOutputBoundary;
+import use_case.modify_habit.ModifyHabitOutputData;
+import use_case.modify_task.ModifyTaskInputBoundary;
+import use_case.modify_task.ModifyTaskInteractor;
+import use_case.modify_task.ModifyTaskOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.update_profile.UpdateProfileBoundary;
+import use_case.update_profile.UpdateProfileInteractor;
+import use_case.update_profile.UpdateProfileOutputBoundary;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarInputBoundary;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarInteractor;
 import use_case.sync_to_google_calendar.SyncToGoogleCalendarOutputBoundary;
@@ -58,6 +73,30 @@ import view.*;
 import use_case.view_stats.ViewStatsInputBoundary;
 import use_case.view_stats.ViewStatsInteractor;
 import use_case.view_stats.ViewStatsOutputBoundary;
+import interface_adapter.create_habit.CreateHabitController;
+import interface_adapter.create_habit.CreateHabitPresenter;
+import interface_adapter.create_habit.CreateHabitViewModel;
+import interface_adapter.create_task.CreateTaskController;
+import interface_adapter.create_task.CreateTaskPresenter;
+import interface_adapter.create_task.CreateTaskViewModel;
+import interface_adapter.delete_habit.DeleteHabitController;
+import interface_adapter.delete_habit.DeleteHabitPresenter;
+import interface_adapter.delete_habit.DeleteHabitViewModel;
+import interface_adapter.delete_task.DeleteTaskController;
+import interface_adapter.delete_task.DeleteTaskPresenter;
+import interface_adapter.delete_task.DeleteTaskViewModel;
+import use_case.create_habit.CreateHabitInputBoundary;
+import use_case.create_habit.CreateHabitInteractor;
+import use_case.create_habit.CreateHabitOutputBoundary;
+import use_case.create_task.CreateTaskInputBoundary;
+import use_case.create_task.CreateTaskInteractor;
+import use_case.create_task.CreateTaskOutputBoundary;
+import use_case.delete_habit.DeleteHabitInputBoundary;
+import use_case.delete_habit.DeleteHabitInteractor;
+import use_case.delete_habit.DeleteHabitOutputBoundary;
+import use_case.delete_task.DeleteTaskInputBoundary;
+import use_case.delete_task.DeleteTaskInteractor;
+import use_case.delete_task.DeleteTaskOutputBoundary;
 import view.*;
 
 import view.*;
@@ -67,6 +106,12 @@ import view.LoginView;
 import view.SignupView;
 import view.ViewManager;
 
+import view.*;
+import view.LeaderboardView;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
 
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
@@ -93,10 +138,27 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
-    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; //View model carrying sync status updates
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // View model carrying sync status updates
     private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private ModifyTaskViewModel modifyTaskViewModel;
+    private ModifyTaskView modifyTaskView;
+    private ModifyTaskController modifyTaskController;
+    private ModifyHabitView modifyHabitView;
+    private ModifyHabitController modifyHabitController;
+    private ModifyHabitViewModel modifyHabitViewModel;
     private ViewStatsViewModel viewStatsViewModel;
     private StatsView statsView;
+    private CreateTaskViewModel createTaskViewModel;
+    private DeleteTaskViewModel deleteTaskViewModel;
+    private CreateHabitViewModel createHabitViewModel;
+    private DeleteHabitViewModel deleteHabitViewModel;
+    private CreateTaskView createTaskView;
+    private DeleteTaskView deleteTaskView;
+    private CreateHabitView createHabitView;
+    private DeleteHabitView deleteHabitView;
+    private UpdateProfileViewModel updateProfileViewModel;
+    private UpdateProfileView updateProfileView;
+
 
     public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
         cardPanel.setLayout(cardLayout);
@@ -127,7 +189,8 @@ public class AppBuilder {
 
     public AppBuilder addViewTasksAndHabitsView() {
         viewTasksAndHabitsViewModel = new ViewTasksAndHabitsViewModel();
-        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel, loggedInViewModel);
+        viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel,
+                loggedInViewModel, modifyHabitViewModel, modifyTaskViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
         cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
         return this;
@@ -141,6 +204,30 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addUpdateProfileView() {
+        updateProfileViewModel = new  UpdateProfileViewModel();
+        updateProfileView = new  UpdateProfileView(updateProfileViewModel);
+        updateProfileView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(updateProfileView, updateProfileView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyTaskView() {
+        modifyTaskViewModel = new ModifyTaskViewModel();
+        modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
+        modifyTaskView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addModifyHabitView(){
+        modifyHabitViewModel = new ModifyHabitViewModel();
+        modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
+        modifyHabitView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(modifyHabitView, modifyHabitView.getViewName());
+        return this;
+    }
+
     public AppBuilder addStatsView(){
         viewStatsViewModel = new ViewStatsViewModel();
         statsView = new StatsView(viewStatsViewModel, viewManagerModel);
@@ -148,6 +235,42 @@ public class AppBuilder {
         cardPanel.add(statsView, statsView.getViewName());
         return this;
     }
+    public AppBuilder addCreateTaskView() {
+        if (createTaskViewModel == null) {
+            createTaskViewModel = new CreateTaskViewModel("create task");
+        }
+        createTaskView = new CreateTaskView(createTaskViewModel, viewManagerModel, loggedInViewModel);
+        cardPanel.add(createTaskView, createTaskView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addCreateHabitView() {
+        if (createHabitViewModel == null) {
+            createHabitViewModel = new CreateHabitViewModel("create habit");
+        }
+        createHabitView = new CreateHabitView(createHabitViewModel, viewManagerModel, loggedInViewModel);
+        cardPanel.add(createHabitView, createHabitView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addDeleteTaskView() {
+        if (deleteTaskViewModel == null) {
+            deleteTaskViewModel = new DeleteTaskViewModel("delete task");
+        }
+        deleteTaskView = new DeleteTaskView(deleteTaskViewModel, viewManagerModel, loggedInViewModel);
+        cardPanel.add(deleteTaskView, deleteTaskView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addDeleteHabitView() {
+        if (deleteHabitViewModel == null) {
+            deleteHabitViewModel = new DeleteHabitViewModel("delete habit");
+        }
+        deleteHabitView = new DeleteHabitView(deleteHabitViewModel, viewManagerModel, loggedInViewModel);
+        cardPanel.add(deleteHabitView, deleteHabitView.getViewName());
+        return this;
+    }
+
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
@@ -162,7 +285,7 @@ public class AppBuilder {
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
+                loggedInViewModel, loginViewModel, updateProfileViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
 
@@ -171,20 +294,9 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addChangePasswordUseCase() {
-        final ChangePasswordOutputBoundary changePasswordOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel);
-
-        final ChangePasswordInputBoundary changePasswordInteractor =
-                new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
-
-        ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
-        return this;
-    }
-
     public AppBuilder addViewLeaderboardUseCase() {
-        final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(viewLeaderboardViewModel);
+        final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(
+                viewLeaderboardViewModel);
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
                 habitDataAccessObject, viewLeaderboardOutputBoundary);
 
@@ -193,33 +305,72 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addUpdateProfileUseCase() {
+        final UpdateProfileOutputBoundary updateProfileOutputBoundary =
+                new UpdateProfilePresenter(viewManagerModel, updateProfileViewModel, loggedInViewModel);
+
+        final UpdateProfileBoundary updateProfileInteractor =
+                new UpdateProfileInteractor(userDataAccessObject, updateProfileOutputBoundary);
+
+        UpdateProfileController updateProfileController = new UpdateProfileController(updateProfileInteractor);
+        updateProfileView.setUpdateProfileController(updateProfileController);
+        return this;
+    }
+
     public AppBuilder addSyncToGoogleCalendarUseCase() { // Wire sync-to-calendar use case components together
         if (syncToGoogleCalendarViewModel == null) {
             syncToGoogleCalendarViewModel = new SyncToGoogleCalendarViewModel();
         }
-        SyncToGoogleCalendarOutputBoundary syncOutputBoundary =
-                new SyncToGoogleCalendarPresenter(syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
-        SyncToGoogleCalendarInputBoundary syncInteractor =
-                new SyncToGoogleCalendarInteractor(taskDataAccessObject, calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
-        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by logged-in view
-        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into logged-in view
-        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI updates
+        SyncToGoogleCalendarOutputBoundary syncOutputBoundary = new SyncToGoogleCalendarPresenter(
+                syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
+        SyncToGoogleCalendarInputBoundary syncInteractor = new SyncToGoogleCalendarInteractor(taskDataAccessObject,
+                calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
+        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by
+                                                                                             // logged-in view
+        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into
+                                                                                        // logged-in view
+        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI
+                                                                                      // updates
         return this;
     }
 
+    public AppBuilder addModifyTaskUseCase() {
+        final ModifyTaskOutputBoundary modifyTaskOutputBoundary = new ModifyTaskPresenter(viewManagerModel,
+                modifyTaskViewModel, viewTasksAndHabitsViewModel);
+        final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
+                taskDataAccessObject);
+
+        modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
+        modifyTaskView.setModifyTaskController(modifyTaskController);
+        return this;
+    }
+
+    public AppBuilder addModifyHabitUseCase(){
+        final ModifyHabitOutputBoundary modifyHabitOutputBoundary = new ModifyHabitPresenter(viewManagerModel,
+                modifyHabitViewModel, viewTasksAndHabitsViewModel);
+        final ModifyHabitInputBoundary modifyHabitInteractor = new ModifyHabitInteractor(modifyHabitOutputBoundary,
+                habitDataAccessObject);
+
+        modifyHabitController = new ModifyHabitController(modifyHabitInteractor, loggedInViewModel);
+        modifyHabitView.setModifyHabitController(modifyHabitController);
+        return this;
+    }
 
     public AppBuilder addViewTasksAndHabitsUseCase() {
-        final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
-        final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
-                (taskDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
+        final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(
+                viewManagerModel, viewTasksAndHabitsViewModel);
+        final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor(
+                taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
-        ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
+        this.viewTasksAndHabitsController =
+                new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
+
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
     }
 
-    public AppBuilder addViewStatsUseCase(){
+    public AppBuilder addViewStatsUseCase() {
         final ViewStatsOutputBoundary viewStatsOutputBoundary = new ViewStatsPresenter(viewStatsViewModel,
                 viewManagerModel);
         final ViewStatsInputBoundary viewStatsInteractor = new ViewStatsInteractor(habitDataAccessObject,
@@ -230,6 +381,80 @@ public class AppBuilder {
 
         return this;
     }
+
+    public AppBuilder addCreateTaskUseCase() {
+        if (createTaskViewModel == null) {
+            createTaskViewModel = new CreateTaskViewModel("create task");
+        }
+        final CreateTaskOutputBoundary createTaskOutputBoundary = new CreateTaskPresenter(createTaskViewModel,
+                loggedInViewModel, viewManagerModel, viewTasksAndHabitsController);
+        final CreateTaskInputBoundary createTaskInteractor = new CreateTaskInteractor(taskDataAccessObject,
+                createTaskOutputBoundary);
+        final CreateTaskController createTaskController = new CreateTaskController(createTaskInteractor);
+        createTaskView.setCreateTaskController(createTaskController);
+        return this;
+    }
+
+    public AppBuilder addDeleteTaskUseCase() {
+        if (deleteTaskViewModel == null) {
+            deleteTaskViewModel = new DeleteTaskViewModel("delete task");
+        }
+
+        final DeleteTaskOutputBoundary deleteTaskOutputBoundary =
+                new DeleteTaskPresenter(
+                        deleteTaskViewModel,
+                        viewManagerModel,
+                        loggedInViewModel,
+                        viewTasksAndHabitsController
+                );
+
+        final DeleteTaskInputBoundary deleteTaskInteractor =
+                new DeleteTaskInteractor(deleteTaskOutputBoundary, taskDataAccessObject);
+
+        final DeleteTaskController deleteTaskController =
+                new DeleteTaskController(deleteTaskInteractor);
+
+        deleteTaskView.setDeleteTaskController(deleteTaskController);
+        return this;
+    }
+
+
+    public AppBuilder addCreateHabitUseCase() {
+        if (createHabitViewModel == null) {
+            createHabitViewModel = new CreateHabitViewModel("create habit");
+        }
+        final CreateHabitOutputBoundary createHabitOutputBoundary = new CreateHabitPresenter(createHabitViewModel,
+                loggedInViewModel, viewManagerModel, viewTasksAndHabitsController);
+        final CreateHabitInputBoundary createHabitInteractor = new CreateHabitInteractor(habitDataAccessObject,
+                createHabitOutputBoundary);
+        final CreateHabitController createHabitController = new CreateHabitController(createHabitInteractor);
+        createHabitView.setCreateHabitController(createHabitController);
+        return this;
+    }
+
+    public AppBuilder addDeleteHabitUseCase() {
+        if (deleteHabitViewModel == null) {
+            deleteHabitViewModel = new DeleteHabitViewModel("delete habit");
+        }
+
+        final DeleteHabitOutputBoundary deleteHabitOutputBoundary =
+                new DeleteHabitPresenter(
+                        deleteHabitViewModel,
+                        viewManagerModel,
+                        loggedInViewModel,
+                        viewTasksAndHabitsController
+                );
+
+        final DeleteHabitInputBoundary deleteHabitInteractor =
+                new DeleteHabitInteractor(deleteHabitOutputBoundary, habitDataAccessObject);
+
+        final DeleteHabitController deleteHabitController =
+                new DeleteHabitController(deleteHabitInteractor);
+
+        deleteHabitView.setDeleteHabitController(deleteHabitController);
+        return this;
+    }
+
 
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
@@ -243,4 +468,3 @@ public class AppBuilder {
         return application;
     }
 }
-

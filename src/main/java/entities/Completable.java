@@ -1,5 +1,7 @@
 package entities;
 
+import java.time.LocalDateTime;
+
 public interface Completable {
     void complete();
 
@@ -9,7 +11,18 @@ public interface Completable {
 
     String getDescription();
 
-    String getTitle();
+    /**
+     * Returns the due data
+     * @return
+     */
+    LocalDateTime getDueDate();
 
-    Object getDueDate();
+    int getPriority();
+
+
+
+    Completable clone();
+
+    LocalDateTime getStartTime();
+
 }

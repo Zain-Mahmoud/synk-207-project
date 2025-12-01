@@ -1,13 +1,11 @@
 package interface_adapter.logged_in;
 
 import interface_adapter.ViewManagerModel;
-import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.change_password.ChangePasswordOutputData;
 
 /**
  * The Presenter for the Change Password Use Case.
  */
-public class LoggedInPresenter implements ChangePasswordOutputBoundary {
+public class LoggedInPresenter {
 
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
@@ -16,17 +14,5 @@ public class LoggedInPresenter implements ChangePasswordOutputBoundary {
                              LoggedInViewModel loggedInViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
-    }
-
-    @Override
-    public void prepareSuccessView(ChangePasswordOutputData outputData) {
-        // update the viewmodel
-        loggedInViewModel.firePropertyChanged("password");
-
-    }
-
-    @Override
-    public void prepareFailView(String error) {
-
     }
 }

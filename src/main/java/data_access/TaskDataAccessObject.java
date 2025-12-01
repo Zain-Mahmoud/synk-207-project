@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,6 @@ public class TaskDataAccessObject implements TaskGateway {
     public TaskDataAccessObject(Path taskCsvPath) {
         this.taskCsvFile = taskCsvPath.toFile();
         initializeFileIfNeeded(taskCsvFile, TASK_HEADER);
-        loadTasksFromCsv();
     }
 
     private void initializeFileIfNeeded(File csvFile, String header) {
@@ -66,10 +66,13 @@ public class TaskDataAccessObject implements TaskGateway {
 
     private void loadTasksFromCsv() {
         userTasks.clear();
+        int loadedCount = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(taskCsvFile))) {
             final String headerLine = reader.readLine();
             if (headerLine == null) {
-                writeHeader(taskCsvFile, TASK_HEADER);
+                if (taskCsvFile.length() == 0) {
+                    writeHeader(taskCsvFile, TASK_HEADER);
+                }
                 return;
             }
             if (!TASK_HEADER.equals(headerLine)) {
@@ -81,30 +84,56 @@ public class TaskDataAccessObject implements TaskGateway {
                     continue;
                 }
                 final String[] columns = line.split(",", -1);
-                if (columns.length < 8) {
+
+
+                final String userId = columns[0].trim();
+                final String taskName = columns[1].trim();
+                final String description = columns[2].trim();
+                final String startTimeRaw = columns[3].trim();
+                final String deadlineRaw = columns[4].trim();
+                final String taskGroup = columns[5].trim();
+                final boolean status;
+                final int priority;
+
+                try {
+                    status = Boolean.parseBoolean(columns[6].trim());
+                } catch (Exception e) {
                     continue;
                 }
-                final String userId = columns[0];
-                final String taskName = columns[1];
-                final String description = columns[2];
-                final String startTimeRaw = columns[3];
-                final String deadlineRaw = columns[4];
-                final String taskGroup = columns[5];
-                final boolean status = Boolean.parseBoolean(columns[6]);
-                final int priority = columns[7].isBlank() ? 0 : Integer.parseInt(columns[7]);
+
+                String priorityStr = "";
+                if (columns.length > 7) {
+                    priorityStr = columns[7].trim();
+                }
+
+                try {
+                    priority = priorityStr.isBlank() ? 0 : Integer.parseInt(priorityStr);
+                } catch (NumberFormatException e) {
+                    continue;
+                }
 
                 LocalDateTime startTime = null;
                 if (!startTimeRaw.isBlank()) {
-                    startTime = LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+                    try {
+                        startTime = LocalDateTime.parse(startTimeRaw, DATE_FORMATTER);
+                    } catch (DateTimeParseException e) {
+                        continue;
+                    }
                 }
+
                 LocalDateTime deadline = null;
                 if (!deadlineRaw.isBlank()) {
-                    deadline = LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
+                    try {
+                        deadline = LocalDateTime.parse(deadlineRaw, DATE_FORMATTER);
+                    } catch (DateTimeParseException e) {
+                        continue;
+                    }
                 }
 
                 Task task = new TaskBuilder()
                         .setTaskName(taskName)
                         .setDescription(description)
+                        .setStartTime(startTime)
                         .setDeadline(deadline)
                         .setTaskGroup(taskGroup)
                         .setStatus(status)
@@ -112,7 +141,9 @@ public class TaskDataAccessObject implements TaskGateway {
                         .build();
 
                 userTasks.computeIfAbsent(userId, key -> new ArrayList<>()).add(task);
+                loadedCount++;
             }
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to load tasks from CSV", e);
         }
@@ -126,7 +157,7 @@ public class TaskDataAccessObject implements TaskGateway {
                 final String userId = entry.getKey();
                 for (Task task : entry.getValue()) {
                     final String startTime = task.getStartTime() == null ? "" : DATE_FORMATTER.format(task.getStartTime());
-                    final String deadline = task.getDeadline() == null ? "" : DATE_FORMATTER.format(task.getDeadline());
+                    final String deadline = task.getDueDate() == null ? "" : DATE_FORMATTER.format(task.getDueDate());
                     final String line = String.join(",",
                             userId,
                             safe(task.getName()),
@@ -168,12 +199,13 @@ public class TaskDataAccessObject implements TaskGateway {
 
     @Override
     public ArrayList<Task> fetchTasks(String userId) {
+        loadTasksFromCsv();
+
         ArrayList<Task> tasks = userTasks.get(userId);
 
         if (tasks == null) {
             return new ArrayList<>();
         }
-
         return tasks;
     }
 
