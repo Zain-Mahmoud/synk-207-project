@@ -1,8 +1,6 @@
 package interface_adapter.view_tasks_and_habits;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The State information for the View Tasks and Habits View.
@@ -10,7 +8,7 @@ import java.util.Map;
 public class ViewTasksAndHabitsState {
     private ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
     private ArrayList<ArrayList<String>> formattedHabits = new ArrayList<>();
-    private String errorMessage = null;
+    private String errorMessage;
 
     public ViewTasksAndHabitsState() {
     }
