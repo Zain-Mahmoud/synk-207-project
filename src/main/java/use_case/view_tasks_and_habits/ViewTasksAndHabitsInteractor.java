@@ -1,6 +1,5 @@
 package use_case.view_tasks_and_habits;
 
-
 import data_access.FileUserDataAccessObject;
 import data_access.HabitDataAccessObject;
 import data_access.TaskDataAccessObject;
@@ -18,7 +17,8 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
     private HabitDataAccessObject habitDataAccess;
     private ViewTasksAndHabitsOutputBoundary presenter;
 
-    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess, FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter){
+    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess,
+            FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter) {
         this.presenter = presenter;
         this.userDataAccess = userDataAccess;
         this.taskDataAccess = taskDataAccess;
@@ -136,57 +136,74 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
                 switch (habitStartDateTimeToString.substring(5, 7)) {
                     case "01":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " January, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "02":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " February, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "03":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " March, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "04":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " April, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "05":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " May, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "06":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " June, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "07":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " July, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "08":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " August, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "09":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " September, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "10":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " October, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "11":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " November, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                     case "12":
                         formattedHabit.add(habitStartDateTimeToString.substring(8, 10) + " December, " +
-                                habitStartDateTimeToString.substring(0, 4) + " " + habitStartDateTimeToString.substring(11, 16));
+                                habitStartDateTimeToString.substring(0, 4) + " "
+                                + habitStartDateTimeToString.substring(11, 16));
                         break;
                 }
 
                 formattedHabit.add(Integer.toString(habitFrequency));
 
+                // Last Date Time Completed - Not available in Entity, using placeholder
+                formattedHabit.add("N/A");
+
                 formattedHabit.add(habitGroup);
+
+                formattedHabit.add(Integer.toString(habitStreakCount));
 
                 formattedHabit.add(Integer.toString(priority));
 
@@ -202,8 +219,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
             }
             ViewTasksAndHabitsOutputData outputData = new ViewTasksAndHabitsOutputData(formattedTasks, formattedHabits);
             presenter.prepareSuccessView(outputData);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             presenter.prepareFailView("Failed to load task and habit data");
         }
     }

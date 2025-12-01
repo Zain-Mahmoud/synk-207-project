@@ -13,24 +13,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener  {
+public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;
     private final String viewName = "view tasks and habits";
     private ViewManagerModel viewManagerModel;
     private LoggedInViewModel loggedInViewModel;
-
     private DefaultTableModel taskModel;
     private DefaultTableModel habitModel;
 
     private final JButton refreshButton;
     private final JButton exitButton;
+    private final JButton createTaskButton;
+    private final JButton deleteTaskButton;
+    private final JButton createHabitButton;
+    private final JButton deleteHabitButton;
 
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
-                                  ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel) {
+            ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel) {
 
         this.viewTasksAndHabitsViewModel = viewTasksAndHabitsViewModel;
         this.viewTasksAndHabitsViewModel.addPropertyChangeListener(this);
@@ -53,12 +57,21 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
         final JPanel TablePanel = new JPanel();
         final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(6, 1, 5, 5));
 
         this.exitButton = new JButton("Exit");
         this.refreshButton = new JButton("Refresh");
+        this.createTaskButton = new JButton("Create Task");
+        this.deleteTaskButton = new JButton("Delete Task");
+        this.createHabitButton = new JButton("Create Habit");
+        this.deleteHabitButton = new JButton("Delete Habit");
 
-        buttonPanel.add(this.exitButton);
+        buttonPanel.add(this.createTaskButton);
+        buttonPanel.add(this.deleteTaskButton);
+        buttonPanel.add(this.createHabitButton);
+        buttonPanel.add(this.deleteHabitButton);
         buttonPanel.add(this.refreshButton);
+        buttonPanel.add(this.exitButton);
 
         final JLabel TableLabel = new JLabel("Tasks and Habits");
 
@@ -82,7 +95,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         tabbedPane.addTab("Habits", habitScrollPane);
 
         add(tabbedPane, BorderLayout.CENTER);
-
 
         this.exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -109,6 +121,26 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
         });
 
+        createTaskButton.addActionListener(e -> {
+            viewManagerModel.setState("create task");
+            viewManagerModel.firePropertyChanged();
+        });
+
+        deleteTaskButton.addActionListener(e -> {
+            viewManagerModel.setState("delete task");
+            viewManagerModel.firePropertyChanged();
+        });
+
+        createHabitButton.addActionListener(e -> {
+            viewManagerModel.setState("create habit");
+            viewManagerModel.firePropertyChanged();
+        });
+
+        deleteHabitButton.addActionListener(e -> {
+            viewManagerModel.setState("delete habit");
+            viewManagerModel.firePropertyChanged();
+        });
+
 
         if (this.viewTasksAndHabitsController != null && this.loggedInViewModel != null) {
             this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
@@ -117,7 +149,9 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     }
 
     /**
-     * Required method for ActionListener, though typically handled via anonymous classes now.
+     * Required method for ActionListener, though typically handled via anonymous
+     * classes now.
+     * 
      * @param evt the ActionEvent to react to
      */
     public void actionPerformed(ActionEvent evt) {
@@ -144,16 +178,17 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     }
 
     /**
-     * Setter for Dependency Injection, used by the main application builder to wire up the controller later.
+     * Setter for Dependency Injection, used by the main application builder to wire
+     * up the controller later.
      */
-    public void setViewTasksAndHabitsController (ViewTasksAndHabitsController viewTasksAndHabitsController){
+    public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
         if (this.loggedInViewModel != null) {
             this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
         }
     }
 
-    public String getViewName () {
+    public String getViewName() {
         return viewName;
     }
 
@@ -162,16 +197,17 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     }
 
     /**
-     * Reacts to changes in the ViewModel state. This is how the table data is refreshed after a controller call.
+     * Reacts to changes in the ViewModel state. This is how the table data is
+     * refreshed after a controller call.
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
 
-
             if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
-                JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Loading Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Loading Error",
+                        JOptionPane.ERROR_MESSAGE);
                 state.setErrorMessage(null);
             }
 

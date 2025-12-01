@@ -55,8 +55,15 @@ public class HabitBuilder {
         if (startDateTime == null) {
             throw new IllegalStateException("startDateTime must not be null");
         }
-        return new Habit(habitName, startDateTime, frequency, habitGroup, streakCount, priority, status);
-    }
+        return new Habit(
+                habitName,
+                startDateTime,
+                frequency,
+                habitGroup,
+                streakCount,
+                priority,
+                status
+        ); }
 
 }
 

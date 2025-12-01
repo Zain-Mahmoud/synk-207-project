@@ -17,8 +17,9 @@ import java.util.ArrayList;
  */
 public class ViewTasksAndHabitsViewModel extends ViewModel<ViewTasksAndHabitsState> {
 
-    public static final String[] taskCols = {"Task", "Deadline", "Task Group", "Status", "Priority", "Description"};
-    public static final String[] habitCols = {"Habit", "Start Date Time", "Frequency", "Last Date Time Completed", "Habit Group", "Streak Count", "Priority", "Status", "Description"};
+    public static final String[] taskCols = { "Task", "Deadline", "Task Group", "Status", "Priority", "Description" };
+    public static final String[] habitCols = { "Habit", "Start Date Time", "Frequency", "Last Date Time Completed",
+            "Habit Group", "Streak Count", "Priority", "Status", "Description" };
 
     public ViewTasksAndHabitsViewModel() {
         super("view tasks and habits");
