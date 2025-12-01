@@ -77,12 +77,7 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
         });
 
         cancelButton.addActionListener(e -> {
-            DeleteTaskState state = viewModel.getState();
-            state.setSuccessMessage(null);
-            state.setErrorMessage(null);
-            viewModel.setState(state);
-            viewModel.firePropertyChanged();
-
+            clearMessages();
             viewManagerModel.setState("view tasks and habits");
             viewManagerModel.firePropertyChanged();
         });
@@ -119,22 +114,40 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
         // unused
     }
 
+    private void clearMessages() {
+        DeleteTaskState state = viewModel.getState();
+        state.setErrorMessage(null);
+        state.setSuccessMessage(null);
+        viewModel.setState(state);
+        messageLabel.setText(" ");
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (!"state".equals(evt.getPropertyName())) {
             return;
         }
         DeleteTaskState state = viewModel.getState();
+
         if (state.getErrorMessage() != null) {
+
+            JOptionPane.showMessageDialog(this, state.getErrorMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             messageLabel.setText(state.getErrorMessage());
+
+            state.setErrorMessage(null);
+            viewModel.setState(state);
         } else if (state.getSuccessMessage() != null) {
-            messageLabel.setText(state.getSuccessMessage());
+            JOptionPane.showMessageDialog(this, state.getSuccessMessage(),
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
             taskNameField.setText("");
+
+            messageLabel.setText(" ");
+            state.setSuccessMessage(null);
+            viewModel.setState(state);
 
             viewManagerModel.setState("view tasks and habits");
             viewManagerModel.firePropertyChanged();
-        } else {
-            messageLabel.setText(" ");
         }
     }
 
