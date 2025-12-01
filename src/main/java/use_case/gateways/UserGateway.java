@@ -19,4 +19,5 @@ public interface UserGateway {
     boolean isUsernameTaken(String username);
 
     void save(User user);
+
 }
