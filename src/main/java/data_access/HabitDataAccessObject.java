@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,7 +156,7 @@ public class HabitDataAccessObject implements HabitGateway {
             for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
                 final String username = entry.getKey();
                 for (Habit habit : entry.getValue()) {
-                    final String startDateTime = habit.getStartDateTime() == null ? "" : DATE_FORMATTER.format(habit.getStartDateTime());
+                    final String startDateTime = habit.getStartTime() == null ? "" : DATE_FORMATTER.format(habit.getStartTime());
                     final String frequency = Integer.toString(habit.getFrequency());
                     final String line = String.join(",",
                             username,

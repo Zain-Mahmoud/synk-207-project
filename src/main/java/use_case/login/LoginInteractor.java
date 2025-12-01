@@ -1,15 +1,16 @@
 package use_case.login;
 
 import entities.User;
+import use_case.gateways.UserGateway;
 
 /**
  * The Login Interactor.
  */
 public class LoginInteractor implements LoginInputBoundary {
-    private final LoginUserDataAccessInterface userDataAccessObject;
+    private final UserGateway userDataAccessObject;
     private final LoginOutputBoundary loginPresenter;
 
-    public LoginInteractor(LoginUserDataAccessInterface userDataAccessInterface,
+    public LoginInteractor(UserGateway userDataAccessInterface,
                            LoginOutputBoundary loginOutputBoundary) {
         this.userDataAccessObject = userDataAccessInterface;
         this.loginPresenter = loginOutputBoundary;
@@ -23,17 +24,20 @@ public class LoginInteractor implements LoginInputBoundary {
             loginPresenter.prepareFailView(username + ": Account does not exist.");
         }
         else {
-            final String pwd = userDataAccessObject.get(username).getPassword();
+            final String pwd = userDataAccessObject.getByName(username).getPassword();
             if (!password.equals(pwd)) {
                 loginPresenter.prepareFailView("Incorrect password for \"" + username + "\".");
             }
             else {
 
-                final User user = userDataAccessObject.get(loginInputData.getUsername());
+                final User user = userDataAccessObject.getByName(loginInputData.getUsername());
 
-                final LoginOutputData loginOutputData = new LoginOutputData(user.getName(), false);
+                final LoginOutputData loginOutputData =
+                        new LoginOutputData(user.getUid(), user.getUsername(), user.getAvatarPath(), false);
                 loginPresenter.prepareSuccessView(loginOutputData);
             }
         }
     }
+
+
 }

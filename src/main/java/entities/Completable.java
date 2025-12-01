@@ -3,7 +3,6 @@ package entities;
 import java.time.LocalDateTime;
 
 public interface Completable {
-
     void complete();
 
     boolean isCompleted();
@@ -20,5 +19,10 @@ public interface Completable {
 
     int getPriority();
 
+
+
+    Completable clone();
+
+    LocalDateTime getStartTime();
 
 }

@@ -22,13 +22,28 @@ public class InMemoryUserDataAccessObject implements UserGateway {
     }
 
     @Override
-    public void createUser(User user) {
-        users.put(user.getName(), user);
+    public boolean isUsernameTaken(String username) {
+        return false;
     }
 
     @Override
-    public User getUserById(String userID) {
+    public void save(User user) {
+
+    }
+
+    @Override
+    public User getByUid(String userID) {
         return users.get(userID);
+    }
+
+    @Override
+    public User getByName(String username) {
+        return null;
+    }
+
+    @Override
+    public boolean existsByUid(String uid) {
+        return false;
     }
 
     @Override
