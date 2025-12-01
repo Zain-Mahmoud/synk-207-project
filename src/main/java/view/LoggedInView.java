@@ -50,7 +50,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     // --- Styling Constants ---
     private static final Color PRIMARY_COLOR = new Color(59, 130, 246); // Tailwind blue-500
     private static final Color SECONDARY_COLOR = new Color(243, 244, 246); // Tailwind gray-100
-    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 64);
+    private static final Font TITLE_FONT = new Font("Monospaced", Font.BOLD, 64);
     private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
     private static final Font USER_INFO_FONT = new Font("SansSerif", Font.PLAIN, 16);
 
@@ -62,7 +62,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(50, 50, 50, 50));
 
-        final JLabel title = new JLabel("synk");
+        final JLabel title = new JLabel("SYNK");
         title.setFont(TITLE_FONT);
         title.setForeground(PRIMARY_COLOR);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -203,10 +203,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (viewTasksAndHabitsController != null && state.getUsername() != null && !state.getUsername().isEmpty()) {
                 this.viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
             }
-        }
-        else if (evt.getPropertyName().equals("password")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, "Password updated for " + state.getUsername(), "Success", JOptionPane.INFORMATION_MESSAGE);
         }
         else if (evt.getPropertyName().equals("sync")) {
             final SyncToGoogleCalendarControllerState syncState = (SyncToGoogleCalendarControllerState) evt.getNewValue();
