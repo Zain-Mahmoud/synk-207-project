@@ -229,7 +229,10 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         if (trimmed.isEmpty()) {
             return "primary";
         }
-        return trimmed;
+        if (trimmed.contains("@")) {
+            return trimmed;
+        }
+        return "primary";
     }
 
     /**
