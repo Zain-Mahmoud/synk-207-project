@@ -20,22 +20,22 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
 
     @Override
     public void execute(UpdateProfileInputData inputData) {
-        String uid = inputData.getUid();
-        String newUsername = inputData.getNewUsername();
-        String newAvatarPath = inputData.getNewAvatarPath();
-        String newPassword = inputData.getNewPassword();
+        final String uid = inputData.getUid();
+        final String newUsername = inputData.getNewUsername();
+        final String newAvatarPath = inputData.getNewAvatarPath();
+        final String newPassword = inputData.getNewPassword();
 
         if (!userDataAccess.existsByUid(uid)) {
             presenter.prepareFailView("User does not exist.");
             return;
         }
 
-        User user = userDataAccess.getByUid(uid);
+        final User user = userDataAccess.getByUid(uid);
 
         if (newUsername != null && !newUsername.isBlank()) {
-            String trimmed = newUsername.trim();
-
-            if (trimmed.isEmpty() || trimmed.length() > 12) {
+            final String trimmed = newUsername.trim();
+            final int usernameLimit = 12;
+            if (trimmed.isEmpty() || trimmed.length() > usernameLimit) {
                 presenter.prepareFailView("Username must be 1–12 characters.");
                 return;
             }
@@ -54,8 +54,9 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
         }
 
         if (newPassword != null && !newPassword.isBlank()) {
-            String trimmed = newPassword.trim();
-            if (trimmed.length() < 6) {
+            final String trimmed = newPassword.trim();
+            final int passwordLimit = 6;
+            if (trimmed.length() < passwordLimit) {
                 presenter.prepareFailView("Password must be longer than 6 characters.");
                 return;
             }
@@ -65,7 +66,7 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
 
         userDataAccess.save(user);
 
-        UpdateProfileOutputData outputData = new UpdateProfileOutputData(
+        final UpdateProfileOutputData outputData = new UpdateProfileOutputData(
                 user.getUid(),
                 user.getUsername(),
                 user.getAvatarPath(),

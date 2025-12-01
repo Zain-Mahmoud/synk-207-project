@@ -55,7 +55,9 @@ public class UpdateProfileState {
         this.usernameError = usernameError;
     }
 
-    public String getPasswordError() {return this.passwordError; }
+    public String getPasswordError() {
+        return this.passwordError;
+    }
 
     public void setPasswordError(String passwordError) {
         this.passwordError = passwordError;

@@ -1,15 +1,5 @@
 package view;
 
-import interface_adapter.ViewManagerModel;
-import interface_adapter.ViewModel;
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.update_profile.UpdateProfileController;
-import interface_adapter.update_profile.UpdateProfileState;
-import interface_adapter.update_profile.UpdateProfileViewModel;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,15 +8,25 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import interface_adapter.ViewManagerModel;
+import interface_adapter.update_profile.UpdateProfileController;
+import interface_adapter.update_profile.UpdateProfileState;
+import interface_adapter.update_profile.UpdateProfileViewModel;
+
 /**
  * The View for updating the user's profile (e.g., username).
  */
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings"})
 public class UpdateProfileView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "updateprofile";
     private final UpdateProfileViewModel updateProfileViewModel;
-    private UpdateProfileController updateProfileController = null;
-        private ViewManagerModel viewManagerModel;
+    private UpdateProfileController updateProfileController;
+    private ViewManagerModel viewManagerModel;
 
     private final JTextField usernameInputField = new JTextField(15);
     private final JTextField passwordInputField = new JTextField(15);
@@ -41,6 +41,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private String currentUid;
 
+    @SuppressWarnings({"checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings", "checkstyle:JavaNCSS"})
     public UpdateProfileView(UpdateProfileViewModel updateProfileViewModel) {
         this.updateProfileViewModel = updateProfileViewModel;
         this.updateProfileViewModel.addPropertyChangeListener(this);
@@ -65,59 +66,13 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
         chooseAvatarButton.addActionListener(evt -> {
             if (evt.getSource().equals(chooseAvatarButton)) {
-                JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-
-                    File selected = fileChooser.getSelectedFile();
-
-                    File avatarsDir = new File("avatars");
-                    if (!avatarsDir.exists()) {
-                        avatarsDir.mkdirs();
-                    }
-
-                    String name = selected.getName();
-                    String ext = "";
-                    int dot = name.lastIndexOf('.');
-                    if (dot != -1) {
-                        ext = name.substring(dot);
-                    }
-
-                    String fileName = (currentUid != null ? currentUid : "tmp") + ext;
-                    File dest = new File(avatarsDir, fileName);
-
-                    try {
-                        java.nio.file.Files.copy(
-                                selected.toPath(),
-                                dest.toPath(),
-                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                        );
-
-                        UpdateProfileState state = updateProfileViewModel.getState();
-                        state.setAvatarPath(dest.getPath());
-                        updateProfileViewModel.setState(state);
-                        updateProfileViewModel.firePropertyChanged();
-
-                        updateAvatarPreview(dest.getPath());
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(this, "Failed to save avatar: " + e.getMessage());
-                    }
-                }
+                chooseAvatarButtonFunction();
             }
         });
 
         saveButton.addActionListener(evt -> {
             if (evt.getSource().equals(saveButton)) {
-                final UpdateProfileState currentState = updateProfileViewModel.getState();
-
-                updateProfileController.execute(
-                        currentState.getUid(),
-                        currentState.getUsername(),
-                        currentState.getAvatarPath(),
-                        currentState.getPassword()
-                );
+                saveButtonFunction();
             }
         });
 
@@ -195,7 +150,6 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     @Override
     public void actionPerformed(ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
-
     }
 
     @Override
@@ -215,10 +169,9 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     private void updateAvatarPreview(String avatarPath) {
         if (avatarPath == null || avatarPath.isBlank()) {
             avatarPreviewLabel.setIcon(null);
-            return;
         }
-        ImageIcon icon = new ImageIcon(avatarPath);
-        Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+        final ImageIcon icon = new ImageIcon(avatarPath);
+        final Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
         avatarPreviewLabel.setIcon(new ImageIcon(img));
     }
 
@@ -238,4 +191,64 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * Button functionality of changing avatar.
+     */
+    public void chooseAvatarButtonFunction() {
+        final JFileChooser fileChooser = new JFileChooser();
+        final int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+
+            final File selected = fileChooser.getSelectedFile();
+
+            final File avatarsDir = new File("avatars");
+            if (!avatarsDir.exists()) {
+                avatarsDir.mkdirs();
+            }
+
+            final String name = selected.getName();
+            String ext = "";
+            final int dot = name.lastIndexOf('.');
+            if (dot != -1) {
+                ext = name.substring(dot);
+            }
+
+            final String fileName = (currentUid != null ? currentUid : "tmp") + ext;
+            final File dest = new File(avatarsDir, fileName);
+
+            try {
+                java.nio.file.Files.copy(
+                        selected.toPath(),
+                        dest.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+
+                final UpdateProfileState state = updateProfileViewModel.getState();
+                state.setAvatarPath(dest.getPath());
+                updateProfileViewModel.setState(state);
+                updateProfileViewModel.firePropertyChanged();
+
+                updateAvatarPreview(dest.getPath());
+
+            }
+            catch (IOException excp) {
+                excp.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to save avatar: " + excp.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Button functionality of saving user info.
+     */
+    public void saveButtonFunction() {
+        final UpdateProfileState currentState = updateProfileViewModel.getState();
+
+        updateProfileController.execute(
+                currentState.getUid(),
+                currentState.getUsername(),
+                currentState.getAvatarPath(),
+                currentState.getPassword()
+        );
+    }
 }

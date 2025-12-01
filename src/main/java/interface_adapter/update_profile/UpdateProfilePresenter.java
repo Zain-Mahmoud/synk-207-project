@@ -15,7 +15,6 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
     private final UpdateProfileViewModel updateProfileViewModel;
     private final LoggedInViewModel loggedInViewModel;
 
-
     public UpdateProfilePresenter(ViewManagerModel viewManagerModel,
                                   UpdateProfileViewModel updateProfileViewModel,
                                   LoggedInViewModel loggedInViewModel) {
@@ -39,7 +38,7 @@ public class UpdateProfilePresenter implements UpdateProfileOutputBoundary {
         updateProfileViewModel.setState(state);
         updateProfileViewModel.firePropertyChanged();
 
-        LoggedInState loggedInState = loggedInViewModel.getState();
+        final LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setUid(response.getUid());
         loggedInState.setUsername(response.getUsername());
         loggedInState.setAvatarPath(response.getAvatarPath());
