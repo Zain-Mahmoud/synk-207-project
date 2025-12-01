@@ -21,4 +21,6 @@ public interface Completable {
     int getPriority();
 
 
+    LocalDateTime getStartTime();
+
 }

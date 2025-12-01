@@ -17,10 +17,10 @@ public class Main {
                 .addCreateHabitView()
                 .addDeleteTaskView()
                 .addDeleteHabitView()
+                .addUpdateProfileView()
                 .addStatsView()
                 .addSignupUseCase()
                 .addLoginUseCase()
-                .addChangePasswordUseCase()
                 .addViewLeaderboardUseCase()
                 .addViewTasksAndHabitsUseCase()
                 .addCreateTaskUseCase()
@@ -29,6 +29,7 @@ public class Main {
                 .addDeleteHabitUseCase()
                 .addSyncToGoogleCalendarUseCase()
                 .addViewStatsUseCase()
+                .addUpdateProfileUseCase()
                 .build();
 
         application.pack();

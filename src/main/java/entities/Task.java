@@ -13,8 +13,8 @@ public class Task implements Completable {
     private int priority; // May use different data object.
     private LocalDateTime startTime;
 
-    Task(String taskName, LocalDateTime startTime, LocalDateTime deadline, String taskGroup, boolean status,
-            int priority, String description) {
+    // LocalDateTime startTime this.startTime = startTime;
+    Task(String taskName, LocalDateTime startTime, LocalDateTime deadline, String taskGroup, boolean status, int priority, String description) {
         this.taskName = taskName;
         this.startTime = startTime;
         this.deadline = deadline;
@@ -41,6 +41,8 @@ public class Task implements Completable {
     public void setTaskName(String taskName) {
         this.taskName = taskName;
     }
+    public LocalDateTime getDueDate() { return deadline; }
+    public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
 
     public LocalDateTime getDeadline() {
         return deadline;
@@ -111,13 +113,7 @@ public class Task implements Completable {
         return description;
     }
 
-    /**
-     * @return
-     */
-    @Override
-    public LocalDateTime getDueDate() {
-        return this.deadline;
-    }
+
 
     public void setDescription(String description) {
         this.description = description;
