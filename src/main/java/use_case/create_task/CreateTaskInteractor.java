@@ -44,6 +44,7 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
         }
 
         String description = inputdata.getDescription();
+        LocalDateTime startTime = inputdata.getStartTime();
         LocalDateTime deadline = inputdata.getDeadline();
         String taskGroup = inputdata.getTaskGroup();
         boolean status = inputdata.getstatus();
@@ -52,6 +53,7 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
         Task newTask = new TaskBuilder()
                 .setTaskName(taskName)
                 .setDescription(description)
+                .setStartTime(startTime)
                 .setDeadline(deadline)
                 .setTaskGroup(taskGroup)
                 .setStatus(status)
