@@ -211,7 +211,7 @@ public class AppBuilder {
     public AppBuilder addViewTasksAndHabitsUseCase() {
         final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(viewManagerModel, viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor
-                (taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
+                (taskDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
         ViewTasksAndHabitsController viewTasksAndHabitsController = new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
