@@ -38,7 +38,7 @@ class CreateTaskInteractorTest {
                 "Study",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -65,7 +65,7 @@ class CreateTaskInteractorTest {
                 "Study",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -88,7 +88,7 @@ class CreateTaskInteractorTest {
                 "Study",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -111,7 +111,7 @@ class CreateTaskInteractorTest {
                 "Study",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -134,7 +134,7 @@ class CreateTaskInteractorTest {
                 "",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -157,7 +157,7 @@ class CreateTaskInteractorTest {
                 null,
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -180,7 +180,7 @@ class CreateTaskInteractorTest {
                 "   ",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1
@@ -203,7 +203,7 @@ class CreateTaskInteractorTest {
                 "Study",
                 "Study for exam",
                 LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
                 1

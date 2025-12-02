@@ -1,11 +1,12 @@
 package app;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.security.GeneralSecurityException; // this is just for Type Safety
+import java.security.GeneralSecurityException;
+
+import javax.swing.JFrame; // this is just for Type Safety
 
 public class Main {
-    public static void main(String[] args) throws IOException, GeneralSecurityException {
+    public static void  main(String[] args) throws IOException, GeneralSecurityException {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addLoginView()
