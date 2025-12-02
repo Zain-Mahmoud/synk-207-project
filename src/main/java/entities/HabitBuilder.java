@@ -12,6 +12,7 @@ public class HabitBuilder {
     private int streakCount = 0;
     private int priority = 0;
     private boolean status = false;
+    private String description;
 
     public HabitBuilder setHabitName(String habitName) {
         this.habitName = habitName;
@@ -40,6 +41,11 @@ public class HabitBuilder {
 
     public HabitBuilder setPriority(int priority) {
         this.priority = priority;
+        return this;
+    }
+
+    public HabitBuilder setDescription(String description) {
+        this.description = description;
         return this;
     }
 

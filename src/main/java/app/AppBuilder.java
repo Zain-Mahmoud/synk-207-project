@@ -2,7 +2,7 @@ package app;
 
 import java.awt.CardLayout;
 import java.io.IOException;
-import java.security.GeneralSecurityException; // Type Safety
+import java.security.GeneralSecurityException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -356,7 +356,7 @@ public class AppBuilder {
         final ViewTasksAndHabitsOutputBoundary viewTasksAndHabitsOutputBoundary = new ViewTasksAndHabitsPresenter(
                 viewManagerModel, viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor(
-                taskDataAccessObject, habitDataAccessObject, userDataAccessObject, viewTasksAndHabitsOutputBoundary);
+                taskDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
         this.viewTasksAndHabitsController =
                 new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
