@@ -25,17 +25,17 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
         final String newAvatarPath = inputData.getNewAvatarPath();
         final String newPassword = inputData.getNewPassword();
 
-        if (!userDataAccess.existsByUid(uid)) {
-            presenter.prepareFailView("User does not exist.");
-            return;
-        }
+//        if (!userDataAccess.existsByUid(uid)) {
+//            presenter.prepareFailView("User does not exist.");
+//            return;
+//        }
 
         final User user = userDataAccess.getByUid(uid);
 
         if (newUsername != null && !newUsername.isBlank()) {
             final String trimmed = newUsername.trim();
             final int usernameLimit = 12;
-            if (trimmed.isEmpty() || trimmed.length() > usernameLimit) {
+            if (trimmed.length() > usernameLimit) {
                 presenter.prepareFailView("Username must be 1–12 characters.");
                 return;
             }

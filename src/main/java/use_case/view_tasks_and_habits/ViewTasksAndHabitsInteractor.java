@@ -35,7 +35,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
             final ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
 
-            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yy, HH:mm");
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM, yyyy HH:mm");
 
             for (Task task : taskList) {
                 final ArrayList<String> formattedTask = new ArrayList<>();
