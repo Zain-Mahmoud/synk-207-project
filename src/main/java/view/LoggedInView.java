@@ -50,7 +50,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
     private static final Color SECONDARY_COLOR = new Color(242, 244, 248);
     private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
-    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 28);
+    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 82);
     private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
     private static final Font USER_INFO_FONT = new Font("SansSerif", Font.PLAIN, 16);
 
