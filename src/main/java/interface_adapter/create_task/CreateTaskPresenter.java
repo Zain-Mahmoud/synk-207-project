@@ -6,7 +6,7 @@ import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import use_case.create_task.CreateTaskOutputBoundary;
 import use_case.create_task.CreateTaskOutputData;
 
-public class CreateTaskPresenter implements CreateTaskOutputBoundary  {
+public class CreateTaskPresenter implements CreateTaskOutputBoundary {
     private final CreateTaskViewModel createTaskViewModel;
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
@@ -33,15 +33,15 @@ public class CreateTaskPresenter implements CreateTaskOutputBoundary  {
         createTaskState.setPriority(0);
         createTaskState.setErrorMessage(null);
         createTaskState.setSuccessMessage(
-                "Task '" + outputData.getTaskName() +
-                        "' created successfully for user '" + outputData.getUsername() + "'!"
+                "Task '" + outputData.getTaskName()
+                        + "' created successfully for user '" + outputData.getUsername() + "'!"
         );
 
         createTaskViewModel.setState(createTaskState);
         createTaskViewModel.firePropertyChanged();
 
         if (viewTasksAndHabitsController != null) {
-            viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+            viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
     }
 

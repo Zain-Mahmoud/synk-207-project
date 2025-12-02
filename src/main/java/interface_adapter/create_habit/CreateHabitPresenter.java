@@ -15,7 +15,8 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
 
     public CreateHabitPresenter(CreateHabitViewModel createHabitViewModel,
                                 LoggedInViewModel loggedInViewModel,
-                                ViewManagerModel viewManagerModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
+                                ViewManagerModel viewManagerModel,
+                                ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.createHabitViewModel = createHabitViewModel;
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
@@ -42,7 +43,7 @@ public class CreateHabitPresenter implements CreateHabitOutputBoundary {
         createHabitViewModel.firePropertyChanged();
 
         if (viewTasksAndHabitsController != null) {
-            viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+            viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
     }
 

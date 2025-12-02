@@ -5,5 +5,17 @@ package use_case.view_tasks_and_habits;
  */
 
 public class ViewTasksAndHabitsInputData {
+    private String username;
 
+    public ViewTasksAndHabitsInputData(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

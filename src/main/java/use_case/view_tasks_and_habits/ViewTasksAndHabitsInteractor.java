@@ -4,34 +4,30 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import data_access.FileUserDataAccessObject;
-import data_access.HabitDataAccessObject;
-import data_access.TaskDataAccessObject;
 import entities.Habit;
 import entities.Task;
-import interface_adapter.logged_in.LoggedInViewModel;
+import use_case.gateways.HabitGateway;
+import use_case.gateways.TaskGateway;
 
 public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoundary {
-    private FileUserDataAccessObject userDataAccess;
-    private TaskDataAccessObject taskDataAccess;
-    private HabitDataAccessObject habitDataAccess;
+    private TaskGateway taskDataAccess;
+    private HabitGateway habitDataAccess;
     private ViewTasksAndHabitsOutputBoundary presenter;
 
-    public ViewTasksAndHabitsInteractor(TaskDataAccessObject taskDataAccess, HabitDataAccessObject habitDataAccess,
-            FileUserDataAccessObject userDataAccess, ViewTasksAndHabitsOutputBoundary presenter) {
+    public ViewTasksAndHabitsInteractor(TaskGateway taskDataAccess, HabitGateway habitDataAccess,
+                                        ViewTasksAndHabitsOutputBoundary presenter) {
         this.presenter = presenter;
-        this.userDataAccess = userDataAccess;
         this.taskDataAccess = taskDataAccess;
         this.habitDataAccess = habitDataAccess;
     }
 
     /**
-     * Fetches tasks and habits from the task and habit gateways and then formatts them into ArrayLists of strings.
-     * @param loggedInViewModel the view model for the logged in use case/
+     * Fetches tasks and habits from the task and habit gateways and then formats them into ArrayLists of strings.
+     * @param inputData the input data for the view tasks and habits use case
      */
-    public void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel) {
+    public void getFormattedTasksAndHabits(ViewTasksAndHabitsInputData inputData) {
         try {
-            final ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(loggedInViewModel.getState().getUsername());
+            final ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(inputData.getUsername());
 
             final ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
 
@@ -71,8 +67,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedTasks.add(formattedTask);
             }
-            final ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(
-                    loggedInViewModel.getState().getUsername());
+            final ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(inputData.getUsername());
 
             final ArrayList<ArrayList<String>> formattedHabits = new ArrayList<>();
 
