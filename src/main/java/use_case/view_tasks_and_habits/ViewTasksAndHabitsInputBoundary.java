@@ -1,6 +1,5 @@
 package use_case.view_tasks_and_habits;
 
-import java.util.ArrayList;
 import interface_adapter.logged_in.LoggedInViewModel;
 
 /**
@@ -8,8 +7,10 @@ import interface_adapter.logged_in.LoggedInViewModel;
  */
 public interface ViewTasksAndHabitsInputBoundary {
 
-    void execute(ViewTasksAndHabitsInputData createInputData);
-
+    /**
+     * Fetches tasks and habits from the task and habit gateways and then formatts them into ArrayLists of strings.
+     * @param loggedInViewModel the view model for the logged in use case/
+     */
     void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel);
 
 }

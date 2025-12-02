@@ -198,8 +198,8 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         this.modifyHabitViewModel = modifyHabitViewModel;
         this.modifyTaskViewModel = modifyTaskViewModel;
 
-        String[] taskColsWithButton = extendColumns(viewTasksAndHabitsViewModel.taskCols, "Modify");
-        String[] habitColsWithButton = extendColumns(viewTasksAndHabitsViewModel.habitCols, "Modify");
+        String[] taskColsWithButton = extendColumns(viewTasksAndHabitsViewModel.TASKCOLS, "Modify");
+        String[] habitColsWithButton = extendColumns(viewTasksAndHabitsViewModel.HABITCOLS, "Modify");
 
         this.taskModel = new DefaultTableModel(taskColsWithButton, 0) {
             @Override
