@@ -15,7 +15,4 @@ public class ViewTasksAndHabitsInputData {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }

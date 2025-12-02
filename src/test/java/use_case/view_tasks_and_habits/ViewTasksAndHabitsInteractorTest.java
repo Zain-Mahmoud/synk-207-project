@@ -52,10 +52,12 @@ public class ViewTasksAndHabitsInteractorTest {
                 .setTaskName("project")
                 .setStartTime(LocalDateTime.parse("2025-11-26T00:00:00"))
                 .setDeadline(LocalDateTime.parse("2025-11-27T00:00:00"))
-                .setStatus(false)
+                .setStatus(true)
                 .setPriority(2)
                 .setDescription("Finishing a project")
                 .build();
+
+        Task emptyTask = taskBuilder.build();
 
         Habit habit1 = habitBuilder.setHabitName("Not programming")
                 .setHabitGroup("Programming")
@@ -105,7 +107,7 @@ public class ViewTasksAndHabitsInteractorTest {
         task2List.add("26 November, 2025 00:00");
         task2List.add("27 November, 2025 00:00");
         task2List.add("project");
-        task2List.add("Incomplete");
+        task2List.add("Complete");
         task2List.add("2");
         task2List.add("Finishing a project");
 
@@ -144,6 +146,44 @@ public class ViewTasksAndHabitsInteractorTest {
         assertEquals(habit2List, resultState.getFormattedHabits().get(1));
     }
 
+    @Test
+    void FailTest() {
+        TaskGateway taskGateway = new InMemoryTaskDataAccessObject();
+        HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        UserGateway userGateway = new InMemoryUserDataAccessObject();
+
+        LoggedInViewModel loggedInViewModel = new LoggedInViewModel();
+
+        ViewTasksAndHabitsViewModel testViewModel = new ViewTasksAndHabitsViewModel();
+        ViewManagerModel viewManagerModel = new ViewManagerModel();
+        TestPresenter presenter = new TestPresenter(viewManagerModel, testViewModel);
+
+        TaskBuilder taskBuilder = new TaskBuilder();
+        HabitBuilder habitBuilder = new HabitBuilder();
+
+        Task emptyTask = taskBuilder
+                        .setTaskName("Empty Task")
+                        .build();
+
+        UserFactory factory = new UserFactory();
+        User arya = factory.create("arya", "123");
+        userGateway.save(arya);
+
+        taskGateway.addTask("arya", emptyTask);
+
+        ViewTasksAndHabitsInputData inputData = new ViewTasksAndHabitsInputData("arya");
+
+        ViewTasksAndHabitsInteractor interactor =
+                new ViewTasksAndHabitsInteractor(taskGateway, habitGateway, presenter);
+
+        interactor.getFormattedTasksAndHabits(inputData);
+
+        ViewTasksAndHabitsState resultState = testViewModel.getState();
+        assertNotNull(resultState);
+
+        assertEquals("Failed to load task and habit data", resultState.getErrorMessage());
+    }
+
     private static class TestPresenter extends ViewTasksAndHabitsPresenter {
 
         private final ViewTasksAndHabitsViewModel vm;
@@ -162,8 +202,10 @@ public class ViewTasksAndHabitsInteractorTest {
         }
 
         @Override
-        public void prepareFailView(String error) {
-            fail("Interactor should not fail in this test");
+        public void prepareFailView(String errorMessage) {
+            ViewTasksAndHabitsState state = new ViewTasksAndHabitsState();
+            state.setErrorMessage(errorMessage);
+            vm.setState(state);
         }
     }
 }
