@@ -7,7 +7,7 @@ on:
 
 jobs:
   checkstyle:
-    name: Run Checkstyle
+    name: Run Checkstyle on Changed Files
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +24,17 @@ jobs:
         run: |
           wget -O checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.4/checkstyle-10.12.4-all.jar
 
-      - name: Run Checkstyle
+      - name: Get list of changed Java files
+        id: changed_files
         run: |
-          java -jar checkstyle.jar -c mystyle.xml $(find . -name '*.java')
+          git fetch origin ${{ github.base_ref }}
+          git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.java$' > changed_java_files.txt || true
+
+      - name: Run Checkstyle on changed files
+        if: success() && (steps.changed_files.outputs.changed_files != '')
+        run: |
+          if [ -s changed_java_files.txt ]; then
+            java -jar checkstyle.jar -c mystyle.xml $(cat changed_java_files.txt)
+          else
+            echo "No changed .java files to check."
+          fi
