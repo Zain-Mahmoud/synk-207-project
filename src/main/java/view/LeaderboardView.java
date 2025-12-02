@@ -24,24 +24,27 @@ import java.util.Map;
  */
 public class LeaderboardView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 28);
-    private static final Font TABLE_HEADER_FONT = new Font("SansSerif", Font.BOLD, 14);
-    private static final Font TABLE_CELL_FONT = new Font("SansSerif", Font.PLAIN, 13);
-    private static final Color PRIMARY_COLOR = new Color(52, 152, 219);
-    private static final Color SECONDARY_COLOR = new Color(236, 240, 241);
-    private static final Color ACCENT_COLOR = new Color(46, 204, 113);
+    private static final Color BACKGROUND_COLOR = new Color(242, 244, 248);
+    private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232);
+    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
+    private static final Color ACCENT_COLOR = new Color(46, 139, 87);
+    private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
+    private static final Color ERROR_COLOR = new Color(231, 76, 60);
 
     private final String viewName = "leaderboard";
     private final ViewLeaderboardViewModel viewLeaderboardViewModel;
     private ViewLeaderboardController viewLeaderboardController;
     private ViewManagerModel viewManagerModel;
 
-    private final JLabel title = new JLabel(ViewLeaderboardViewModel.TITLE_LABEL, SwingConstants.CENTER);
+    private final JLabel title = new JLabel(ViewLeaderboardViewModel.TITLE_LABEL, SwingConstants.LEFT);
+    private final JLabel subtitle = new JLabel("See who’s keeping their habits going the longest.", SwingConstants.LEFT);
+    private final JLabel statsLabel = new JLabel("", SwingConstants.RIGHT);
+
     private JTable leaderboardTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton;
     private JButton backButton;
-    private final JLabel errorLabel = new JLabel("", SwingConstants.CENTER);
+    private final JLabel errorLabel = new JLabel("", SwingConstants.LEFT);
 
     public LeaderboardView(ViewLeaderboardViewModel viewLeaderboardViewModel) {
         this.viewLeaderboardViewModel = viewLeaderboardViewModel;
@@ -51,36 +54,78 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     }
 
     private void setupUI() {
-        this.setLayout(new BorderLayout(10, 10));
-        this.setBackground(SECONDARY_COLOR);
-        this.setBorder(new EmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
+        setBackground(BACKGROUND_COLOR);
+        setBorder(new EmptyBorder(24, 32, 24, 32));
 
-        setupTitle();
+        setupHeaderText();
         setupTable();
         setupButtons();
         setupErrorLabel();
 
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setBackground(SECONDARY_COLOR);
-        centerPanel.add(createTablePanel(), BorderLayout.CENTER);
+        JPanel headerPanel = createHeaderPanel();
 
-        this.add(title, BorderLayout.NORTH);
-        this.add(centerPanel, BorderLayout.CENTER);
-        this.add(createButtonPanel(), BorderLayout.SOUTH);
+        JPanel cardPanel = new JPanel(new BorderLayout(0, 16));
+        cardPanel.setBackground(Color.WHITE);
+        Border cardBorder = BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 1, 1, 1, CARD_BORDER_COLOR),
+                new EmptyBorder(20, 20, 16, 20)
+        );
+        cardPanel.setBorder(cardBorder);
+        cardPanel.add(createTablePanel(), BorderLayout.CENTER);
+        cardPanel.add(createBottomPanel(), BorderLayout.SOUTH);
+
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        centerWrapper.add(cardPanel, gbc);
+
+        add(headerPanel, BorderLayout.NORTH);
+        add(centerWrapper, BorderLayout.CENTER);
     }
 
-    private void setupTitle() {
-        title.setFont(TITLE_FONT);
-        title.setForeground(PRIMARY_COLOR.darker());
-        title.setBorder(new EmptyBorder(0, 0, 20, 0));
+    private void setupHeaderText() {
+        Font baseFont = UIManager.getFont("Label.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 14);
+        }
+
+        Font titleFont = baseFont.deriveFont(Font.BOLD, 22f);
+        Font subtitleFont = baseFont.deriveFont(Font.PLAIN, 12f);
+
+        title.setFont(titleFont);
+        title.setForeground(new Color(45, 57, 82));
+
+        subtitle.setFont(subtitleFont);
+        subtitle.setForeground(MUTED_TEXT_COLOR);
+    }
+
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(new EmptyBorder(0, 0, 16, 0));
+
+        JPanel left = new JPanel();
+        left.setOpaque(false);
+        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        left.add(title);
+        left.add(Box.createRigidArea(new Dimension(0, 4)));
+        left.add(subtitle);
+
+        headerPanel.add(left, BorderLayout.WEST);
+        return headerPanel;
     }
 
     private JPanel createTablePanel() {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(Color.WHITE);
-        Border lineBorder = BorderFactory.createLineBorder(PRIMARY_COLOR, 2);
-        Border marginBorder = new EmptyBorder(10, 10, 10, 10);
-        tablePanel.setBorder(BorderFactory.createCompoundBorder(lineBorder, marginBorder));
 
         JScrollPane scrollPane = new JScrollPane(leaderboardTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -99,64 +144,101 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
                 return false;
             }
         };
+
         leaderboardTable = new JTable(tableModel);
-        leaderboardTable.setPreferredScrollableViewportSize(new Dimension(600, 400));
+        leaderboardTable.setPreferredScrollableViewportSize(new Dimension(600, 360));
         leaderboardTable.setFillsViewportHeight(true);
         leaderboardTable.setRowSelectionAllowed(false);
-        leaderboardTable.setRowHeight(35);
-        leaderboardTable.setFont(TABLE_CELL_FONT);
-        leaderboardTable.setGridColor(new Color(220, 220, 220));
+        leaderboardTable.setRowHeight(34);
+        leaderboardTable.setGridColor(new Color(225, 228, 236));
         leaderboardTable.setShowGrid(true);
         leaderboardTable.setIntercellSpacing(new Dimension(0, 0));
 
-        styleTableHeader();
-        styleTableCells();
+        Font baseFont = UIManager.getFont("Table.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 13);
+        }
+        leaderboardTable.setFont(baseFont.deriveFont(Font.PLAIN, 13f));
+
+        styleTableHeader(baseFont);
+        styleTableCells(baseFont);
     }
 
-    private void styleTableHeader() {
+    private void styleTableHeader(Font baseFont) {
         JTableHeader header = leaderboardTable.getTableHeader();
-        header.setFont(TABLE_HEADER_FONT);
+        header.setFont(baseFont.deriveFont(Font.BOLD, 13f));
         header.setBackground(PRIMARY_COLOR);
         header.setForeground(Color.WHITE);
         header.setPreferredSize(new Dimension(header.getWidth(), 40));
         header.setReorderingAllowed(false);
     }
 
-    private void styleTableCells() {
+    private void styleTableCells(Font baseFont) {
         leaderboardTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(250, 250, 250));
-                c.setForeground(Color.BLACK);
 
-                if (column == 0) {
-                    Integer rank = (Integer) value;
-                    if (rank != null && rank <= 3) {
-                        c.setForeground(PRIMARY_COLOR.darker());
-                        c.setFont(new Font("SansSerif", Font.BOLD, 14));
-                    }
-                } else if (column == 2) {
-                    Integer streak = (Integer) value;
-                    if (streak != null && streak > 0) {
-                        c.setForeground(ACCENT_COLOR.darker());
-                        c.setFont(new Font("SansSerif", Font.BOLD, 13));
+                if (isSelected) {
+                    c.setBackground(new Color(232, 235, 252));
+                } else {
+                    if (row == 0) {
+                        c.setBackground(new Color(246, 237, 208));
+                    } else if (row == 1) {
+                        c.setBackground(new Color(199, 199, 218));
+                    } else if (row == 2) {
+                        c.setBackground(new Color(234, 220, 208, 255));
+                    } else if (row % 2 == 0) {
+                        c.setBackground(Color.WHITE);
+                    } else {
+                        c.setBackground(new Color(250, 250, 252));
                     }
                 }
 
-                setHorizontalAlignment(SwingConstants.CENTER);
-                setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+                c.setForeground(Color.BLACK);
+                c.setFont(baseFont.deriveFont(Font.PLAIN, 13f));
+
+                if (column == 0) {
+                    int rankValue = -1;
+                    if (value instanceof Number) {
+                        rankValue = ((Number) value).intValue();
+                    }
+                    if (rankValue == 1) {
+                        setText("🥇 " + rankValue);
+                    } else if (rankValue == 2) {
+                        setText("🥈 " + rankValue);
+                    } else if (rankValue == 3) {
+                        setText("🥉 " + rankValue);
+                    }
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                    setForeground(new Color(80, 80, 80));
+                    setFont(baseFont.deriveFont(Font.BOLD, 13f));
+                } else if (column == 2) {
+                    int streakValue = -1;
+                    if (value instanceof Number) {
+                        streakValue = ((Number) value).intValue();
+                    }
+                    if (streakValue > 0) {
+                        setForeground(ACCENT_COLOR.darker());
+                        setFont(baseFont.deriveFont(Font.BOLD, 13f));
+                    }
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                } else {
+                    setHorizontalAlignment(SwingConstants.LEFT);
+                }
+
+                setBorder(new EmptyBorder(5, 10, 5, 10));
                 return c;
             }
         });
     }
 
     private void setupButtons() {
-        refreshButton = createStyledButton(ViewLeaderboardViewModel.REFRESH_BUTTON_LABEL);
+        refreshButton = createPrimaryButton(ViewLeaderboardViewModel.REFRESH_BUTTON_LABEL);
         refreshButton.addActionListener(this);
 
-        backButton = createStyledButton("Back");
+        backButton = createSecondaryButton("Back");
         backButton.addActionListener(evt -> {
             if (evt.getSource().equals(backButton) && viewManagerModel != null) {
                 viewManagerModel.setState("logged in");
@@ -165,48 +247,103 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         });
     }
 
-    private JButton createStyledButton(String text) {
+    private JButton createPrimaryButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        button.setBackground(Color.WHITE);
-        button.setForeground(PRIMARY_COLOR.darker());
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(PRIMARY_COLOR, 1),
-                new EmptyBorder(8, 20, 8, 20)
-        ));
+        Font baseFont = UIManager.getFont("Button.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 13);
+        }
+        button.setFont(baseFont.deriveFont(Font.PLAIN, 13f));
+        button.setForeground(Color.WHITE);
+        button.setBackground(PRIMARY_COLOR);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(PRIMARY_COLOR);
-                button.setForeground(Color.WHITE);
+                button.setBackground(PRIMARY_COLOR.darker());
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(Color.WHITE);
-                button.setForeground(PRIMARY_COLOR.darker());
+                button.setBackground(PRIMARY_COLOR);
             }
         });
 
         return button;
     }
 
-    private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        buttonPanel.setBackground(SECONDARY_COLOR);
+    private JButton createSecondaryButton(String text) {
+        JButton button = new JButton(text);
+        Font baseFont = UIManager.getFont("Button.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 13);
+        }
+        button.setFont(baseFont.deriveFont(Font.PLAIN, 13f));
+        button.setForeground(PRIMARY_COLOR);
+        button.setBackground(new Color(246, 247, 252));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 205, 221), 1, true),
+                new EmptyBorder(8, 18, 8, 18)
+        ));
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(237, 239, 248));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(246, 247, 252));
+            }
+        });
+
+        return button;
+    }
+
+    private JPanel createBottomPanel() {
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setOpaque(false);
+
+        statsLabel.setForeground(MUTED_TEXT_COLOR);
+        Font baseFont = UIManager.getFont("Label.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 12);
+        }
+        statsLabel.setFont(baseFont.deriveFont(Font.PLAIN, 12f));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        buttonPanel.setOpaque(false);
         buttonPanel.add(refreshButton);
         buttonPanel.add(backButton);
-        buttonPanel.add(errorLabel);
-        return buttonPanel;
+
+        JPanel leftPanel = new JPanel(new GridLayout(2, 1, 0, 2));
+        leftPanel.setOpaque(false);
+        leftPanel.add(errorLabel);
+        leftPanel.add(statsLabel);
+
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+        bottomPanel.add(buttonPanel, BorderLayout.EAST);
+        return bottomPanel;
     }
 
     private void setupErrorLabel() {
-        errorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        errorLabel.setForeground(new Color(231, 76, 60));
-        errorLabel.setBorder(new EmptyBorder(5, 0, 0, 0));
+        Font baseFont = UIManager.getFont("Label.font");
+        if (baseFont == null) {
+            baseFont = new Font("SansSerif", Font.PLAIN, 12);
+        }
+        errorLabel.setFont(baseFont.deriveFont(Font.PLAIN, 12f));
+        errorLabel.setForeground(ERROR_COLOR);
+        errorLabel.setBorder(new EmptyBorder(0, 0, 4, 0));
     }
 
     @Override
@@ -221,11 +358,12 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ViewLeaderboardState state = (ViewLeaderboardState) evt.getNewValue();
-        
+
         if (state.getErrorMessage() != null) {
             errorLabel.setText(state.getErrorMessage());
-            errorLabel.setForeground(new Color(231, 76, 60));
+            errorLabel.setForeground(ERROR_COLOR);
             tableModel.setRowCount(0);
+            statsLabel.setText("Participants: 0");
         } else {
             updateTable(state.getLeaderboardEntries());
         }
@@ -236,11 +374,14 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
 
         if (leaderboardEntries.isEmpty()) {
             errorLabel.setText("No leaderboard data available. Create some habits to see rankings!");
-            errorLabel.setForeground(new Color(149, 165, 166));
+            errorLabel.setForeground(MUTED_TEXT_COLOR);
+            statsLabel.setText("Participants: 0");
             return;
         }
 
         errorLabel.setText("");
+        errorLabel.setForeground(MUTED_TEXT_COLOR);
+        statsLabel.setText("Participants: " + leaderboardEntries.size());
 
         for (Map<String, Object> entry : leaderboardEntries) {
             Integer rank = (Integer) entry.get("rank");
@@ -283,4 +424,3 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         }
     }
 }
-
