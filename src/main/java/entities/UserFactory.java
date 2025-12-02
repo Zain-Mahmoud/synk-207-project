@@ -7,7 +7,7 @@ public class UserFactory {
 
     public User create(String username, String password) {
         String uid = UUID.randomUUID().toString();
-        return new User(uid, username, null, password);
+        return new User(uid, username, "avatars/default_avatar.jpg", password);
     }
 
     public User create(String uid, String username, String avatarPath, String password) {
