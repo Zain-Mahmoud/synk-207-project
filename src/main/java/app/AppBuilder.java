@@ -10,9 +10,11 @@ import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
 import data_access.GoogleCalendarDataAccessObject;
+import data_access.GoogleSheetsHabitDataAccessObject;
 import data_access.HabitDataAccessObject;
 import data_access.TaskDataAccessObject;
 import entities.UserFactory;
+import use_case.gateways.HabitGateway;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_habit.CreateHabitController;
 import interface_adapter.create_habit.CreateHabitPresenter;
@@ -120,7 +122,7 @@ public class AppBuilder {
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
-    final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
+    HabitGateway habitDataAccessObject = new HabitDataAccessObject(); // Use interface to allow switching implementations
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
 
     private SignupView signupView;
@@ -451,6 +453,38 @@ public class AppBuilder {
         return this;
     }
 
+
+    /**
+     * Configures the application to use Google Sheets for habit storage.
+     * This enables online multi-user leaderboard functionality.
+     *
+     * @param spreadsheetId the Google Sheet ID (extracted from the Sheet URL)
+     *                      Example: from https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
+     * @param sheetName     the name of the sheet tab (default: "Sheet1")
+     * @return this AppBuilder instance for method chaining
+     * @throws IOException              if Google Sheets API setup fails
+     * @throws GeneralSecurityException if security setup fails
+     */
+    public AppBuilder useGoogleSheetsForHabits(String spreadsheetId, String sheetName)
+            throws IOException, GeneralSecurityException {
+        GoogleSheetsHabitDataAccessObject sheetsDao = new GoogleSheetsHabitDataAccessObject(
+                "user", spreadsheetId, sheetName);
+        this.habitDataAccessObject = sheetsDao;
+        return this;
+    }
+
+    /**
+     * Configures the application to use Google Sheets for habit storage with default sheet name.
+     *
+     * @param spreadsheetId the Google Sheet ID
+     * @return this AppBuilder instance for method chaining
+     * @throws IOException              if Google Sheets API setup fails
+     * @throws GeneralSecurityException if security setup fails
+     */
+    public AppBuilder useGoogleSheetsForHabits(String spreadsheetId)
+            throws IOException, GeneralSecurityException {
+        return useGoogleSheetsForHabits(spreadsheetId, "Sheet1");
+    }
 
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
