@@ -328,7 +328,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
 
         if (this.viewTasksAndHabitsController != null && this.loggedInViewModel != null) {
-            this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
+            this.viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
 
     }

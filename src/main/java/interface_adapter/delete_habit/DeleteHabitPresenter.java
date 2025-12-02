@@ -14,7 +14,8 @@ public class DeleteHabitPresenter implements DeleteHabitOutputBoundary {
     private final ViewTasksAndHabitsController viewTasksAndHabitsController;
 
     public DeleteHabitPresenter(DeleteHabitViewModel deleteHabitViewModel,
-                                ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
+                                ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel,
+                                ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.deleteHabitViewModel = deleteHabitViewModel;
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
@@ -23,7 +24,7 @@ public class DeleteHabitPresenter implements DeleteHabitOutputBoundary {
 
     @Override
     public void prepareSuccessView(DeleteHabitOutputData outputData) {
-        DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
+        final DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
 
         deleteHabitState.setUsername(outputData.getUsername());
         deleteHabitState.setHabitName(outputData.getHabitName());
@@ -37,13 +38,13 @@ public class DeleteHabitPresenter implements DeleteHabitOutputBoundary {
         deleteHabitViewModel.firePropertyChanged();
 
         if (viewTasksAndHabitsController != null && loggedInViewModel != null) {
-            viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+            viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
     }
 
     @Override
     public void prepareFailView(String errorMessage) {
-        DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
+        final DeleteHabitState deleteHabitState = deleteHabitViewModel.getState();
         deleteHabitState.setErrorMessage(errorMessage);
         deleteHabitState.setSuccessMessage(null);
 

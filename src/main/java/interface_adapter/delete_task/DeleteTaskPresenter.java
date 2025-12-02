@@ -13,7 +13,8 @@ public class DeleteTaskPresenter implements DeleteTaskOutputBoundary {
     private final ViewTasksAndHabitsController viewTasksAndHabitsController;
 
     public DeleteTaskPresenter(DeleteTaskViewModel deleteTaskViewModel,
-                               ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel, ViewTasksAndHabitsController viewTasksAndHabitsController) {
+                               ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel,
+                               ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.deleteTaskViewModel = deleteTaskViewModel;
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
@@ -35,10 +36,9 @@ public class DeleteTaskPresenter implements DeleteTaskOutputBoundary {
         deleteTaskViewModel.setState(deleteTaskState);
         deleteTaskViewModel.firePropertyChanged();
         if (viewTasksAndHabitsController != null) {
-            viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+            viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
     }
-
 
     @Override
     public void prepareFailView(String errorMessage) {
