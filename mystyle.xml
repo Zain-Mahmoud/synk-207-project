@@ -335,7 +335,6 @@
         <module name="DeclarationOrder"/>
         <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>
-        <module name="EqualsAvoidNull"/>
         <module name="EqualsHashCode"/>
         <module name="ExplicitInitialization"/>
         <module name="FallThrough"/>
@@ -344,13 +343,6 @@
             <property name="ignoreConstructorParameter" value="true"/>
             <property name="ignoreSetter" value="true"/>
             <property name="setterCanReturnItsClass" value="true"/>
-        </module>
-        <module name="IllegalCatch">
-            <property name="illegalClassNames"
-                      value="java.lang.Exception,
-                       java.lang.Throwable,
-                       java.lang.RuntimeException,
-                       java.lang.NullPointerException"/>
         </module>
         <module name="IllegalInstantiation">
             <property name="classes"
@@ -480,9 +472,6 @@
         </module>
         <module name="MissingSwitchDefault"/>
         <module name="ModifiedControlVariable"/>
-        <module name="MultipleStringLiterals">
-            <property name="allowedDuplicates" value="2"/>
-        </module>
         <module name="MultipleVariableDeclarations"/>
         <module name="NestedForDepth">
             <property name="max" value="2"/>
@@ -508,11 +497,6 @@
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RequireThis"/>
-        <module name="ReturnCount">
-            <property name="max" value="1"/>
-            <property name="maxForVoid" value="0"/>
-            <property name="format" value="^create"/>
-        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="StringLiteralEquality"/>
@@ -562,11 +546,7 @@
             <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
             <property name="checks" value="JavadocType"/>
         </module>
-        <module name="SuppressionXpathSingleFilter">
-            <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
-            <property name="checks" value="MagicNumber"/>
-        </module>
-        <module name="SuppressionXpathSingleFilter">
+            <module name="SuppressionXpathSingleFilter">
             <property name="files" value=".*[\\/]src[\\/](test|it|xdocs-examples)[\\/]"/>
             <property name="checks" value="AvoidStaticImport"/>
         </module>
@@ -591,7 +571,6 @@
         </module>
 
         <!-- Imports -->
-        <module name="AvoidStarImport"/>
         <module name="AvoidStaticImport"/>
         <module name="CustomImportOrder">
             <property name="customImportOrderRules"
@@ -654,22 +633,7 @@
         <module name="BooleanExpressionComplexity">
             <property name="max" value="7"/>
         </module>
-        <module name="ClassDataAbstractionCoupling">
-            <!-- Default classes are also listed -->
-            <property name="excludedClasses"
-                      value="boolean, byte, char, double, float, int, long, short, void,
-                       Boolean, Byte, Character, Double, Float, Integer, Long, Short, Void,
-                       Object, Class, String, StringBuffer, StringBuilder,
-                       ArrayIndexOutOfBoundsException, Exception, RuntimeException,
-                       IllegalArgumentException, IllegalStateException,
-                       IndexOutOfBoundsException, NullPointerException, Throwable,
-                       SecurityException, UnsupportedOperationException, List, ArrayList,
-                       Deque, Queue, LinkedList, Set, HashSet, SortedSet, TreeSet, Map,
-                       HashMap, SortedMap, TreeMap, DetailsAST, CheckstyleException,
-                       UnsupportedEncodingException, BuildException, ConversionException,
-                       FileNotFoundException, TestException"/>
-        </module>
-        <module name="ClassFanOutComplexity">
+            <module name="ClassFanOutComplexity">
             <property name="max" value="25"/>
             <!-- Default classes are also listed -->
             <property name="excludedClasses"
@@ -692,7 +656,6 @@
         <module name="CyclomaticComplexity">
             <property name="switchBlockAsSingleDecisionPoint" value="true"/>
         </module>
-        <module name="JavaNCSS"/>
         <module name="NPathComplexity"/>
 
         <!-- Misc -->
@@ -756,7 +719,6 @@
         </module>
         <module name="MethodName"/>
         <module name="MethodTypeParameterName"/>
-        <module name="PackageName"/>
         <module name="ParameterName">
             <property name="format" value="^(id)|([a-z][a-z0-9][a-zA-Z0-9]+)$"/>
             <property name="ignoreOverridden" value="true"/>
@@ -789,9 +751,6 @@
 
         <!-- Size Violations -->
         <module name="AnonInnerLength"/>
-        <module name="ExecutableStatementCount">
-            <property name="max" value="30"/>
-        </module>
         <module name="LambdaBodyLength"/>
         <module name="MethodCount">
             <property name="maxTotal" value="34"/>

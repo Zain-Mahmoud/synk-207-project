@@ -1,2 +1,4 @@
 userId,taskName,description,startTime,deadline,taskGroup,status,priority
-z,fishing,goin fishing,2024-01-01T06:00:00,2024-02-01T06:00:00,1,true
+z,fishing,goin fishing,2024-01-01T06:00:00,2024-02-01T06:00:00,1,true,0
+z,Test,Test,2025-12-01T23:27:00,2025-12-01T23:27:00,1,false,1
+z,Test for CSC,Hello this is a test for CSC207,2025-12-03T11:00:00,2025-12-03T12:00:00,1,false,1

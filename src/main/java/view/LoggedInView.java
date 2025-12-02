@@ -12,24 +12,15 @@ import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import interface_adapter.view_stats.ViewStatsController;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Period;
 
 /**
- * The View for when the user is logged into the program.
+ * The View for when the user is logged into the program, styled as a landing page.
  */
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -38,9 +29,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private UpdateProfileView updateProfileView;
 
     private ViewManagerModel viewManagerModel;
-    private SyncToGoogleCalendarController syncToGoogleCalendarController; // Injected controller to kick off calendar sync
+    private SyncToGoogleCalendarController syncToGoogleCalendarController;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;
-    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // View model providing sync result updates
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel;
     private ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
 
     private ViewStatsController viewStatsController;
@@ -51,48 +42,80 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton viewTasksAndHabits;
     private final JButton viewLeaderboard;
     private final JButton updateProfile;
-    private final JButton syncCalendarButton; //  Button to sync tasks to Google Calendar
-    private final JLabel syncStatusLabel = new JLabel(); //  Inline status label for sync results
-
+    private final JButton syncCalendarButton;
+    private final JLabel syncStatusLabel = new JLabel();
 
     private final JButton viewStats;
 
+    // --- Styling Constants ---
+    private static final Color PRIMARY_COLOR = new Color(59, 130, 246); // Tailwind blue-500
+    private static final Color SECONDARY_COLOR = new Color(243, 244, 246); // Tailwind gray-100
+    private static final Font TITLE_FONT = new Font("Monospaced", Font.BOLD, 64);
+    private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
+    private static final Font USER_INFO_FONT = new Font("SansSerif", Font.PLAIN, 16);
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("Logged In Screen");
+        this.setBackground(SECONDARY_COLOR);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        final JLabel title = new JLabel("SYNK");
+        title.setFont(TITLE_FONT);
+        title.setForeground(PRIMARY_COLOR);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JLabel usernameInfo = new JLabel("Currently logged in: ");
         username = new JLabel();
+        username.setFont(USER_INFO_FONT);
+        final JLabel usernameInfo = new JLabel("Welcome back, ");
+        usernameInfo.setFont(USER_INFO_FONT);
+
         avatarLabel = new JLabel();
+        avatarLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // Padding next to avatar
 
         JPanel userPanel = new JPanel();
-        userPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        userPanel.setBackground(SECONDARY_COLOR);
+        userPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center everything in the flow
         userPanel.add(avatarLabel);
         userPanel.add(usernameInfo);
         userPanel.add(username);
+        userPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         final JPanel buttons = new JPanel();
-        logOut = new JButton("Log Out");
+        buttons.setBackground(SECONDARY_COLOR);
+        buttons.setLayout(new GridLayout(3, 2, 15, 15)); // 3 rows, 2 columns, with 15px gap
+        buttons.setBorder(new EmptyBorder(25, 100, 25, 100)); // Padding around the buttons
+        buttons.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        logOut = createStyledButton("Log Out");
+        viewTasksAndHabits = createStyledButton("View Tasks and Habits");
+        viewLeaderboard = createStyledButton("View Leaderboard");
+        updateProfile = createStyledButton("Update Profile");
+        syncCalendarButton = createStyledButton("Sync to Google Calendar");
+        viewStats = createStyledButton("View Statistics");
+
+        buttons.add(viewTasksAndHabits);
+        buttons.add(viewStats);
+        buttons.add(viewLeaderboard);
+        buttons.add(updateProfile);
+        buttons.add(syncCalendarButton);
         buttons.add(logOut);
 
-        viewTasksAndHabits = new JButton("View Tasks and Habits");
-        buttons.add(viewTasksAndHabits);
+        syncStatusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        syncStatusLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
+        syncStatusLabel.setForeground(Color.GRAY);
 
-        viewLeaderboard = new JButton("View Leaderboard");
-        buttons.add(viewLeaderboard);
-
-        updateProfile = new JButton("Update Profile");
-        buttons.add(updateProfile);
-
-        syncCalendarButton = new JButton("Sync to Google Calendar"); //  Create sync trigger button
-        buttons.add(syncCalendarButton); // Add sync button alongside other actions
-
-        viewStats = new JButton("View statistics");
-        buttons.add(viewStats);
+        this.add(Box.createVerticalGlue()); // Push content to the center vertically
+        this.add(title);
+        this.add(Box.createVerticalStrut(20));
+        this.add(userPanel);
+        this.add(Box.createVerticalStrut(40));
+        this.add(buttons);
+        this.add(Box.createVerticalStrut(15));
+        this.add(syncStatusLabel);
+        this.add(Box.createVerticalGlue()); // Push content to the center vertically
 
         logOut.addActionListener(this);
 
@@ -101,7 +124,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 viewManagerModel.setState("leaderboard");
                 viewManagerModel.firePropertyChanged();
             }
-
         });
 
         updateProfile.addActionListener(evt -> {
@@ -120,7 +142,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         viewTasksAndHabits.addActionListener(evt -> {
             if (evt.getSource().equals(viewTasksAndHabits) && viewManagerModel != null) {
-                // When the button is clicked, we fetch the data and then switch the view
                 viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
                 viewManagerModel.setState("view tasks and habits");
                 viewManagerModel.firePropertyChanged();
@@ -134,24 +155,34 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 viewManagerModel.firePropertyChanged();
             }
         });
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-
-
-
-
-        syncCalendarButton.addActionListener(evt -> { // Invoke calendar sync when button is clicked
+        syncCalendarButton.addActionListener(evt -> {
             if (evt.getSource().equals(syncCalendarButton) && syncToGoogleCalendarController != null) {
-                final LoggedInState currentState = loggedInViewModel.getState(); // Use logged-in username as user identifier for sync
-                syncToGoogleCalendarController.execute(currentState.getUsername()); // Trigger sync interactor via controller
+                final LoggedInState currentState = loggedInViewModel.getState();
+                syncToGoogleCalendarController.execute(currentState.getUsername());
             }
         });
+    }
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(BUTTON_FONT);
+        button.setBackground(PRIMARY_COLOR);
+        button.setForeground(Color.BLACK);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(PRIMARY_COLOR, 1, true),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        this.add(title);
-        this.add(userPanel);
-        this.add(buttons);
-        this.add(syncStatusLabel); // Show latest sync success/error message in UI
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(PRIMARY_COLOR.darker());
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(PRIMARY_COLOR);
+            }
+        });
+        return button;
     }
 
     /**
@@ -166,33 +197,25 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
-            username.setText(state.getUsername());
+            username.setText(state.getUsername() + "!");
             updateAvatar(state.getAvatarPath());
 
-
             if (viewTasksAndHabitsController != null && state.getUsername() != null && !state.getUsername().isEmpty()) {
-                System.out.println("User logged in. Triggering initial task/habit data load for: " + state.getUsername());
-                // The logged-in ViewModel holds the necessary username information
                 this.viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
             }
-
-
         }
-        else if (evt.getPropertyName().equals("password")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            JOptionPane.showMessageDialog(null, "password updated for " + state.getUsername());
-        }
-        else if (evt.getPropertyName().equals("sync")) { // React to sync view model updates
-            final SyncToGoogleCalendarControllerState syncState = (SyncToGoogleCalendarControllerState) evt.getNewValue(); // Capture sync state updates
+        else if (evt.getPropertyName().equals("sync")) {
+            final SyncToGoogleCalendarControllerState syncState = (SyncToGoogleCalendarControllerState) evt.getNewValue();
             if (syncState.isSuccess()) {
-                syncStatusLabel.setText(syncState.getStatusMessage()); // Reflect successful sync in label
-                JOptionPane.showMessageDialog(this, syncState.getStatusMessage(), "Sync Complete", JOptionPane.INFORMATION_MESSAGE); // Show confirmation dialog on success
+                syncStatusLabel.setText(syncState.getStatusMessage());
+                syncStatusLabel.setForeground(new Color(34, 197, 94));
+                JOptionPane.showMessageDialog(this, syncState.getStatusMessage(), "Sync Complete", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                syncStatusLabel.setText(syncState.getError()); // Show error on failure
-                JOptionPane.showMessageDialog(this, syncState.getError(), "Sync Failed", JOptionPane.ERROR_MESSAGE); // Alert user when sync fails
+                syncStatusLabel.setText("Error: " + syncState.getError());
+                syncStatusLabel.setForeground(new Color(239, 68, 68));
+                JOptionPane.showMessageDialog(this, syncState.getError(), "Sync Failed", JOptionPane.ERROR_MESSAGE);
             }
         }
-
     }
 
     public String getViewName() {
@@ -217,13 +240,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.viewManagerModel = viewManagerModel;
     }
 
-    public void setSyncToGoogleCalendarController(SyncToGoogleCalendarController syncToGoogleCalendarController) { // Allow builder to inject sync controller
-        this.syncToGoogleCalendarController = syncToGoogleCalendarController; // Store injected sync controller
+    public void setSyncToGoogleCalendarController(SyncToGoogleCalendarController syncToGoogleCalendarController) {
+        this.syncToGoogleCalendarController = syncToGoogleCalendarController;
     }
 
-    public void setSyncToGoogleCalendarViewModel(SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel) { // Subscribe to sync view model updates
-        this.syncToGoogleCalendarViewModel = syncToGoogleCalendarViewModel; // Capture sync view model reference
-        this.syncToGoogleCalendarViewModel.addPropertyChangeListener(this); // Listen for sync result changes
+    public void setSyncToGoogleCalendarViewModel(SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel) {
+        this.syncToGoogleCalendarViewModel = syncToGoogleCalendarViewModel;
+        this.syncToGoogleCalendarViewModel.addPropertyChangeListener(this);
     }
 
     public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {

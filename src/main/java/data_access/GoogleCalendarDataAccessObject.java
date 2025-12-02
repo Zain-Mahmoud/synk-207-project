@@ -1,4 +1,4 @@
-package data_access;// package data_access;
+package data_access;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,16 +39,21 @@ import entities.Task;
 import use_case.gateways.CalendarGateway;
 
 
+/**
+ * Google Calendar-backed implementation of {@link CalendarGateway} that handles OAuth and CRUD operations
+ * for calendar events created from the application's {@link Completable} entities.
+ */
 public class GoogleCalendarDataAccessObject implements CalendarGateway {
 
     private static final String APPLICATION_NAME = "CSC-207-SYNK";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    private static final String TIME_ZONE_ID = "America/Toronto";
     private static final List<String> SCOPES =
             Collections.singletonList(CalendarScopes.CALENDAR); // Changed to Write access
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     private static final String DEFAULT_USER_ID = "user";
+    private static final String DEFAULT_TIME_ZONE = "America/Toronto";
+    private static final int DEFAULT_MAX_EVENTS = 10;
     private static final Duration TOKEN_VALIDITY = Duration.ofDays(30); // Re-authorize after 30 days
     private static final String TOKEN_METADATA_SUFFIX = "-auth.meta";
 
@@ -58,14 +63,21 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     private final Map<String, Calendar> serviceCache = new HashMap<>(); // Calendar clients keyed by userId
 
     /**
-     * Constructor: Initializes the Google Calendar Service with a default user identifier.
+     * Creates a calendar DAO scoped to the default credential storage user.
+     *
+     * @throws IOException              if the credential file cannot be read
+     * @throws GeneralSecurityException if the HTTP transport cannot be trusted
      */
     public GoogleCalendarDataAccessObject() throws IOException, GeneralSecurityException {
         this(DEFAULT_USER_ID);
     }
 
     /**
-     * Constructor: Initializes the Google Calendar Service for a specific user.
+     * Creates a calendar DAO scoped to a specific user identifier.
+     *
+     * @param userId identifier used to store OAuth tokens and resolve the calendar ID
+     * @throws IOException              if the credential file cannot be read
+     * @throws GeneralSecurityException if the HTTP transport cannot be trusted
      */
     public GoogleCalendarDataAccessObject(String userId) throws IOException, GeneralSecurityException {
         this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -76,6 +88,13 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     /* -----------------------------------------------------------------------
        AUTHENTICATION HELPERS
        ----------------------------------------------------------------------- */
+    /**
+     * Builds the Google authorization flow backed by the application's client secrets.
+     *
+     * @param httpTransport configured transport layer
+     * @return authorization flow capable of persisting credentials
+     * @throws IOException if the credentials resource cannot be loaded
+     */
     private GoogleAuthorizationCodeFlow buildAuthorizationFlow(NetHttpTransport httpTransport) throws IOException {
         InputStream credentialsStream = GoogleCalendarDataAccessObject.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (credentialsStream == null) {
@@ -91,6 +110,13 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         }
     }
 
+    /**
+     * Ensures a credential exists for the provided user, triggering the installed-app flow when necessary.
+     *
+     * @param normalizedUserId normalized identifier returned by {@link #normalizeUserId(String)}
+     * @return authorized {@link Credential}
+     * @throws IOException if persisting or loading credentials fails
+     */
     private File metadataFile(String normalizedUserId) {
         return new File(TOKENS_DIRECTORY_PATH, normalizedUserId + TOKEN_METADATA_SUFFIX);
     }
@@ -156,6 +182,13 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         return credential;
     }
 
+    /**
+     * Normalizes user identifiers by trimming whitespace and falling back to the default ID.
+     *
+     * @param userId potentially null or blank identifier
+     * @return sanitized identifier that can be used for credential lookup
+     */
+
     private synchronized Calendar getServiceForUser(String userId) throws IOException {
         final String normalizedUserId = normalizeUserId(userId);
         Calendar existing = serviceCache.get(normalizedUserId);
@@ -173,28 +206,41 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     // Standardize the USER ID STRING to access later
     private String normalizeUserId(String userId) {
         if (userId == null) {
-            return defaultUserId == null ? DEFAULT_USER_ID : defaultUserId;
+            return DEFAULT_USER_ID;
         }
         String trimmed = userId.trim();
         if (trimmed.isEmpty()) {
-            return defaultUserId == null ? DEFAULT_USER_ID : defaultUserId;
+            return DEFAULT_USER_ID;
         }
         return trimmed;
     }
 
+    /**
+     * Resolves the calendar ID, defaulting to the user's primary calendar when unspecified.
+     *
+     * @param userId calendar identifier or user email address
+     * @return calendar ID accepted by the Calendar API
+     */
     private String resolveCalendarId(String userId) {
-        // Default to the user's primary calendar unless a full email calendar ID is provided.
-        if (userId != null) {
-            String trimmed = userId.trim();
-            if (!trimmed.isEmpty() && trimmed.contains("@")) { // treat probable email as calendar id
-                return trimmed;
-            }
+        if (userId == null) {
+            return "primary";
+        }
+        String trimmed = userId.trim();
+        if (trimmed.isEmpty()) {
+            return "primary";
+        }
+        if (trimmed.contains("@")) {
+            return trimmed;
         }
         return "primary";
     }
 
     /**
-     * Public helper that attempts to load a previously stored credential without prompting.
+     * Attempts to load a stored credential for the given user without triggering OAuth prompts.
+     *
+     * @param userId raw user identifier
+     * @return credential when available, otherwise {@code null}
+     * @throws IOException if the credential store cannot be accessed
      */
     public Credential getStoredCredential(String userId) throws IOException {
         String normalizedUserId = normalizeUserId(userId);
@@ -209,21 +255,20 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
        INTERFACE IMPLEMENTATION (CRUD)
        ----------------------------------------------------------------------- */
 
-
     /**
-     * Create an Event on Google Calendar based on a Task entity.
-     * @param userId The Calendar ID (usually "primary" or the user's email).
-     * @param task The internal Task entity.
-     * @return The Google Event ID.
+     * Creates a Google Calendar event mirroring the provided {@link Completable}.
+     *
+     * @param userId calendar identifier (for example, "primary" or an email address)
+     * @param task   source entity used to populate summary and description
+     * @return the created event ID, or {@code null} when the API call fails
      */
     @Override
     public String createEvent(String userId, Completable task) {
         try {
             Calendar service = getServiceForUser(userId);
             Event event = new Event()
-                    .setSummary(task.getName()) // Assuming Task has getName()
-                    .setDescription(task.getDescription())
-                    ;
+                    .setSummary(task.getName())
+                    .setDescription(task.getDescription());
 
             // Derive start/end from the task (fallback to now/+1h if absent)
             LocalDateTime startTime = null;
@@ -242,13 +287,13 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
             DateTime startDateTime = toGoogleDateTime(startTime);
             EventDateTime start = new EventDateTime()
                     .setDateTime(startDateTime)
-                    .setTimeZone(TIME_ZONE_ID); // Hardcoded for now, ideally passed in
+                    .setTimeZone(DEFAULT_TIME_ZONE); // Hardcoded for now, ideally passed in
             event.setStart(start);
 
             DateTime endDateTime = toGoogleDateTime(endTime);
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime)
-                    .setTimeZone(TIME_ZONE_ID);
+                    .setTimeZone(DEFAULT_TIME_ZONE);
             event.setEnd(end);
 
             // EXECUTE API CALL
@@ -258,14 +303,19 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
             return createdEvent.getId();
 
         } catch (IOException e) {
-            e.printStackTrace(); // In production, log this or throw a custom DataAccess exception
+            e.printStackTrace();
             return null;
         }
     }
 
 
     /**
-     * Update an existing Google Calendar Event.
+     * Updates an existing calendar event to reflect new {@link Completable} details.
+     *
+     * @param userId  calendar identifier containing the target event
+     * @param eventID Google event ID returned by {@link #createEvent(String, Completable)}
+     * @param updatedTask entity containing the latest summary/description values
+     * @return {@code true} when the event update succeeds, otherwise {@code false}
      */
     @Override
     public boolean updateEvent(String userId, String eventID, Completable updatedTask) {
@@ -291,7 +341,11 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     }
 
     /**
-     * Delete an event from Google Calendar.
+     * Deletes a Google Calendar event.
+     *
+     * @param userId  calendar identifier containing the target event
+     * @param eventID event identifier to delete
+     * @return {@code true} when the deletion succeeds, otherwise {@code false}
      */
     @Override
     public boolean deleteEvent(String userId, String eventID) {
@@ -313,9 +367,10 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
        ----------------------------------------------------------------------- */
 
     /**
-     * Fetches a list of events.
-     * Note: Your Interface had `getCalendarById` returning String, but you asked for "Get Events".
-     * I have implemented a list retrieval here. You may need to update your Interface to return List<String> or List<Task>.
+     * Retrieves a limited set of upcoming events from the user's calendar.
+     *
+     * @param userId calendar identifier to query
+     * @return immutable list of events sorted by start time
      */
     @Override
     public List<Event> getEvents(String userId) {
@@ -325,7 +380,7 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
             DateTime now = new DateTime(System.currentTimeMillis());
 
             Events events = service.events().list(calendarId)
-                    .setMaxResults(10)
+                    .setMaxResults(DEFAULT_MAX_EVENTS)
                     .setTimeMin(now)
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
@@ -338,8 +393,14 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         }
     }
 
+    /**
+     * Reports whether an OAuth credential has already been stored for the provided user.
+     *
+     * @param userId raw user identifier
+     * @return {@code true} when a credential exists, {@code false} otherwise
+     */
     @Override
-    public boolean hasStoredCredential(String userId) { // report if credential is already available
+    public boolean hasStoredCredential(String userId) {
         try {
             return getStoredCredential(userId) != null; // true when credential exists and is fresh
         } catch (IOException e) {
@@ -347,8 +408,13 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
         }
     }
 
+    /**
+     * Forces an OAuth authentication flow for the provided user, ensuring future API calls succeed.
+     *
+     * @param userId identifier whose credential should be created
+     */
     @Override
-    public void authenticateUser(String userId) { //  run OAuth flow when credential missing
+    public void authenticateUser(String userId) {
         try {
             ensureCredential(normalizeUserId(userId)); // invoke credential setup
         } catch (IOException e) {
@@ -357,7 +423,7 @@ public class GoogleCalendarDataAccessObject implements CalendarGateway {
     }
 
     private DateTime toGoogleDateTime(LocalDateTime dateTime) {
-        return new DateTime(dateTime.atZone(ZoneId.of(TIME_ZONE_ID)).toInstant().toEpochMilli());
+        return new DateTime(dateTime.atZone(ZoneId.of(DEFAULT_TIME_ZONE)).toInstant().toEpochMilli());
     }
-
 }
+

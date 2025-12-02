@@ -4,7 +4,6 @@ import use_case.create_habit.CreateHabitInputBoundary;
 import use_case.create_habit.CreateHabitInputData;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 public class CreateHabitController {
 
@@ -16,28 +15,11 @@ public class CreateHabitController {
 
     public void execute(String username,
             String habitName,
-            String startDateTimeText,
-            String frequencyText,
+            LocalDateTime startDateTime,
+            int frequency,
             String habitGroup,
             int streakCount,
             int priority) {
-
-        LocalDateTime startDateTime;
-        int frequency;
-
-        try {
-            startDateTime = LocalDateTime.parse(startDateTimeText);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException(
-                    "Invalid start date & time format. Use yyyy-MM-dd'T'HH:mm");
-        }
-
-        try {
-            frequency = Integer.parseInt(frequencyText);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "Invalid frequency. Must be an integer.");
-        }
 
         CreateHabitInputData inputData = new CreateHabitInputData(
                 username,
