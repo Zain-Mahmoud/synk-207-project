@@ -359,7 +359,7 @@ public class AppBuilder {
                 taskDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
 
         this.viewTasksAndHabitsController =
-                new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor);
+                new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
 
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);

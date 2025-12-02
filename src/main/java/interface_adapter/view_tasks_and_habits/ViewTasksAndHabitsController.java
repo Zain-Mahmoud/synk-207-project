@@ -10,17 +10,19 @@ import use_case.view_tasks_and_habits.ViewTasksAndHabitsInputData;
 public class ViewTasksAndHabitsController {
 
     private final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsUseCaseInteractor;
-    private final LoggedInViewModel loggedInViewModel = new LoggedInViewModel();
+    private final LoggedInViewModel loggedInViewModel;
 
-    public ViewTasksAndHabitsController(ViewTasksAndHabitsInputBoundary viewTasksAndHabitsUseCaseInteractor) {
+    public ViewTasksAndHabitsController(ViewTasksAndHabitsInputBoundary viewTasksAndHabitsUseCaseInteractor,
+                                        LoggedInViewModel loggedInViewModel) {
         this.viewTasksAndHabitsUseCaseInteractor = viewTasksAndHabitsUseCaseInteractor;
+        this.loggedInViewModel = loggedInViewModel;
     }
 
     /**
      * Calls the respective method in the interactor to execute the use case.
      */
     public void getFormattedTasksAndHabits() {
-        final ViewTasksAndHabitsInputData inputData = new ViewTasksAndHabitsInputData(loggedInViewModel.getState()
+        final ViewTasksAndHabitsInputData inputData = new ViewTasksAndHabitsInputData(this.loggedInViewModel.getState()
                 .getUsername());
         viewTasksAndHabitsUseCaseInteractor.getFormattedTasksAndHabits(inputData);
     }
