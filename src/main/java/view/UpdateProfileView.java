@@ -5,10 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID; // New import for unique temporary filenames
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -17,10 +22,7 @@ import interface_adapter.update_profile.UpdateProfileController;
 import interface_adapter.update_profile.UpdateProfileState;
 import interface_adapter.update_profile.UpdateProfileViewModel;
 
-/**
- * The View for updating the user's profile (e.g., username).
- */
-@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings"})
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings", "checkstyle:AnonInnerLength", "checkstyle:JavaNCSS"})
 public class UpdateProfileView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "updateprofile";
@@ -28,11 +30,11 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     private UpdateProfileController updateProfileController;
     private ViewManagerModel viewManagerModel;
 
-    private final JTextField usernameInputField = new JTextField(15);
-    private final JTextField passwordInputField = new JTextField(15);
-    private final JLabel usernameErrorField = new JLabel();
-    private final JLabel passwordErrorField = new JLabel();
-    private final JLabel successMessageField = new JLabel();
+    private final JTextField usernameInputField = new JTextField(20);
+    private final JPasswordField passwordInputField = new JPasswordField(20);
+    private final JLabel usernameErrorField = new JLabel(" ");
+    private final JLabel passwordErrorField = new JLabel(" ");
+    private final JLabel successMessageField = new JLabel(" ");
     private final JButton chooseAvatarButton;
     private final JLabel avatarPreviewLabel = new JLabel();
 
@@ -41,13 +43,40 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
     private String currentUid;
 
-    @SuppressWarnings({"checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings", "checkstyle:JavaNCSS"})
+    private class FieldDocumentListener implements DocumentListener {
+        private final boolean isUsername;
+
+        public FieldDocumentListener(boolean isUsername) {
+            this.isUsername = isUsername;
+        }
+
+        private void updateState() {
+            final UpdateProfileState currentState = updateProfileViewModel.getState();
+            if (isUsername) {
+                currentState.setUsername(usernameInputField.getText());
+            } else {
+                currentState.setPassword(String.valueOf(passwordInputField.getPassword()));
+            }
+            updateProfileViewModel.setState(currentState);
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) { updateState(); }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) { updateState(); }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) { updateState(); }
+    }
+
     public UpdateProfileView(UpdateProfileViewModel updateProfileViewModel) {
         this.updateProfileViewModel = updateProfileViewModel;
         this.updateProfileViewModel.addPropertyChangeListener(this);
 
         final JLabel title = new JLabel(UpdateProfileViewModel.TITLE_LABEL);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setForeground(new Color(50, 50, 100));
 
         final LabelTextPanel usernameInfo = new LabelTextPanel(
                 new JLabel(UpdateProfileViewModel.USERNAME_LABEL), usernameInputField);
@@ -55,14 +84,43 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         final LabelTextPanel passwordInfo = new LabelTextPanel(
                 new JLabel(UpdateProfileViewModel.PASSWORD_LABEL), passwordInputField);
 
-        final JPanel buttons = new JPanel();
+        usernameErrorField.setForeground(new Color(200, 0, 0));
+        passwordErrorField.setForeground(new Color(200, 0, 0));
+        successMessageField.setForeground(new Color(0, 150, 50));
 
         chooseAvatarButton = new JButton(UpdateProfileViewModel.AVATAR_LABEL);
-        buttons.add(chooseAvatarButton);
         saveButton = new JButton(UpdateProfileViewModel.SAVE_BUTTON_LABEL);
-        buttons.add(saveButton);
         cancelButton = new JButton(UpdateProfileViewModel.CANCEL_BUTTON_LABEL);
-        buttons.add(cancelButton);
+
+        Color primaryColor = new Color(75, 100, 170);
+        Color secondaryColor = new Color(200, 200, 200);
+
+        saveButton.setBackground(primaryColor);
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setFocusPainted(false);
+        saveButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(primaryColor.darker(), 1),
+                BorderFactory.createEmptyBorder(8, 15, 8, 15)
+        ));
+
+        cancelButton.setBackground(secondaryColor);
+        cancelButton.setForeground(Color.BLACK);
+        cancelButton.setFocusPainted(false);
+        cancelButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(secondaryColor.darker(), 1),
+                BorderFactory.createEmptyBorder(8, 15, 8, 15)
+        ));
+
+        chooseAvatarButton.setBackground(new Color(150, 150, 220));
+        chooseAvatarButton.setForeground(Color.BLACK);
+        chooseAvatarButton.setFocusPainted(false);
+        chooseAvatarButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        avatarPreviewLabel.setPreferredSize(new Dimension(54, 54));
+        avatarPreviewLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(1, 1, 1, 1),
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2)
+        ));
 
         chooseAvatarButton.addActionListener(evt -> {
             if (evt.getSource().equals(chooseAvatarButton)) {
@@ -78,75 +136,86 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
         cancelButton.addActionListener(evt -> {
             if (evt.getSource().equals(cancelButton) && viewManagerModel != null) {
+                updateProfileViewModel.setState(new UpdateProfileState());
+                updateProfileViewModel.firePropertyChanged();
                 viewManagerModel.setState("logged in");
                 viewManagerModel.firePropertyChanged();
             }
         });
 
-        usernameInputField.getDocument().addDocumentListener(new DocumentListener() {
+        usernameInputField.getDocument().addDocumentListener(new FieldDocumentListener(true));
+        passwordInputField.getDocument().addDocumentListener(new FieldDocumentListener(false));
 
-            private void documentListenerHelper() {
-                final UpdateProfileState currentState = updateProfileViewModel.getState();
-                currentState.setUsername(usernameInputField.getText());
-                updateProfileViewModel.setState(currentState);
-            }
+        JPanel contentPanel = new JPanel(new GridBagLayout());
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        Border line = BorderFactory.createLineBorder(new Color(180, 180, 220), 2, true);
+        Border titled = BorderFactory.createTitledBorder(line, "User Profile Settings");
+        Border finalBorder = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createCompoundBorder(
+                        titled,
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                )
+        );
+        contentPanel.setBorder(finalBorder);
+        contentPanel.setBackground(new Color(245, 245, 250));
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10);
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-        });
+        gbc.gridx = 0;
 
-        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
+        contentPanel.add(title, gbc);
 
-            private void documentListenerHelper() {
-                final UpdateProfileState currentState = updateProfileViewModel.getState();
-                currentState.setPassword(passwordInputField.getText());
-                updateProfileViewModel.setState(currentState);
-            }
+        gbc.gridy = 1;
+        contentPanel.add(successMessageField, gbc);
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        contentPanel.add(chooseAvatarButton, gbc);
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        contentPanel.add(avatarPreviewLabel, gbc);
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-        });
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        gbc.gridy = 3;
+        contentPanel.add(usernameInfo, gbc);
 
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(passwordInfo);
-        this.add(chooseAvatarButton);
-        this.add(avatarPreviewLabel);
-        this.add(passwordErrorField);
-        this.add(usernameErrorField);
-        this.add(successMessageField);
-        this.add(buttons);
+        gbc.gridy = 4;
+        contentPanel.add(usernameErrorField, gbc);
+
+        gbc.gridy = 5;
+        contentPanel.add(passwordInfo, gbc);
+
+        gbc.gridy = 6;
+        contentPanel.add(passwordErrorField, gbc);
+
+        final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 10));
+        buttons.setBackground(contentPanel.getBackground());
+        buttons.add(saveButton);
+        buttons.add(cancelButton);
+
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        contentPanel.add(buttons, gbc);
+
+        this.setLayout(new GridBagLayout());
+        this.add(contentPanel, new GridBagConstraints());
+        this.setBackground(Color.WHITE);
     }
 
-    /**
-     * React to a button click that results in evt.
-     */
     @Override
     public void actionPerformed(ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
@@ -156,8 +225,11 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     public void propertyChange(PropertyChangeEvent evt) {
         final UpdateProfileState state = (UpdateProfileState) evt.getNewValue();
         setFields(state);
-        usernameErrorField.setText(state.getUsernameError());
-        successMessageField.setText(state.getSuccessMessage());
+        usernameErrorField.setText(Objects.requireNonNullElse(state.getUsernameError(), " "));
+        passwordErrorField.setText(Objects.requireNonNullElse(state.getPasswordError(), " "));
+        successMessageField.setText(Objects.requireNonNullElse(state.getSuccessMessage(), " "));
+
+        saveButton.setEnabled(state.getUsernameError() == null && state.getPasswordError() == null);
     }
 
     private void setFields(UpdateProfileState state) {
@@ -169,10 +241,24 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
     private void updateAvatarPreview(String avatarPath) {
         if (avatarPath == null || avatarPath.isBlank()) {
             avatarPreviewLabel.setIcon(null);
+            avatarPreviewLabel.setText("No Avatar");
+            return;
         }
-        final ImageIcon icon = new ImageIcon(avatarPath);
-        final Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
-        avatarPreviewLabel.setIcon(new ImageIcon(img));
+
+        avatarPreviewLabel.setText(null);
+        try {
+            final ImageIcon icon = new ImageIcon(avatarPath);
+            if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+                final Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+                avatarPreviewLabel.setIcon(new ImageIcon(img));
+            } else {
+                avatarPreviewLabel.setText("Image Load Failed");
+                avatarPreviewLabel.setIcon(null);
+            }
+        } catch (Exception e) {
+            avatarPreviewLabel.setText("Preview Error");
+            avatarPreviewLabel.setIcon(null);
+        }
     }
 
     public String getViewName() {
@@ -191,56 +277,54 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         this.viewManagerModel = viewManagerModel;
     }
 
-    /**
-     * Button functionality of changing avatar.
-     */
     public void chooseAvatarButtonFunction() {
         final JFileChooser fileChooser = new JFileChooser();
         final int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
 
-            final File selected = fileChooser.getSelectedFile();
+        if (result == JFileChooser.APPROVE_OPTION) {
+            final File selectedFile = fileChooser.getSelectedFile();
 
             final File avatarsDir = new File("avatars");
             if (!avatarsDir.exists()) {
                 avatarsDir.mkdirs();
             }
 
-            final String name = selected.getName();
-            String ext = "";
-            final int dot = name.lastIndexOf('.');
-            if (dot != -1) {
-                ext = name.substring(dot);
+            final String name = selectedFile.getName();
+            String extension = "";
+            final int dotIndex = name.lastIndexOf('.');
+            if (dotIndex != -1) {
+                extension = name.substring(dotIndex);
             }
 
-            final String fileName = (currentUid != null ? currentUid : "tmp") + ext;
-            final File dest = new File(avatarsDir, fileName);
+            final String fallbackUid = UUID.randomUUID().toString();
+            final String uidForFileName = Objects.requireNonNullElse(currentUid, fallbackUid);
+
+            final String fileName = uidForFileName + extension;
+            final File destinationFile = new File(avatarsDir, fileName);
+            String newPath = null;
 
             try {
-                java.nio.file.Files.copy(
-                        selected.toPath(),
-                        dest.toPath(),
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                Files.copy(
+                        selectedFile.toPath(),
+                        destinationFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING
                 );
+                newPath = destinationFile.getPath();
+            } catch (IOException excp) {
+                excp.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to save avatar: " + excp.getMessage(),
+                        "File Error", JOptionPane.ERROR_MESSAGE);
+            }
 
+            if (newPath != null) {
                 final UpdateProfileState state = updateProfileViewModel.getState();
-                state.setAvatarPath(dest.getPath());
+                state.setAvatarPath(newPath);
                 updateProfileViewModel.setState(state);
                 updateProfileViewModel.firePropertyChanged();
-
-                updateAvatarPreview(dest.getPath());
-
-            }
-            catch (IOException excp) {
-                excp.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Failed to save avatar: " + excp.getMessage());
             }
         }
     }
 
-    /**
-     * Button functionality of saving user info.
-     */
     public void saveButtonFunction() {
         final UpdateProfileState currentState = updateProfileViewModel.getState();
 
