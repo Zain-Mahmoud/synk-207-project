@@ -24,7 +24,7 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
     private static final Font VALUE_FONT = new Font("SansSerif", Font.BOLD, 36);
 
     // Updated, more modern color palette (same visual layout)
-    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);      // soft indigo
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);      // soft indigo
     private static final Color SECONDARY_COLOR = new Color(242, 244, 248);   // light gray background
     private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232); // subtle card border
     private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);  // muted label text

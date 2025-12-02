@@ -26,13 +26,13 @@ import java.util.ArrayList;
 
 public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
-    private static final Color BACKGROUND_COLOR = new Color(242, 244, 248);
-    private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232);
-    private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);
+    private static final Color BACKGROUND_COLOR = new Color(248, 244, 242);
+    private static final Color CARD_BORDER_COLOR = new Color(232, 222, 218);
+    private static final Color MUTED_TEXT_COLOR = new Color(150, 131, 120);
     private static final Color TABLE_GRID_COLOR = new Color(230, 233, 240);
-    private static final Color TABLE_ALT_ROW_COLOR = new Color(250, 250, 252);
-    private static final Color TABLE_SELECTION_COLOR = new Color(232, 235, 252);
+    private static final Color TABLE_ALT_ROW_COLOR = new Color(252, 251, 250);
+    private static final Color TABLE_SELECTION_COLOR = new Color(252, 240, 232);
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;

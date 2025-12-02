@@ -26,9 +26,9 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
 
     private static final Color BACKGROUND_COLOR = new Color(242, 244, 248);
     private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232);
-    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);
     private static final Color ACCENT_COLOR = new Color(46, 139, 87);
-    private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
+    private static final Color MUTED_TEXT_COLOR = new Color(150, 129, 120);
     private static final Color ERROR_COLOR = new Color(231, 76, 60);
 
     private final String viewName = "leaderboard";
@@ -150,7 +150,7 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
         leaderboardTable.setFillsViewportHeight(true);
         leaderboardTable.setRowSelectionAllowed(false);
         leaderboardTable.setRowHeight(34);
-        leaderboardTable.setGridColor(new Color(225, 228, 236));
+        leaderboardTable.setGridColor(new Color(236, 228, 225));
         leaderboardTable.setShowGrid(true);
         leaderboardTable.setIntercellSpacing(new Dimension(0, 0));
 
@@ -181,18 +181,18 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
                 if (isSelected) {
-                    c.setBackground(new Color(232, 235, 252));
+                    c.setBackground(new Color(252, 237, 232));
                 } else {
                     if (row == 0) {
-                        c.setBackground(new Color(246, 237, 208));
+                        c.setBackground(new Color(255, 245, 224));
                     } else if (row == 1) {
-                        c.setBackground(new Color(199, 199, 218));
+                        c.setBackground(new Color(250, 254, 255));
                     } else if (row == 2) {
-                        c.setBackground(new Color(234, 220, 208, 255));
+                        c.setBackground(new Color(253, 232, 220, 255));
                     } else if (row % 2 == 0) {
                         c.setBackground(Color.WHITE);
                     } else {
-                        c.setBackground(new Color(250, 250, 252));
+                        c.setBackground(new Color(252, 250, 250));
                     }
                 }
 

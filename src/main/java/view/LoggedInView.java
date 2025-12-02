@@ -47,7 +47,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     private final JButton viewStats;
 
-    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);
     private static final Color SECONDARY_COLOR = new Color(242, 244, 248);
     private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
     private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 82);
@@ -268,7 +268,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
     }
 
-    public void setViewStatsController(ViewStatsController viewStatsController){
+    public void setViewStatsController(ViewStatsController viewStatsController) {
         this.viewStatsController = viewStatsController;
     }
 }

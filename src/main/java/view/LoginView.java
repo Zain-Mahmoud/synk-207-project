@@ -22,9 +22,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 24);
     private static final Font LABEL_FONT = new Font("SansSerif", Font.PLAIN, 14);
     private static final Font ERROR_FONT = new Font("SansSerif", Font.PLAIN, 12);
-    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);
     private static final Color SECONDARY_COLOR = new Color(242, 244, 248);
-    private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232);
+    private static final Color CARD_BORDER_COLOR = new Color(232, 221, 218);
     private static final Color MUTED_TEXT_COLOR = new Color(89, 89, 89);
     private static final Color ERROR_COLOR = new Color(231, 76, 60);
 

@@ -92,8 +92,8 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         saveButton = new JButton(UpdateProfileViewModel.SAVE_BUTTON_LABEL);
         cancelButton = new JButton(UpdateProfileViewModel.CANCEL_BUTTON_LABEL);
 
-        Color primaryColor = new Color(88, 101, 242);
-        Color secondaryColor = new Color(246, 247, 252);
+        Color primaryColor = new Color(255, 161, 108);
+        Color secondaryColor = new Color(252, 247, 246);
 
         saveButton.setBackground(primaryColor);
         saveButton.setForeground(Color.WHITE);
@@ -107,7 +107,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         cancelButton.setForeground(primaryColor);
         cancelButton.setFocusPainted(false);
         cancelButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 205, 221), 1),
+                BorderFactory.createLineBorder(new Color(221, 205, 200), 1),
                 BorderFactory.createEmptyBorder(8, 15, 8, 15)
         ));
 
@@ -115,14 +115,14 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
         chooseAvatarButton.setForeground(new Color(248, 248, 248));
         chooseAvatarButton.setFocusPainted(false);
         chooseAvatarButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 223, 231), 1),
+                BorderFactory.createLineBorder(new Color(231, 223, 220), 1),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
         avatarPreviewLabel.setPreferredSize(new Dimension(54, 54));
         avatarPreviewLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(1, 1, 1, 1),
-                BorderFactory.createLineBorder(new Color(218, 222, 232), 2)
+                BorderFactory.createLineBorder(new Color(232, 222, 218), 2)
         ));
 
         chooseAvatarButton.addActionListener(evt -> {
@@ -151,7 +151,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
         JPanel contentPanel = new JPanel(new GridBagLayout());
 
-        Border line = BorderFactory.createLineBorder(new Color(218, 222, 232), 2, true);
+        Border line = BorderFactory.createLineBorder(new Color(232, 222, 218), 2, true);
         Border titled = BorderFactory.createTitledBorder(line, "User Profile Settings");
         Border finalBorder = BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10, 10, 10, 10),
@@ -161,7 +161,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
                 )
         );
         contentPanel.setBorder(finalBorder);
-        contentPanel.setBackground(new Color(236, 239, 248));
+        contentPanel.setBackground(new Color(248, 240, 236));
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 10, 8, 10);
@@ -216,7 +216,7 @@ public class UpdateProfileView extends JPanel implements ActionListener, Propert
 
         this.setLayout(new GridBagLayout());
         this.add(contentPanel, new GridBagConstraints());
-        this.setBackground(new Color(242, 244, 248));
+        this.setBackground(new Color(248, 243, 242));
     }
 
     @Override
