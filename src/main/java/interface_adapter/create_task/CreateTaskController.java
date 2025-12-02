@@ -2,6 +2,7 @@ package interface_adapter.create_task;
 
 import use_case.create_task.CreateTaskInputBoundary;
 import use_case.create_task.CreateTaskInputData;
+
 import java.time.LocalDateTime;
 
 public class CreateTaskController {
@@ -12,9 +13,9 @@ public class CreateTaskController {
     }
 
     public void execute(String username, String taskName, String description, LocalDateTime startTime,
-            LocalDateTime deadline, String group, boolean status, int priority) {
+            LocalDateTime deadline, String group, boolean status, int priority, String colorId) {
         final CreateTaskInputData createTaskInputData = new CreateTaskInputData(username, taskName, description,
-                startTime, deadline, group, status, priority);
+                startTime, deadline, group, status, priority, colorId);
 
         interactor.execute(createTaskInputData);
     }

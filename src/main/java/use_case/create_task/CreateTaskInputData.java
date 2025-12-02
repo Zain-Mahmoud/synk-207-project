@@ -15,9 +15,10 @@ public class CreateTaskInputData {
     private final String taskGroup;
     private final boolean status;
     private final int priority;
+    private final String colorId;
 
     public CreateTaskInputData(String username, String taskName, String description, LocalDateTime startTime,
-            LocalDateTime deadline, String taskGroup, boolean status, int priority) {
+            LocalDateTime deadline, String taskGroup, boolean status, int priority, String colorId) {
         this.username = username;
         this.taskName = taskName;
         this.description = description;
@@ -26,6 +27,7 @@ public class CreateTaskInputData {
         this.taskGroup = taskGroup;
         this.status = status;
         this.priority = priority;
+        this.colorId = colorId;
 
     }
 
@@ -59,6 +61,10 @@ public class CreateTaskInputData {
 
     String getDescription() {
         return description;
+    }
+
+    String getColorId() {
+        return colorId;
     }
 
 }
