@@ -66,12 +66,11 @@ public class ModifyTaskView extends JPanel implements ActionListener, PropertyCh
 
 
         JLabel taskNameLabel = new JLabel("Task name");
-        JLabel taskDeadlineLabel = new JLabel("Task deadline (YYYY-MM-DDTHH:MM:SS)");
-        JLabel taskStartTimeLabel = new JLabel("Start time (YYYY-MM-DDTHH:MM:SS)");
+        JLabel taskDeadlineLabel = new JLabel("Task deadline");
+        JLabel taskStartTimeLabel = new JLabel("Start time");
         JLabel taskStatusLabel = new JLabel("Task status");
-        JLabel taskPriorityLabel = new JLabel("Task priority (Number)");
+        JLabel taskPriorityLabel = new JLabel("Task priority (number)");
         JLabel taskDescriptionLabel = new JLabel("Description");
-        // Removed: JLabel taskStartTimeLabel = new JLabel("Start time (YYYY-MM-DDTHH:MM:SS)");
         JLabel taskGroupLabel = new JLabel("Task Group");
 
 

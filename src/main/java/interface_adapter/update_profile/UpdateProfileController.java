@@ -25,8 +25,14 @@ public class UpdateProfileController {
                         String newUsername,
                         String newPassword,
                         String newAvatarPath) {
-        UpdateProfileInputData inputData =
-                new UpdateProfileInputData(uid, newUsername, newPassword, newAvatarPath);
+
+        final UpdateProfileInputData inputData =
+                new UpdateProfileInputData(
+                        uid,
+                        newUsername,
+                        newPassword,
+                        newAvatarPath
+                );
         updateProfileUseCase.execute(inputData);
     }
 }

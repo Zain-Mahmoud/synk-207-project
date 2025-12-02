@@ -4,10 +4,10 @@ package use_case.update_profile;
  * The Input Data for the UpdateProfile Use Case.
  */
 public class UpdateProfileInputData {
-    private final String uid; //UID of the current user
-    private final String newUsername; //new username for current user
-    private final String newAvatarPath; //new avatar Path (URL) for the current user
-    private final String newPassword; //new password for the current user
+    private final String uid;
+    private final String newUsername;
+    private final String newAvatarPath;
+    private final String newPassword;
 
     public UpdateProfileInputData(String uid,
                                   String newUsername,
@@ -31,6 +31,8 @@ public class UpdateProfileInputData {
         return newAvatarPath;
     }
 
-    public String getNewPassword() {return newPassword; }
+    public String getNewPassword() {
+        return newPassword;
+    }
 }
 

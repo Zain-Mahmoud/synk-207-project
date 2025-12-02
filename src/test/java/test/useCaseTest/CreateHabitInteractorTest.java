@@ -1,10 +1,16 @@
 package test.useCaseTest;
 
 import data_access.InMemoryHabitDataAccessObject;
+import entities.Habit;
+import entities.HabitBuilder;
 import org.junit.jupiter.api.Test;
 import use_case.create_habit.*;
+import use_case.gateways.HabitGateway;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +35,6 @@ class CreateHabitInteractorTest {
 
     @Test
     void createHabit_successfullyCreatesHabit() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
@@ -41,24 +46,20 @@ class CreateHabitInteractorTest {
                 1,
                 "Health",
                 0,
-                5);
+                5
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertNull(presenter.failMessage);
         assertNotNull(presenter.successData);
         assertEquals("Exercise", presenter.successData.getHabitName());
-
-        // Verify it's in the gateway
         assertEquals(1, habitGateway.getHabitsForUser("roy").size());
         assertEquals("Exercise", habitGateway.getHabitsForUser("roy").get(0).getName());
     }
 
     @Test
     void createHabit_failsWhenNameIsEmpty() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
@@ -70,121 +71,17 @@ class CreateHabitInteractorTest {
                 1,
                 "Health",
                 0,
-                5);
+                5
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
-        assertEquals("Habit name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void createHabit_failsWhenHabitAlreadyExists() {
-        // Arrange
-        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
-
-        // Pre-populate DAO
-        CreateHabitInputData input1 = new CreateHabitInputData(
-                "roy",
-                "Exercise",
-                LocalDateTime.of(2025, 1, 1, 10, 0),
-                1,
-                "Health",
-                0,
-                5);
-        interactor.execute(input1);
-
-        // Act - Try to create same habit again
-        interactor.execute(input1);
-
-        // Assert
-        assertEquals("Habit with name 'Exercise' already exists.", presenter.failMessage);
-    }
-
-    @Test
-    void createHabit_failsWhenDAOThrowsException() {
-        // Arrange
-        use_case.gateways.HabitGateway throwingGateway = new use_case.gateways.HabitGateway() {
-            @Override
-            public String addHabit(String userId, entities.Habit habit) {
-                throw new RuntimeException("Database error");
-            }
-
-            @Override
-            public java.util.ArrayList<entities.Habit> fetchHabits(String userId) {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public boolean deleteHabit(String userId, entities.Habit habit) {
-                return false;
-            }
-
-            @Override
-            public java.util.Map<String, java.util.List<entities.Habit>> getAllUsersWithHabits() {
-                return new java.util.HashMap<>();
-            }
-
-            @Override
-            public java.util.List<String> getAllUsernames() {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public java.util.List<entities.Habit> getHabitsForUser(String username) {
-                return new java.util.ArrayList<>();
-            }
-        };
-        TestPresenter presenter = new TestPresenter();
-        CreateHabitInteractor interactor = new CreateHabitInteractor(throwingGateway, presenter);
-
-        CreateHabitInputData input = new CreateHabitInputData(
-                "roy",
-                "Exercise",
-                LocalDateTime.of(2025, 1, 1, 10, 0),
-                1,
-                "Health",
-                0,
-                5);
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertTrue(presenter.failMessage.contains("Failed to create habit: Database error"));
-    }
-
-    @Test
-    void createHabit_failsWhenNameIsNull() {
-        // Arrange
-        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
-
-        CreateHabitInputData input = new CreateHabitInputData(
-                "roy",
-                null,
-                LocalDateTime.of(2025, 1, 1, 10, 0),
-                1,
-                "Health",
-                0,
-                5);
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
         assertEquals("Habit name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void createHabit_failsWhenNameIsWhitespace() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
@@ -196,50 +93,94 @@ class CreateHabitInteractorTest {
                 1,
                 "Health",
                 0,
-                5);
+                5
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Habit name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
-    void createHabit_failsWhenBuilderThrowsIllegalStateException() {
-        // Arrange
-        use_case.gateways.HabitGateway throwingGateway = new use_case.gateways.HabitGateway() {
+    void createHabit_failsWhenNameIsNull() {
+        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
+
+        CreateHabitInputData input = new CreateHabitInputData(
+                "roy",
+                null,
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                1,
+                "Health",
+                0,
+                5
+        );
+
+        interactor.execute(input);
+
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createHabit_failsWhenHabitAlreadyExists() {
+        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(habitGateway, presenter);
+
+        CreateHabitInputData first = new CreateHabitInputData(
+                "roy",
+                "Exercise",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                1,
+                "Health",
+                0,
+                5
+        );
+        interactor.execute(first);
+
+        interactor.execute(first);
+
+        assertEquals("Habit with name 'Exercise' already exists.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void createHabit_failsWhenGatewayThrowsRuntimeException() {
+        HabitGateway throwingGateway = new HabitGateway() {
             @Override
-            public String addHabit(String userId, entities.Habit habit) {
-                throw new IllegalStateException("DAO State Error");
+            public String addHabit(String userId, Habit habit) {
+                throw new RuntimeException("Database error");
             }
 
             @Override
-            public java.util.ArrayList<entities.Habit> fetchHabits(String userId) {
-                return new java.util.ArrayList<>();
+            public ArrayList<Habit> fetchHabits(String userId) {
+                return new ArrayList<>();
             }
 
             @Override
-            public boolean deleteHabit(String userId, entities.Habit habit) {
+            public boolean deleteHabit(String userId, Habit habit) {
                 return false;
             }
 
             @Override
-            public java.util.Map<String, java.util.List<entities.Habit>> getAllUsersWithHabits() {
-                return new java.util.HashMap<>();
+            public HashMap<String, List<Habit>> getAllUsersWithHabits() {
+                return new HashMap<>();
             }
 
             @Override
-            public java.util.List<String> getAllUsernames() {
-                return new java.util.ArrayList<>();
+            public List<String> getAllUsernames() {
+                return new ArrayList<>();
             }
 
             @Override
-            public java.util.List<entities.Habit> getHabitsForUser(String username) {
-                return new java.util.ArrayList<>();
+            public List<Habit> getHabitsForUser(String username) {
+                return new ArrayList<>();
             }
         };
+
         TestPresenter presenter = new TestPresenter();
         CreateHabitInteractor interactor = new CreateHabitInteractor(throwingGateway, presenter);
 
@@ -250,12 +191,66 @@ class CreateHabitInteractorTest {
                 1,
                 "Health",
                 0,
-                5);
+                5
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertNotNull(presenter.failMessage);
+        assertTrue(presenter.failMessage.contains("Failed to create habit:"));
+        assertTrue(presenter.failMessage.contains("Database error"));
+    }
+
+    @Test
+    void createHabit_failsWhenGatewayThrowsIllegalStateException() {
+        HabitGateway throwingGateway = new HabitGateway() {
+            @Override
+            public String addHabit(String userId, Habit habit) {
+                throw new IllegalStateException("DAO State Error");
+            }
+
+            @Override
+            public ArrayList<Habit> fetchHabits(String userId) {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public boolean deleteHabit(String userId, Habit habit) {
+                return false;
+            }
+
+            @Override
+            public HashMap<String, List<Habit>> getAllUsersWithHabits() {
+                return new HashMap<>();
+            }
+
+            @Override
+            public List<String> getAllUsernames() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<Habit> getHabitsForUser(String username) {
+                return new ArrayList<>();
+            }
+        };
+
+        TestPresenter presenter = new TestPresenter();
+        CreateHabitInteractor interactor = new CreateHabitInteractor(throwingGateway, presenter);
+
+        CreateHabitInputData input = new CreateHabitInputData(
+                "roy",
+                "Exercise",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                1,
+                "Health",
+                0,
+                5
+        );
+
+        interactor.execute(input);
+
+        assertNotNull(presenter.failMessage);
         assertTrue(presenter.failMessage.contains("Failed to create habit: DAO State Error"));
     }
 }

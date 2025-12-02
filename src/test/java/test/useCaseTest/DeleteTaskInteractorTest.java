@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import use_case.delete_task.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,12 +32,10 @@ class DeleteTaskInteractorTest {
 
     @Test
     void deleteTask_successfullyDeletesTask() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
 
-        // Setup: Add a task
         Task task = new TaskBuilder()
                 .setTaskName("Study")
                 .setDeadline(LocalDateTime.now())
@@ -44,73 +43,108 @@ class DeleteTaskInteractorTest {
         taskGateway.addTask("roy", task);
 
         DeleteTaskInputData input = new DeleteTaskInputData("roy", "Study");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertNull(presenter.failMessage);
         assertNotNull(presenter.successData);
         assertEquals("Study", presenter.successData.getTaskName());
-
-        // Verify it's gone from gateway
         assertEquals(0, taskGateway.fetchTasks("roy").size());
     }
 
     @Test
     void deleteTask_failsWhenUsernameIsEmpty() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
 
         DeleteTaskInputData input = new DeleteTaskInputData("", "Study");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenUsernameIsNull() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
+
+        DeleteTaskInputData input = new DeleteTaskInputData(null, "Study");
+        interactor.execute(input);
+
+        assertEquals("Username cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenUsernameIsWhitespace() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("   ", "Study");
+        interactor.execute(input);
+
         assertEquals("Username cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void deleteTask_failsWhenTaskNameIsEmpty() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
 
         DeleteTaskInputData input = new DeleteTaskInputData("roy", "");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenTaskNameIsNull() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("roy", null);
+        interactor.execute(input);
+
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteTask_failsWhenTaskNameIsWhitespace() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
+
+        DeleteTaskInputData input = new DeleteTaskInputData("roy", "   ");
+        interactor.execute(input);
+
         assertEquals("Task name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void deleteTask_failsWhenTaskDoesNotExist() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
 
         DeleteTaskInputData input = new DeleteTaskInputData("roy", "NonExistent");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertNotNull(presenter.failMessage);
         assertTrue(presenter.failMessage.contains("does not exist"));
         assertNull(presenter.successData);
     }
 
     @Test
-    void deleteTask_failsWhenDAOThrowsException() {
-        // Arrange
+    void deleteTask_failsWhenGatewayThrowsException() {
         use_case.gateways.TaskGateway throwingGateway = new use_case.gateways.TaskGateway() {
             @Override
             public String addTask(String userId, Task task) {
@@ -118,15 +152,14 @@ class DeleteTaskInteractorTest {
             }
 
             @Override
-            public java.util.ArrayList<Task> fetchTasks(String userId) {
-                // Return a fake task so existsByName check passes
-                Task fakeTask = new TaskBuilder()
+            public ArrayList<Task> fetchTasks(String userId) {
+                Task fake = new TaskBuilder()
                         .setTaskName("Study")
                         .setDeadline(LocalDateTime.now())
                         .build();
-                java.util.ArrayList<Task> tasks = new java.util.ArrayList<>();
-                tasks.add(fakeTask);
-                return tasks;
+                ArrayList<Task> list = new ArrayList<>();
+                list.add(fake);
+                return list;
             }
 
             @Override
@@ -134,84 +167,15 @@ class DeleteTaskInteractorTest {
                 throw new RuntimeException("Database error");
             }
         };
+
         TestPresenter presenter = new TestPresenter();
         DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, throwingGateway);
 
         DeleteTaskInputData input = new DeleteTaskInputData("roy", "Study");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertNotNull(presenter.failMessage);
         assertTrue(presenter.failMessage.contains("Failed to delete task"));
         assertTrue(presenter.failMessage.contains("Database error"));
-    }
-
-    @Test
-    void deleteTask_failsWhenUsernameIsNull() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
-
-        DeleteTaskInputData input = new DeleteTaskInputData(null, "Study");
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Username cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void deleteTask_failsWhenUsernameIsWhitespace() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
-
-        DeleteTaskInputData input = new DeleteTaskInputData("   ", "Study");
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Username cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void deleteTask_failsWhenTaskNameIsNull() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
-
-        DeleteTaskInputData input = new DeleteTaskInputData("roy", null);
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Task name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void deleteTask_failsWhenTaskNameIsWhitespace() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteTaskInteractor interactor = new DeleteTaskInteractor(presenter, taskGateway);
-
-        DeleteTaskInputData input = new DeleteTaskInputData("roy", "   ");
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Task name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
     }
 }

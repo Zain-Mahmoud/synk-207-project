@@ -34,7 +34,9 @@ public class UpdateProfileOutputData {
         return avatarPath;
     }
 
-    public String getPassword() {return password; }
+    public String getPassword() {
+        return password;
+    }
 
     public boolean isUseCaseFailed() {
         return useCaseFailed;

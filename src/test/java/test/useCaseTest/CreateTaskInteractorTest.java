@@ -29,7 +29,6 @@ class CreateTaskInteractorTest {
 
     @Test
     void createTask_successfullyCreatesTask() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -42,25 +41,21 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertNull(presenter.failMessage);
         assertNotNull(presenter.successData);
         assertEquals("Study", presenter.successData.getTaskName());
         assertEquals("testUser", presenter.successData.getUsername());
-
-        // Verify it's in the gateway
         assertEquals(1, taskGateway.fetchTasks("testUser").size());
         assertEquals("Study", taskGateway.fetchTasks("testUser").get(0).getName());
     }
 
     @Test
     void createTask_failsWhenUsernameIsEmpty() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -73,69 +68,17 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Username cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
-    void createTask_failsWhenTaskNameIsEmpty() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
-
-        CreateTaskInputData input = new CreateTaskInputData(
-                "testUser",
-                "",
-                "Study for exam",
-                LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 15, 23, 59),
-                "School",
-                false,
-                1);
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Task name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void createTask_failsWhenTaskAlreadyExists() {
-        // Arrange
-        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
-
-        CreateTaskInputData input = new CreateTaskInputData(
-                "testUser",
-                "Study",
-                "Study for exam",
-                LocalDateTime.of(2025, 1, 1, 10, 0),
-                LocalDateTime.of(2025, 1, 15, 23, 59),
-                "School",
-                false,
-                1);
-        interactor.execute(input);
-
-        // Act - Try again
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Task already exists.", presenter.failMessage);
-    }
-
-    @Test
     void createTask_failsWhenUsernameIsNull() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -148,19 +91,17 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Username cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void createTask_failsWhenUsernameIsWhitespace() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -173,19 +114,40 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Username cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
+    void createTask_failsWhenTaskNameIsEmpty() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                "testUser",
+                "",
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
+                "School",
+                false,
+                1
+        );
+
+        interactor.execute(input);
+
+        assertEquals("Task name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
     void createTask_failsWhenTaskNameIsNull() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -198,19 +160,17 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Task name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void createTask_failsWhenTaskNameIsWhitespace() {
-        // Arrange
         InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
@@ -223,13 +183,35 @@ class CreateTaskInteractorTest {
                 LocalDateTime.of(2025, 1, 15, 23, 59),
                 "School",
                 false,
-                1);
+                1
+        );
 
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertEquals("Task name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
+    }
+
+    @Test
+    void createTask_failsWhenTaskAlreadyExists() {
+        InMemoryTaskDataAccessObject taskGateway = new InMemoryTaskDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        CreateTaskInteractor interactor = new CreateTaskInteractor(taskGateway, presenter);
+
+        CreateTaskInputData input = new CreateTaskInputData(
+                "testUser",
+                "Study",
+                "Study for exam",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 23, 59),
+                "School",
+                false,
+                1
+        );
+
+        interactor.execute(input);
+        interactor.execute(input);
+
+        assertEquals("Task already exists.", presenter.failMessage);
     }
 }
