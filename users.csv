@@ -1,7 +1,2 @@
 uid,username,avatarpath,password
-<<<<<<< HEAD
 88bc347e-13dd-4b46-9411-85fc19788a6d,a,avatars\default_avatar.png,a
-=======
-5f95dd32-b2ba-49ed-a205-f1bfd0153987,z,null,z
-d6a1db3e-4ffd-422d-83c8-69260f39dafe,admin,avatars\tmp.jpg,password
->>>>>>> origin/main
