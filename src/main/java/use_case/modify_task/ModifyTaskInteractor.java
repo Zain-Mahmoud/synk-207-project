@@ -69,26 +69,26 @@ public class ModifyTaskInteractor implements ModifyTaskInputBoundary {
         final String oldTaskGroup = modifyInputData.getOldTaskGroup();
         final String oldDescription = modifyInputData.getOldDescription();
 
-        final String newTaskName = modifyInputData.getNewTaskName();
-        final String newTaskPriority = modifyInputData.getNewPriority();
-        final boolean newTaskStatus = modifyInputData.getNewTaskStatus();
-        final String newDeadline = modifyInputData.getNewDeadline();
-        final String newStartDateTime = modifyInputData.getNewStartDateTime();
-        final String newTaskGroup = modifyInputData.getNewTaskGroup();
-        final String newDescription = modifyInputData.getNewDescription();
-        final String userID = modifyInputData.getUserID();
+        String newTaskName = modifyInputData.getNewTaskName();
+        String newTaskPriority = modifyInputData.getNewPriority();
+        boolean newTaskStatus = modifyInputData.getNewTaskStatus();
+        String newDeadline = modifyInputData.getNewDeadline();
+        String newStartDateTime = modifyInputData.getNewStartDateTime();
+        String newTaskGroup = modifyInputData.getNewTaskGroup();
+        String newDescription = modifyInputData.getNewDescription();
+        String userID = modifyInputData.getUserID();
 
         try {
-            final LocalDateTime newDeadlineFormatted = parseFlexibleDateTime(newDeadline);
-            final int newPriorityFormatted = Integer.parseInt(newTaskPriority);
-            final int oldPriorityFormatted = Integer.parseInt(oldTaskPriority);
+            LocalDateTime newDeadlineFormatted = parseFlexibleDateTime(newDeadline);
+            int newPriorityFormatted = Integer.parseInt(newTaskPriority);
+            int oldPriorityFormatted = Integer.parseInt(oldTaskPriority);
 
             if (newDeadlineFormatted.isBefore(LocalDateTime.now())) {
                 modifyTaskPresenter.prepareFailView("New deadline cannot be in the past.");
                 return;
             }
 
-            final LocalDateTime oldDeadlineFormatted = parseFlexibleDateTime(oldDeadline);
+            LocalDateTime oldDeadlineFormatted = parseFlexibleDateTime(oldDeadline);
             LocalDateTime oldStartFormatted = null;
             if (oldStartDateTime != null && !oldStartDateTime.isBlank()) {
                 oldStartFormatted = parseFlexibleDateTime(oldStartDateTime);
