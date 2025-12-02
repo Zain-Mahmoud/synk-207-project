@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import use_case.delete_habit.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,12 +34,10 @@ class DeleteHabitInteractorTest {
 
     @Test
     void deleteHabit_successfullyDeletesHabit() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
 
-        // Setup: Add a habit
         Habit habit = new HabitBuilder()
                 .setHabitName("Exercise")
                 .setStartDateTime(LocalDateTime.now())
@@ -44,56 +45,69 @@ class DeleteHabitInteractorTest {
         habitGateway.addHabit("roy", habit);
 
         DeleteHabitInputData input = new DeleteHabitInputData("roy", "Exercise");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
         assertNull(presenter.failMessage);
         assertNotNull(presenter.successData);
         assertEquals("Exercise", presenter.successData.getHabitName());
-
-        // Verify it's gone from gateway
         assertEquals(0, habitGateway.getHabitsForUser("roy").size());
     }
 
     @Test
     void deleteHabit_failsWhenNameIsEmpty() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
 
         DeleteHabitInputData input = new DeleteHabitInputData("roy", "");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteHabit_failsWhenNameIsNull() {
+        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
+
+        DeleteHabitInputData input = new DeleteHabitInputData("roy", null);
+        interactor.execute(input);
+
+        assertEquals("Habit name cannot be empty.", presenter.failMessage);
+        assertNull(presenter.successData);
+    }
+
+    @Test
+    void deleteHabit_failsWhenNameIsWhitespace() {
+        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
+        TestPresenter presenter = new TestPresenter();
+        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
+
+        DeleteHabitInputData input = new DeleteHabitInputData("roy", "   ");
+        interactor.execute(input);
+
         assertEquals("Habit name cannot be empty.", presenter.failMessage);
         assertNull(presenter.successData);
     }
 
     @Test
     void deleteHabit_failsWhenHabitDoesNotExist() {
-        // Arrange
         InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
         TestPresenter presenter = new TestPresenter();
         DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
 
         DeleteHabitInputData input = new DeleteHabitInputData("roy", "NonExistent");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
+        assertNotNull(presenter.failMessage);
         assertTrue(presenter.failMessage.contains("does not exist"));
         assertNull(presenter.successData);
     }
 
     @Test
-    void deleteHabit_failsWhenDAOThrowsException() {
-        // Arrange
+    void deleteHabit_failsWhenGatewayThrowsException() {
         use_case.gateways.HabitGateway throwingGateway = new use_case.gateways.HabitGateway() {
             @Override
             public String addHabit(String userId, Habit habit) {
@@ -101,8 +115,8 @@ class DeleteHabitInteractorTest {
             }
 
             @Override
-            public java.util.ArrayList<Habit> fetchHabits(String userId) {
-                return new java.util.ArrayList<>();
+            public ArrayList<Habit> fetchHabits(String userId) {
+                return new ArrayList<>();
             }
 
             @Override
@@ -111,71 +125,35 @@ class DeleteHabitInteractorTest {
             }
 
             @Override
-            public java.util.Map<String, java.util.List<Habit>> getAllUsersWithHabits() {
-                return new java.util.HashMap<>();
+            public HashMap<String, List<Habit>> getAllUsersWithHabits() {
+                return new HashMap<>();
             }
 
             @Override
-            public java.util.List<String> getAllUsernames() {
-                return new java.util.ArrayList<>();
+            public List<String> getAllUsernames() {
+                return new ArrayList<>();
             }
 
             @Override
-            public java.util.List<Habit> getHabitsForUser(String username) {
-                // Return a fake habit so existsByName check passes
-                Habit fakeHabit = new HabitBuilder()
+            public List<Habit> getHabitsForUser(String username) {
+                Habit fake = new HabitBuilder()
                         .setHabitName("Exercise")
                         .setStartDateTime(LocalDateTime.now())
                         .build();
-                java.util.List<Habit> habits = new java.util.ArrayList<>();
-                habits.add(fakeHabit);
-                return habits;
+                ArrayList<Habit> list = new ArrayList<>();
+                list.add(fake);
+                return list;
             }
         };
+
         TestPresenter presenter = new TestPresenter();
         DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, throwingGateway);
 
         DeleteHabitInputData input = new DeleteHabitInputData("roy", "Exercise");
-
-        // Act
         interactor.execute(input);
 
-        // Assert
-        assertTrue(presenter.failMessage.contains("Failed to delete habit"));
+        assertNotNull(presenter.failMessage);
+        assertTrue(presenter.failMessage.contains("Failed to delete habit for user 'roy'"));
         assertTrue(presenter.failMessage.contains("Database error"));
-    }
-
-    @Test
-    void deleteHabit_failsWhenNameIsNull() {
-        // Arrange
-        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
-
-        DeleteHabitInputData input = new DeleteHabitInputData("roy", null);
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Habit name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
-    }
-
-    @Test
-    void deleteHabit_failsWhenNameIsWhitespace() {
-        // Arrange
-        InMemoryHabitDataAccessObject habitGateway = new InMemoryHabitDataAccessObject();
-        TestPresenter presenter = new TestPresenter();
-        DeleteHabitInteractor interactor = new DeleteHabitInteractor(presenter, habitGateway);
-
-        DeleteHabitInputData input = new DeleteHabitInputData("roy", "   ");
-
-        // Act
-        interactor.execute(input);
-
-        // Assert
-        assertEquals("Habit name cannot be empty.", presenter.failMessage);
-        assertNull(presenter.successData);
     }
 }
