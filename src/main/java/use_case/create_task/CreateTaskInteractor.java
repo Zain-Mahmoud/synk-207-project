@@ -62,7 +62,6 @@ public class CreateTaskInteractor implements CreateTaskInputBoundary {
 
         taskGateway.addTask(username, newTask);
         presenter.prepareSuccessView(
-                new CreateTaskOutputData(username, newTask.getName(), true, "Task created successfully!"));
-
+                new CreateTaskOutputData(username, newTask.getName(), true, "Task created successfully!      "));
     }
 }
