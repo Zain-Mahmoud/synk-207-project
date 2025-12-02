@@ -48,9 +48,6 @@ public class Task implements Completable {
         return deadline;
     }
 
-    public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
-    }
 
     public LocalDateTime getStartTime() {
         return startTime;

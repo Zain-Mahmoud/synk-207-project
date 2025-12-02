@@ -49,7 +49,7 @@ public class CreateHabitInteractor implements CreateHabitInputBoundary {
             habitGateway.addHabit(username, newHabit);
             final CreateHabitOutputData outputData = new CreateHabitOutputData(
                     newHabit.getName(),
-                    newHabit.getStartDateTime(),
+                    newHabit.getStartTime(),
                     false);
 
             createHabitPresenter.prepareSuccessView(outputData);
