@@ -26,14 +26,29 @@ jobs:
         run: |
           wget -O checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.4/checkstyle-10.12.4-all.jar
 
+      # Debug step to view refs and recent history (for troubleshooting)
+      - name: Debug git state
+        run: |
+          echo "Branches:"
+          git branch -a
+          echo "Recent history:"
+          git log --decorate --oneline -10
+          echo "Base ref is: ${{ github.base_ref }}"
+          echo "HEAD is: $(git rev-parse HEAD)"
+          echo "Origin main is: $(git rev-parse origin/main || echo NO_ORIGIN_MAIN)"
+
       - name: Get list of changed Java files
         id: changed_files
         run: |
-          git fetch origin ${{ github.base_ref }}
-          git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.java$' > changed_java_files.txt || true
+          # Try to fetch base branch just in case
+          git fetch origin ${{ github.base_ref }} || echo "fetch failed"
+          # Robust diff – switch from ... to ..
+          git diff --name-only origin/${{ github.base_ref }}..HEAD | grep '\.java$' > changed_java_files.txt || true
+          # Optionally output the changed files for debugging
+          echo "Changed Java files:"
+          cat changed_java_files.txt
 
       - name: Run Checkstyle on changed files
-        if: success() && (steps.changed_files.outputs.changed_files != '')
         run: |
           if [ -s changed_java_files.txt ]; then
             java -jar checkstyle.jar -c mystyle.xml $(cat changed_java_files.txt)

@@ -18,7 +18,7 @@ public class HabitValidationStrategy implements ValidationStrategy<Habit> {
     @Override
     public String validate(String userID, Habit oldHabit, Habit modifiedHabit) {
         if (oldHabit == null || modifiedHabit == null) {
-            return "Cannot validate: Habit entities are null.";
+            return "Cannot validate: Habit entities are null.                                                                   nnnnn";
         }
 
         ArrayList<Habit> habitList = habitDataAccessObject.fetchHabits(userID);
