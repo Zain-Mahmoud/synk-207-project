@@ -35,7 +35,7 @@ public class UpdateProfileInteractor implements UpdateProfileBoundary {
         if (newUsername != null && !newUsername.isBlank()) {
             final String trimmed = newUsername.trim();
             final int usernameLimit = 12;
-            if (trimmed.isEmpty() || trimmed.length() > usernameLimit) {
+            if (trimmed.length() > usernameLimit) {
                 presenter.prepareFailView("Username must be 1–12 characters.");
                 return;
             }
