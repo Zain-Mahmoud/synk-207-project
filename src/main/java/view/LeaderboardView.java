@@ -1,23 +1,36 @@
 package view;
 
-import interface_adapter.ViewManagerModel;
-import interface_adapter.leaderboard.ViewLeaderboardController;
-import interface_adapter.leaderboard.ViewLeaderboardState;
-import interface_adapter.leaderboard.ViewLeaderboardViewModel;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+import interface_adapter.ViewManagerModel;
+import interface_adapter.leaderboard.ViewLeaderboardController;
+import interface_adapter.leaderboard.ViewLeaderboardState;
+import interface_adapter.leaderboard.ViewLeaderboardViewModel;
 
 /**
  * The View for displaying the Habit Streak Leaderboard.
@@ -30,6 +43,11 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     private static final Color PRIMARY_COLOR = new Color(52, 152, 219);
     private static final Color SECONDARY_COLOR = new Color(236, 240, 241);
     private static final Color ACCENT_COLOR = new Color(46, 204, 113);
+    
+    // Top 3 highlight colors - soft metallic theme
+    private static final Color FIRST_PLACE_COLOR = new Color(255, 248, 220); // Soft gold
+    private static final Color SECOND_PLACE_COLOR = new Color(240, 240, 240); // Soft silver
+    private static final Color THIRD_PLACE_COLOR = new Color(238, 203, 173); // Soft bronze
 
     private final String viewName = "leaderboard";
     private final ViewLeaderboardViewModel viewLeaderboardViewModel;
@@ -128,16 +146,49 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(250, 250, 250));
+                
+                // Get the rank from the first column to determine background color
+                Object rankObj = table.getValueAt(row, 0);
+                int rank = -1;
+                
+                if (rankObj instanceof String) {
+                    // Extract rank number from string (e.g., "🥇 1" -> 1)
+                    String rankStr = (String) rankObj;
+                    // Remove all non-digit characters except spaces, then extract number
+                    String numberStr = rankStr.replaceAll("[^0-9]", "");
+                    if (!numberStr.isEmpty()) {
+                        try {
+                            rank = Integer.parseInt(numberStr);
+                        } catch (NumberFormatException e) {
+                            // Ignore, rank remains -1
+                        }
+                    }
+                } else if (rankObj instanceof Integer) {
+                    rank = (Integer) rankObj;
+                }
+                
+                // Set background color based on rank
+                if (rank == 1) {
+                    c.setBackground(FIRST_PLACE_COLOR);
+                } else if (rank == 2) {
+                    c.setBackground(SECOND_PLACE_COLOR);
+                } else if (rank == 3) {
+                    c.setBackground(THIRD_PLACE_COLOR);
+                } else {
+                    // Zebra striping for other rows
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(250, 250, 250));
+                }
+                
                 c.setForeground(Color.BLACK);
 
                 if (column == 0) {
-                    Integer rank = (Integer) value;
-                    if (rank != null && rank <= 3) {
+                    // Rank column - already has emoji from updateTable
+                    if (rank > 0 && rank <= 3) {
                         c.setForeground(PRIMARY_COLOR.darker());
                         c.setFont(new Font("SansSerif", Font.BOLD, 14));
                     }
                 } else if (column == 2) {
+                    // Max Streak column
                     Integer streak = (Integer) value;
                     if (streak != null && streak > 0) {
                         c.setForeground(ACCENT_COLOR.darker());
@@ -247,8 +298,22 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
             String username = (String) entry.get("username");
             Integer maxStreak = (Integer) entry.get("maxStreak");
 
+            // Format rank with medal emoji for top 3
+            String rankDisplay = "";
+            if (rank != null) {
+                if (rank == 1) {
+                    rankDisplay = "\uD83E\uDD47 " + rank; // 🥇 Gold medal
+                } else if (rank == 2) {
+                    rankDisplay = "\uD83E\uDD48 " + rank; // 🥈 Silver medal
+                } else if (rank == 3) {
+                    rankDisplay = "\uD83E\uDD49 " + rank; // 🥉 Bronze medal
+                } else {
+                    rankDisplay = String.valueOf(rank);
+                }
+            }
+
             tableModel.addRow(new Object[]{
-                    rank != null ? rank : "",
+                    rankDisplay,
                     username != null ? username : "",
                     maxStreak != null ? maxStreak : 0
             });
