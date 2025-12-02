@@ -42,6 +42,7 @@ src/main/resources/credentials.json
 *.xml
 /.idea
 
+
 /target/
 
 credentials.json
