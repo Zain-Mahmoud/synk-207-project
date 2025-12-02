@@ -47,10 +47,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     private final JButton viewStats;
 
-    // --- Styling Constants ---
-    private static final Color PRIMARY_COLOR = new Color(59, 130, 246); // Tailwind blue-500
-    private static final Color SECONDARY_COLOR = new Color(243, 244, 246); // Tailwind gray-100
-    private static final Font TITLE_FONT = new Font("Monospaced", Font.BOLD, 64);
+    private static final Color PRIMARY_COLOR = new Color(88, 101, 242);
+    private static final Color SECONDARY_COLOR = new Color(242, 244, 248);
+    private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);
+    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 28);
     private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
     private static final Font USER_INFO_FONT = new Font("SansSerif", Font.PLAIN, 16);
 
@@ -59,8 +59,16 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.loggedInViewModel.addPropertyChangeListener(this);
 
         this.setBackground(SECONDARY_COLOR);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBorder(new EmptyBorder(50, 50, 50, 50));
+        this.setLayout(new GridBagLayout());
+        this.setBorder(new EmptyBorder(24, 32, 24, 32));
+
+        JPanel cardPanel = new JPanel();
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        cardPanel.setBackground(Color.WHITE);
+        cardPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(218, 222, 232)),
+                new EmptyBorder(24, 32, 24, 32)
+        ));
 
         final JLabel title = new JLabel("SYNK");
         title.setFont(TITLE_FONT);
@@ -73,20 +81,20 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         usernameInfo.setFont(USER_INFO_FONT);
 
         avatarLabel = new JLabel();
-        avatarLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // Padding next to avatar
+        avatarLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
         JPanel userPanel = new JPanel();
-        userPanel.setBackground(SECONDARY_COLOR);
-        userPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center everything in the flow
+        userPanel.setBackground(Color.WHITE);
+        userPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         userPanel.add(avatarLabel);
         userPanel.add(usernameInfo);
         userPanel.add(username);
         userPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         final JPanel buttons = new JPanel();
-        buttons.setBackground(SECONDARY_COLOR);
-        buttons.setLayout(new GridLayout(3, 2, 15, 15)); // 3 rows, 2 columns, with 15px gap
-        buttons.setBorder(new EmptyBorder(25, 100, 25, 100)); // Padding around the buttons
+        buttons.setBackground(Color.WHITE);
+        buttons.setLayout(new GridLayout(3, 2, 15, 15));
+        buttons.setBorder(new EmptyBorder(25, 80, 10, 80));
         buttons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         logOut = createStyledButton("Log Out");
@@ -105,17 +113,25 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
         syncStatusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         syncStatusLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
-        syncStatusLabel.setForeground(Color.GRAY);
+        syncStatusLabel.setForeground(MUTED_TEXT_COLOR);
 
-        this.add(Box.createVerticalGlue()); // Push content to the center vertically
-        this.add(title);
-        this.add(Box.createVerticalStrut(20));
-        this.add(userPanel);
-        this.add(Box.createVerticalStrut(40));
-        this.add(buttons);
-        this.add(Box.createVerticalStrut(15));
-        this.add(syncStatusLabel);
-        this.add(Box.createVerticalGlue()); // Push content to the center vertically
+        cardPanel.add(Box.createVerticalGlue());
+        cardPanel.add(title);
+        cardPanel.add(Box.createVerticalStrut(16));
+        cardPanel.add(userPanel);
+        cardPanel.add(Box.createVerticalStrut(28));
+        cardPanel.add(buttons);
+        cardPanel.add(Box.createVerticalStrut(10));
+        cardPanel.add(syncStatusLabel);
+        cardPanel.add(Box.createVerticalGlue());
+
+        GridBagConstraints rootGbc = new GridBagConstraints();
+        rootGbc.gridx = 0;
+        rootGbc.gridy = 0;
+        rootGbc.weightx = 1.0;
+        rootGbc.weighty = 1.0;
+        rootGbc.fill = GridBagConstraints.BOTH;
+        this.add(cardPanel, rootGbc);
 
         logOut.addActionListener(this);
 
@@ -149,7 +165,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         });
 
         viewStats.addActionListener(evt -> {
-            if (evt.getSource().equals(viewStats) && viewManagerModel != null){
+            if (evt.getSource().equals(viewStats) && viewManagerModel != null) {
                 viewStatsController.execute();
                 viewManagerModel.setState("view stats");
                 viewManagerModel.firePropertyChanged();
@@ -162,17 +178,20 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
     }
+
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
         button.setBackground(PRIMARY_COLOR);
-        button.setForeground(Color.BLACK);
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(PRIMARY_COLOR, 1, true),
+                BorderFactory.createLineBorder(PRIMARY_COLOR.darker(), 1, true),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -185,10 +204,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         return button;
     }
 
-    /**
-     * React to a button click that results in evt.
-     * @param evt the ActionEvent to react to
-     */
     public void actionPerformed(ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }
