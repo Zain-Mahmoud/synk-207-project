@@ -296,7 +296,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
                 if (evt.getSource().equals(refreshButton)) {
 
                     if (viewTasksAndHabitsController != null) {
-                        viewTasksAndHabitsController.getFormattedTasksAndHabits(loggedInViewModel);
+                        viewTasksAndHabitsController.getFormattedTasksAndHabits();
                     } else {
                         JOptionPane.showMessageDialog(ViewTasksAndHabitsView.this,
                                 "Initialization in progress. Please wait a moment.",
@@ -373,7 +373,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
         if (this.loggedInViewModel != null) {
-            this.viewTasksAndHabitsController.getFormattedTasksAndHabits(this.loggedInViewModel);
+            this.viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
     }
 

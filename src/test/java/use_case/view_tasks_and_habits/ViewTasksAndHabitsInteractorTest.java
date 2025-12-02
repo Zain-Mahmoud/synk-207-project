@@ -81,6 +81,8 @@ public class ViewTasksAndHabitsInteractorTest {
         User arya = factory.create("arya", "123");
         userGateway.save(arya);
 
+        ViewTasksAndHabitsInputData inputData = new ViewTasksAndHabitsInputData("arya");
+
         taskGateway.addTask("arya", task1);
         taskGateway.addTask("arya", task2);
         habitGateway.addHabit("arya", habit1);
@@ -89,41 +91,45 @@ public class ViewTasksAndHabitsInteractorTest {
         ViewTasksAndHabitsInteractor interactor =
                 new ViewTasksAndHabitsInteractor(taskGateway, habitGateway, presenter);
 
-        ArrayList<String> f1 = new ArrayList<>();
-        f1.add("Problem Set");
-        f1.add("26 November 25, 00:00");
-        f1.add("27 November 25, 00:00");
-        f1.add("Problem Set");
-        f1.add("Incomplete");
-        f1.add("2");
-        f1.add("Finishing a problem set");
+        ArrayList<String> task1List = new ArrayList<>();
+        task1List.add("Problem Set");
+        task1List.add("26 November, 2025 00:00");
+        task1List.add("27 November, 2025 00:00");
+        task1List.add("Problem set");
+        task1List.add("Incomplete");
+        task1List.add("2");
+        task1List.add("Finishing a problem set");
 
-        ArrayList<String> f2 = new ArrayList<>();
-        f2.add("project");
-        f2.add("26 November 25, 00:00");
-        f2.add("27 November 25, 00:00");
-        f2.add("project");
-        f2.add("Incomplete");
-        f2.add("2");
-        f2.add("Finishing a project");
+        ArrayList<String> task2List = new ArrayList<>();
+        task2List.add("project");
+        task2List.add("26 November, 2025 00:00");
+        task2List.add("27 November, 2025 00:00");
+        task2List.add("project");
+        task2List.add("Incomplete");
+        task2List.add("2");
+        task2List.add("Finishing a project");
 
-        ArrayList<String> h1 = new ArrayList<>();
-        h1.add("Not programming");
-        h1.add("27 November 25, 00:00");
-        h1.add("1");
-        h1.add("Programming");
-        h1.add("1");
-        h1.add("Not doing some programming");
+        ArrayList<String> habit1List = new ArrayList<>();
+        habit1List.add("Not programming");
+        habit1List.add("27 November, 2025 00:00");
+        habit1List.add("1");
+        habit1List.add("Programming");
+        habit1List.add("1");
+        habit1List.add("1");
+        habit1List.add("Complete");
+        habit1List.add("Not programming started on 2025-11-27T00:00");
 
-        ArrayList<String> h2 = new ArrayList<>();
-        h2.add("Programming");
-        h2.add("27 November 25, 00:00");
-        h2.add("1");
-        h2.add("Programming");
-        h2.add("1");
-        h2.add("Doing some programming");
+        ArrayList<String> habit2List = new ArrayList<>();
+        habit2List.add("Programming");
+        habit2List.add("27 November, 2025 00:00");
+        habit2List.add("1");
+        habit2List.add("Programming");
+        habit2List.add("10");
+        habit2List.add("4");
+        habit2List.add("Incomplete");
+        habit2List.add("Programming started on 2025-11-27T00:00");
 
-        interactor.getFormattedTasksAndHabits(loggedInViewModel);
+        interactor.getFormattedTasksAndHabits(inputData);
 
         ViewTasksAndHabitsState resultState = testViewModel.getState();
         assertNotNull(resultState);
@@ -131,16 +137,13 @@ public class ViewTasksAndHabitsInteractorTest {
         assertEquals(2, resultState.getFormattedTasks().size());
         assertEquals(2, resultState.getFormattedHabits().size());
 
-        assertEquals(f1, resultState.getFormattedTasks().get(0));
-        assertEquals(f2, resultState.getFormattedTasks().get(1));
+        assertEquals(task1List, resultState.getFormattedTasks().get(0));
+        assertEquals(task2List, resultState.getFormattedTasks().get(1));
 
-        assertEquals(h1, resultState.getFormattedHabits().get(0));
-        assertEquals(h2, resultState.getFormattedHabits().get(1));
+        assertEquals(habit1List, resultState.getFormattedHabits().get(0));
+        assertEquals(habit2List, resultState.getFormattedHabits().get(1));
     }
 
-    // --------------------------------
-    // Minimal presenter for capturing output
-    // --------------------------------
     private static class TestPresenter extends ViewTasksAndHabitsPresenter {
 
         private final ViewTasksAndHabitsViewModel vm;

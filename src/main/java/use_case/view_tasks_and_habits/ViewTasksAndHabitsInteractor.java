@@ -26,9 +26,9 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
      * Fetches tasks and habits from the task and habit gateways and then formatts them into ArrayLists of strings.
      * @param loggedInViewModel the view model for the logged in use case/
      */
-    public void getFormattedTasksAndHabits(LoggedInViewModel loggedInViewModel) {
+    public void getFormattedTasksAndHabits(ViewTasksAndHabitsInputData inputData) {
         try {
-            final ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(loggedInViewModel.getState().getUsername());
+            final ArrayList<Task> taskList = this.taskDataAccess.fetchTasks(inputData.getUsername());
 
             final ArrayList<ArrayList<String>> formattedTasks = new ArrayList<>();
 
@@ -68,8 +68,7 @@ public class ViewTasksAndHabitsInteractor implements ViewTasksAndHabitsInputBoun
 
                 formattedTasks.add(formattedTask);
             }
-            final ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(
-                    loggedInViewModel.getState().getUsername());
+            final ArrayList<Habit> habitList = this.habitDataAccess.fetchHabits(inputData.getUsername());
 
             final ArrayList<ArrayList<String>> formattedHabits = new ArrayList<>();
 
