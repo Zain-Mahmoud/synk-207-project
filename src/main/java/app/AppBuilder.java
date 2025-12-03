@@ -126,7 +126,7 @@ public class AppBuilder {
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
     HabitGateway habitDataAccessObject = new HabitDataAccessObject(); // Always use local CSV for habit CRUD operations
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
-    private use_case.gateways.LeaderboardGateway leaderboardDataAccessObject; // Separate data source for leaderboard (can be Google Sheets)
+    private use_case.gateways.LeaderboardGateway leaderboardDataAccessObject; // Separate data source for leaderboard (currently null, uses local CSV via LocalLeaderboardDataAccessObject)
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -469,6 +469,9 @@ public class AppBuilder {
      * 
      * Note: This ONLY affects the leaderboard view (read-only).
      * All other features (create, modify, delete habits) continue using local CSV storage (habits.csv).
+     * 
+     * ⚠️ TEMPORARILY DISABLED: This feature is currently disabled in Main.java.
+     * The code is preserved for future use. Leaderboard currently uses local habits.csv.
      *
      * @param driveFileIdOrUrl the Google Drive file ID or full URL of the habits.csv file
      *                         Can be:
