@@ -1,5 +1,17 @@
 package view;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.modify_habit.ModifyHabitState;
@@ -9,18 +21,6 @@ import interface_adapter.modify_task.ModifyTaskViewModel;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsController;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsState;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -44,149 +44,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     private final JButton createHabitButton;
     private final JButton deleteHabitButton;
 
-
-    /**
-     * Renders and edits the JButton component in the table cell.
-     * This class acts as both the renderer (for display) and the editor (for interaction).
-     */
-    class ButtonHandler extends AbstractCellEditor implements TableCellRenderer, TableCellEditor, ActionListener {
-        private final JButton button;
-        private int clickedRow;
-        private String designation;
-
-        public ButtonHandler(String buttonText, String designation) {
-            this.designation = designation;
-            this.button = new JButton(buttonText);
-            this.button.setOpaque(true);
-            this.button.addActionListener(this);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int row, int column) {
-
-            if (value instanceof String) {
-                button.setText((String) value);
-            }
-
-            if (isSelected) {
-                button.setForeground(table.getSelectionForeground());
-                button.setBackground(table.getSelectionBackground());
-            } else {
-                button.setForeground(table.getForeground());
-                button.setBackground(UIManager.getColor("Button.background"));
-            }
-            return button;
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.clickedRow = row;
-            // The button text is set from the String placeholder in the model
-            if (value instanceof String) {
-                button.setText((String) value);
-            }
-            return button;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            // Return the string placeholder from the model
-            if (designation.equals("task")) {
-                return taskModel.getValueAt(clickedRow, taskTable.getColumnCount() - 1);
-            } else {
-                return habitModel.getValueAt(clickedRow, habitTable.getColumnCount() - 1);
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            fireEditingStopped();
-
-            if (designation.equals("task")) {
-
-
-                String taskName = taskModel.getValueAt(clickedRow, 0).toString();
-                String taskStartTime = taskModel.getValueAt(clickedRow, 1).toString();
-                String taskDueDateTime = taskModel.getValueAt(clickedRow, 2).toString(); // Back to Index 1 shifted
-                String taskGroup = taskModel.getValueAt(clickedRow, 3).toString(); // Back to Index 2 shifted
-                String taskStatusText = taskModel.getValueAt(clickedRow, 4).toString(); // Back to Index 3 shifted
-                String taskPriority = taskModel.getValueAt(clickedRow, 5).toString(); // Back to Index 4 shifted
-                String taskDescription = taskModel.getValueAt(clickedRow, 6).toString(); // Back to Index 5 shifted
-
-                boolean taskStatus;
-                if (taskStatusText.equals("Complete")){
-                    taskStatus = true;
-                } else{
-                    taskStatus = false;
-                }
-
-                ModifyTaskState taskState = modifyTaskViewModel.getState();
-
-                taskState.setOldTaskName(taskName);
-                taskState.setOldStartDateTime(taskStartTime);
-                taskState.setOldDeadline(taskDueDateTime);
-                taskState.setOldPriority(taskPriority);
-                taskState.setOldStatus(taskStatus);
-                taskState.setOldTaskGroup(taskGroup);
-                taskState.setOldDescription(taskDescription);
-
-                taskState.setNewTaskName(taskName);
-                taskState.setStartDateTime(taskStartTime);
-                taskState.setDeadline(taskDueDateTime);
-                taskState.setPriority(taskPriority);
-                taskState.setStatus(taskStatus);
-                taskState.setTaskGroup(taskGroup);
-                taskState.setDescription(taskDescription);
-
-                modifyTaskViewModel.firePropertyChanged();
-                viewManagerModel.setState(modifyTaskViewModel.getViewName());
-                viewManagerModel.firePropertyChanged();
-
-            } else if (designation.equals("habit")) {
-                String habitName = habitModel.getValueAt(clickedRow, 0).toString();
-                String startTime = habitModel.getValueAt(clickedRow, 1).toString();
-                String habitFrequency = habitModel.getValueAt(clickedRow, 2).toString();
-                String habitGroup = habitModel.getValueAt(clickedRow, 3).toString();
-                String habitStreakCount = habitModel.getValueAt(clickedRow, 4).toString();
-                String habitPriority = habitModel.getValueAt(clickedRow, 5).toString();
-                String habitStatusText = habitModel.getValueAt(clickedRow,6).toString();
-                boolean habitStatus;
-                if (habitStatusText.equals("Complete")){
-                    habitStatus = true;
-                } else{
-                    habitStatus = false;
-                }
-                ModifyHabitState habitState = modifyHabitViewModel.getState();
-                habitState.setOldHabitName(habitName);
-                habitState.setOldHabitGroup(habitGroup);
-                habitState.setOldFrequency(habitFrequency);
-                habitState.setOldStatus(habitStatus);
-                habitState.setOldPriority(habitPriority);
-                habitState.setOldStreakCount(habitStreakCount);
-                habitState.setOldStartDateTime(startTime);
-
-                habitState.setHabitName(habitName);
-                habitState.setHabitGroup(habitGroup);
-                habitState.setFrequency(habitFrequency);
-                habitState.setStatus(habitStatus);
-                habitState.setPriority(habitPriority);
-                habitState.setStreakCount(habitStreakCount);
-                habitState.setStartDateTime(startTime);
-
-                modifyHabitViewModel.firePropertyChanged();
-                viewManagerModel.setState(modifyHabitViewModel.getViewName());
-                viewManagerModel.firePropertyChanged();
-            }
-        }
-    }
-    private String[] extendColumns(String[] originalCols, String newColName) {
-        String[] newCols = new String[originalCols.length + 1];
-        System.arraycopy(originalCols, 0, newCols, 0, originalCols.length);
-        newCols[originalCols.length] = newColName;
-        return newCols;
-    }
-
     public ViewTasksAndHabitsView(ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel,
                                   ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel,
                                   ModifyHabitViewModel modifyHabitViewModel, ModifyTaskViewModel modifyTaskViewModel) {
@@ -198,14 +55,15 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         this.modifyHabitViewModel = modifyHabitViewModel;
         this.modifyTaskViewModel = modifyTaskViewModel;
 
-        String[] taskColsWithButton = extendColumns(viewTasksAndHabitsViewModel.TASKCOLS, "Modify");
-        String[] habitColsWithButton = extendColumns(viewTasksAndHabitsViewModel.HABITCOLS, "Modify");
+        final String[] taskColsWithButton = extendColumns(viewTasksAndHabitsViewModel.TASKCOLS, "Modify");
+        final String[] habitColsWithButton = extendColumns(viewTasksAndHabitsViewModel.HABITCOLS, "Modify");
 
         this.taskModel = new DefaultTableModel(taskColsWithButton, 0) {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return columnIndex == getColumnCount() - 1;
             }
+
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == getColumnCount() - 1) {
@@ -220,6 +78,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return columnIndex == getColumnCount() - 1;
             }
+
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == getColumnCount() - 1) {
@@ -229,9 +88,11 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
         };
 
-        final JPanel TablePanel = new JPanel();
+        final JPanel tablePanel = new JPanel();
         final JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        buttonPanel.setLayout(new GridLayout(viewTasksAndHabitsViewModel.BUTTONPANELROWNUM,
+                viewTasksAndHabitsViewModel.BUTTONPANELCOLNUM, viewTasksAndHabitsViewModel.BUTTONPANELHGAPNUM,
+                viewTasksAndHabitsViewModel.BUTTONPANELVGAPNUM));
 
         this.exitButton = new JButton("Exit");
         this.refreshButton = new JButton("Refresh");
@@ -247,35 +108,35 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         buttonPanel.add(this.refreshButton);
         buttonPanel.add(this.exitButton);
 
-        final JLabel TableLabel = new JLabel("Tasks and Habits");
+        final JLabel tableLabel = new JLabel("Tasks and Habits");
 
         setLayout(new BorderLayout());
 
         taskTable = new JTable(this.taskModel);
         taskTable.setFillsViewportHeight(true);
-        JScrollPane taskScrollPane = new JScrollPane(taskTable);
+        final JScrollPane taskScrollPane = new JScrollPane(taskTable);
 
         habitTable = new JTable(this.habitModel);
         habitTable.setFillsViewportHeight(true);
-        JScrollPane habitScrollPane = new JScrollPane(habitTable);
+        final JScrollPane habitScrollPane = new JScrollPane(habitTable);
 
-        int taskButtonColumnIndex = taskTable.getColumnCount() - 1;
-        ButtonHandler taskButtonHandler = new ButtonHandler("Modify Task", "task");
+        final int taskButtonColumnIndex = taskTable.getColumnCount() - 1;
+        final ButtonHandler taskButtonHandler = new ButtonHandler("Modify Task", "task");
         taskTable.getColumnModel().getColumn(taskButtonColumnIndex).setCellRenderer(taskButtonHandler);
         taskTable.getColumnModel().getColumn(taskButtonColumnIndex).setCellEditor(taskButtonHandler);
 
-        int habitButtonColumnIndex = habitTable.getColumnCount() - 1;
-        ButtonHandler habitButtonHandler = new ButtonHandler("Modify Habit", "habit");
+        final int habitButtonColumnIndex = habitTable.getColumnCount() - 1;
+        final ButtonHandler habitButtonHandler = new ButtonHandler("Modify Habit", "habit");
         habitTable.getColumnModel().getColumn(habitButtonColumnIndex).setCellRenderer(habitButtonHandler);
         habitTable.getColumnModel().getColumn(habitButtonColumnIndex).setCellEditor(habitButtonHandler);
 
-
-        add(TablePanel, BorderLayout.SOUTH);
-        add(TableLabel, BorderLayout.NORTH);
+        add(tablePanel, BorderLayout.SOUTH);
+        add(tableLabel, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.EAST);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(1200, 500));
+        final JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setPreferredSize(new Dimension(viewTasksAndHabitsViewModel.WINDOWWIDTH,
+                ViewTasksAndHabitsViewModel.WINDOWHEIGHT));
         tabbedPane.addTab("Tasks", taskScrollPane);
         tabbedPane.addTab("Habits", habitScrollPane);
 
@@ -297,7 +158,8 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
                     if (viewTasksAndHabitsController != null) {
                         viewTasksAndHabitsController.getFormattedTasksAndHabits();
-                    } else {
+                    }
+                    else {
                         JOptionPane.showMessageDialog(ViewTasksAndHabitsView.this,
                                 "Initialization in progress. Please wait a moment.",
                                 "Loading", JOptionPane.WARNING_MESSAGE);
@@ -306,31 +168,37 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
         });
 
-        createTaskButton.addActionListener(e -> {
+        createTaskButton.addActionListener(event -> {
             viewManagerModel.setState("create task");
             viewManagerModel.firePropertyChanged();
         });
 
-        deleteTaskButton.addActionListener(e -> {
+        deleteTaskButton.addActionListener(event -> {
             viewManagerModel.setState("delete task");
             viewManagerModel.firePropertyChanged();
         });
 
-        createHabitButton.addActionListener(e -> {
+        createHabitButton.addActionListener(event -> {
             viewManagerModel.setState("create habit");
             viewManagerModel.firePropertyChanged();
         });
 
-        deleteHabitButton.addActionListener(e -> {
+        deleteHabitButton.addActionListener(event -> {
             viewManagerModel.setState("delete habit");
             viewManagerModel.firePropertyChanged();
         });
-
 
         if (this.viewTasksAndHabitsController != null && this.loggedInViewModel != null) {
             this.viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
 
+    }
+
+    private String[] extendColumns(String[] originalCols, String newColName) {
+        final String[] newCols = new String[originalCols.length + 1];
+        System.arraycopy(originalCols, 0, newCols, 0, originalCols.length);
+        newCols[originalCols.length] = newColName;
+        return newCols;
     }
 
     /**
@@ -346,6 +214,8 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     /**
      * Clears and updates the JTables with fresh data from the ViewModel.
      * Inserts the button's text as a String placeholder into each row of the DefaultTableModel.
+     * @param taskList The formatted list of tasks
+     * @param habitList The formatted list of habits
      */
     public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
 
@@ -354,14 +224,14 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
         for (ArrayList<String> row : taskList) {
             row.add("Modify Task");
-            Object[] rowData = row.toArray();
+            final Object[] rowData = row.toArray();
             taskModel.addRow(rowData);
         }
 
         for (ArrayList<String> row : habitList) {
             // Add a String placeholder for the button column.
             row.add("Modify Habit");
-            Object[] rowData = row.toArray();
+            final Object[] rowData = row.toArray();
             habitModel.addRow(rowData);
         }
     }
@@ -369,6 +239,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     /**
      * Setter for Dependency Injection, used by the main application builder to wire
      * up the controller later.
+     * @param viewTasksAndHabitsController the controller for the view tasks and habits use case
      */
     public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
@@ -392,7 +263,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
-            ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
+            final ViewTasksAndHabitsState state = (ViewTasksAndHabitsState) viewTasksAndHabitsViewModel.getState();
 
             if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
                 JOptionPane.showMessageDialog(this, state.getErrorMessage(), "Data Loading Error",
@@ -400,9 +271,164 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
                 state.setErrorMessage(null);
             }
 
-            ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
-            ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
+            final ArrayList<ArrayList<String>> formattedTasks = state.getFormattedTasks();
+            final ArrayList<ArrayList<String>> formattedHabits = state.getFormattedHabits();
             updateTable(formattedTasks, formattedHabits);
         }
     }
+
+    /**
+     * Renders and edits the JButton component in the table cell.
+     * This class acts as both the renderer (for display) and the editor (for interaction).
+     */
+    class ButtonHandler extends AbstractCellEditor implements TableCellRenderer, TableCellEditor, ActionListener {
+        private final JButton button;
+        private int clickedRow;
+        private String designation;
+
+        ButtonHandler(String buttonText, String designation) {
+            this.designation = designation;
+            this.button = new JButton(buttonText);
+            this.button.setOpaque(true);
+            this.button.addActionListener(this);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+
+            if (value instanceof String) {
+                button.setText((String) value);
+            }
+
+            if (isSelected) {
+                button.setForeground(table.getSelectionForeground());
+                button.setBackground(table.getSelectionBackground());
+            }
+            else {
+                button.setForeground(table.getForeground());
+                button.setBackground(UIManager.getColor("Button.background"));
+            }
+            return button;
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                                                     int column) {
+            this.clickedRow = row;
+            if (value instanceof String) {
+                button.setText((String) value);
+            }
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            // Return the string placeholder from the model
+            if (designation.equals("task")) {
+                return taskModel.getValueAt(clickedRow, taskTable.getColumnCount() - 1);
+            }
+            else {
+                return habitModel.getValueAt(clickedRow, habitTable.getColumnCount() - 1);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            fireEditingStopped();
+
+            if (designation.equals("task")) {
+
+                final String taskName = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKNAMECOLNUM).toString();
+                final String taskStartTime = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKSTARTTIMECOLNUM).toString();
+                final String taskDueDateTime = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKDUETIMECOLNUM).toString();
+                final String taskGroup = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKGROUPCOLNUM).toString();
+                final String taskStatusText = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKSTATUSCOLNUM).toString();
+                final String taskPriority = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKPRIORITYCOLNUM).toString();
+                final String taskDescription = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKDESCRIPTIONCOLNUM).toString();
+
+                final boolean taskStatus;
+                if (taskStatusText.equals("Complete")) {
+                    taskStatus = true;
+                }
+                else {
+                    taskStatus = false;
+                }
+
+                final ModifyTaskState taskState = modifyTaskViewModel.getState();
+
+                taskState.setOldTaskName(taskName);
+                taskState.setOldStartDateTime(taskStartTime);
+                taskState.setOldDeadline(taskDueDateTime);
+                taskState.setOldPriority(taskPriority);
+                taskState.setOldStatus(taskStatus);
+                taskState.setOldTaskGroup(taskGroup);
+                taskState.setOldDescription(taskDescription);
+
+                taskState.setNewTaskName(taskName);
+                taskState.setStartDateTime(taskStartTime);
+                taskState.setDeadline(taskDueDateTime);
+                taskState.setPriority(taskPriority);
+                taskState.setStatus(taskStatus);
+                taskState.setTaskGroup(taskGroup);
+                taskState.setDescription(taskDescription);
+
+                modifyTaskViewModel.firePropertyChanged();
+                viewManagerModel.setState(modifyTaskViewModel.getViewName());
+                viewManagerModel.firePropertyChanged();
+
+            }
+            else if (designation.equals("habit")) {
+                final String habitName = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITNAMECOLNUM).toString();
+                final String startTime = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITSTARTTIMECOLNUM).toString();
+                final String habitFrequency = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITFREQCOLNUM).toString();
+                final String habitGroup = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITGROUPCOLNUM).toString();
+                final String habitStreakCount = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITSTREAKCOUNTCOLNUM).toString();
+                final String habitPriority = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITPRIORITYCOLNUM).toString();
+                final String habitStatusText = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITDESCRIPTIONCOLNUM).toString();
+                final boolean habitStatus;
+                if (habitStatusText.equals("Complete")) {
+                    habitStatus = true;
+                }
+                else {
+                    habitStatus = false;
+                }
+                final ModifyHabitState habitState = modifyHabitViewModel.getState();
+                habitState.setOldHabitName(habitName);
+                habitState.setOldHabitGroup(habitGroup);
+                habitState.setOldFrequency(habitFrequency);
+                habitState.setOldStatus(habitStatus);
+                habitState.setOldPriority(habitPriority);
+                habitState.setOldStreakCount(habitStreakCount);
+                habitState.setOldStartDateTime(startTime);
+
+                habitState.setHabitName(habitName);
+                habitState.setHabitGroup(habitGroup);
+                habitState.setFrequency(habitFrequency);
+                habitState.setStatus(habitStatus);
+                habitState.setPriority(habitPriority);
+                habitState.setStreakCount(habitStreakCount);
+                habitState.setStartDateTime(startTime);
+
+                modifyHabitViewModel.firePropertyChanged();
+                viewManagerModel.setState(modifyHabitViewModel.getViewName());
+                viewManagerModel.firePropertyChanged();
+            }
+        }
+    }
+
 }
