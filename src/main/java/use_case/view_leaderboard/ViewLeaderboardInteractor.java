@@ -50,8 +50,12 @@ public class ViewLeaderboardInteractor implements ViewLeaderboardInputBoundary {
 
             // Sort by maxStreak in descending order
             leaderboardEntries.sort((a, b) -> {
-                Integer streakA = (Integer) a.get("maxStreak");
-                Integer streakB = (Integer) b.get("maxStreak");
+                Integer streakA = getIntegerSafely(a.get("maxStreak"));
+                Integer streakB = getIntegerSafely(b.get("maxStreak"));
+                // Handle null values: nulls go to the end
+                if (streakA == null && streakB == null) return 0;
+                if (streakA == null) return 1;
+                if (streakB == null) return -1;
                 return streakB.compareTo(streakA); // Descending order
             });
 
@@ -63,8 +67,36 @@ public class ViewLeaderboardInteractor implements ViewLeaderboardInputBoundary {
             ViewLeaderboardOutputData outputData = new ViewLeaderboardOutputData(leaderboardEntries);
             presenter.prepareSuccessView(outputData);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            // Catch runtime exceptions (e.g., data access errors)
             presenter.prepareFailView("Failed to load leaderboard: " + e.getMessage());
+        } catch (Exception e) {
+            // Catch other unexpected exceptions
+            presenter.prepareFailView("An unexpected error occurred while loading the leaderboard: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Safely converts an Object to Integer, handling various number types and null values.
+     *
+     * @param value the value to convert
+     * @return Integer value, or null if conversion is not possible
+     */
+    private Integer getIntegerSafely(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        // Try parsing string representation
+        try {
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }
