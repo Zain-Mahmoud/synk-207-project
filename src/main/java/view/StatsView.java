@@ -22,8 +22,12 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
     private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 28);
     private static final Font LABEL_FONT = new Font("SansSerif", Font.PLAIN, 14);
     private static final Font VALUE_FONT = new Font("SansSerif", Font.BOLD, 36);
-    private static final Color PRIMARY_COLOR = new Color(52, 152, 219);
-    private static final Color SECONDARY_COLOR = new Color(236, 240, 241);
+
+    // Updated, more modern color palette (same visual layout)
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);      // soft indigo
+    private static final Color SECONDARY_COLOR = new Color(242, 244, 248);   // light gray background
+    private static final Color CARD_BORDER_COLOR = new Color(218, 222, 232); // subtle card border
+    private static final Color MUTED_TEXT_COLOR = new Color(120, 130, 150);  // muted label text
 
     private final JLabel MAX_STREAK_VALUE = new JLabel("0");
     private final JLabel TASKS_COMPLETED_VALUE = new JLabel("0 / 0");
@@ -44,13 +48,11 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
         this.setBackground(SECONDARY_COLOR);
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-
         final JLabel title = new JLabel("Your Productivity Dashboard", SwingConstants.CENTER);
         title.setFont(TITLE_FONT);
         title.setForeground(PRIMARY_COLOR.darker());
         title.setBorder(new EmptyBorder(0, 0, 30, 0));
         this.add(title, BorderLayout.NORTH);
-
 
         final JPanel contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(SECONDARY_COLOR);
@@ -72,13 +74,22 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
         gbc.gridy = 0;
         contentPanel.add(createStatCard("Total Habits Completed", HABITS_COMPLETED_VALUE), gbc);
 
-
         this.add(contentPanel, BorderLayout.CENTER);
 
         back.addActionListener(e -> {
             viewManagerModel.setState("logged in");
             viewManagerModel.firePropertyChanged();
         });
+
+        // Just recolor the existing back button, no layout change
+        back.setBackground(PRIMARY_COLOR);
+        back.setForeground(Color.WHITE);
+        back.setFocusPainted(false);
+        back.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(PRIMARY_COLOR.darker(), 1),
+                new EmptyBorder(6, 14, 6, 14)
+        ));
+        back.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         final JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         backButtonPanel.setBackground(SECONDARY_COLOR);
@@ -97,14 +108,13 @@ public class StatsView extends JPanel implements ActionListener, PropertyChangeL
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Color.WHITE);
 
-
-        Border line = BorderFactory.createLineBorder(PRIMARY_COLOR, 1);
+        Border line = BorderFactory.createLineBorder(CARD_BORDER_COLOR, 1);
         Border margin = BorderFactory.createEmptyBorder(20, 20, 20, 20);
         card.setBorder(BorderFactory.createCompoundBorder(line, margin));
 
         final JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
         titleLabel.setFont(LABEL_FONT);
-        titleLabel.setForeground(Color.GRAY.darker());
+        titleLabel.setForeground(MUTED_TEXT_COLOR);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         valueLabel.setFont(VALUE_FONT);

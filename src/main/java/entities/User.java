@@ -11,13 +11,6 @@ public class User {
     private String avatarpath;
     private String password;
 
-    public User(String uid, String username, String password) {
-        this.uid = uid;
-        this.username = username;
-        this.avatarpath = null;
-        this.password = password;
-    }
-
     public User(String uid, String username, String avatarpath, String password) {
         this.uid = uid;
         this.username = username;

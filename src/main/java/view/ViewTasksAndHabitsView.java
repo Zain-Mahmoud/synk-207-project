@@ -11,7 +11,10 @@ import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsState;
 import interface_adapter.view_tasks_and_habits.ViewTasksAndHabitsViewModel;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -19,10 +22,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class ViewTasksAndHabitsView extends JPanel implements ActionListener, PropertyChangeListener {
+
+    private static final Color PRIMARY_COLOR = new Color(255, 161, 108);
+    private static final Color BACKGROUND_COLOR = new Color(248, 244, 242);
+    private static final Color CARD_BORDER_COLOR = new Color(232, 222, 218);
+    private static final Color MUTED_TEXT_COLOR = new Color(150, 131, 120);
+    private static final Color TABLE_GRID_COLOR = new Color(230, 233, 240);
+    private static final Color TABLE_ALT_ROW_COLOR = new Color(252, 251, 250);
+    private static final Color TABLE_SELECTION_COLOR = new Color(252, 240, 232);
 
     private final ViewTasksAndHabitsViewModel viewTasksAndHabitsViewModel;
     private ViewTasksAndHabitsController viewTasksAndHabitsController;
@@ -44,11 +54,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
     private final JButton createHabitButton;
     private final JButton deleteHabitButton;
 
-
-    /**
-     * Renders and edits the JButton component in the table cell.
-     * This class acts as both the renderer (for display) and the editor (for interaction).
-     */
     class ButtonHandler extends AbstractCellEditor implements TableCellRenderer, TableCellEditor, ActionListener {
         private final JButton button;
         private int clickedRow;
@@ -58,6 +63,11 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             this.designation = designation;
             this.button = new JButton(buttonText);
             this.button.setOpaque(true);
+            this.button.setBackground(PRIMARY_COLOR);
+            this.button.setForeground(Color.WHITE);
+            this.button.setFocusPainted(false);
+            this.button.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
+            this.button.setCursor(new Cursor(Cursor.HAND_CURSOR));
             this.button.addActionListener(this);
         }
 
@@ -70,11 +80,11 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
 
             if (isSelected) {
-                button.setForeground(table.getSelectionForeground());
-                button.setBackground(table.getSelectionBackground());
+                button.setBackground(PRIMARY_COLOR.darker());
+                button.setForeground(Color.WHITE);
             } else {
-                button.setForeground(table.getForeground());
-                button.setBackground(UIManager.getColor("Button.background"));
+                button.setBackground(PRIMARY_COLOR);
+                button.setForeground(Color.WHITE);
             }
             return button;
         }
@@ -82,7 +92,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.clickedRow = row;
-            // The button text is set from the String placeholder in the model
             if (value instanceof String) {
                 button.setText((String) value);
             }
@@ -91,7 +100,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
         @Override
         public Object getCellEditorValue() {
-            // Return the string placeholder from the model
             if (designation.equals("task")) {
                 return taskModel.getValueAt(clickedRow, taskTable.getColumnCount() - 1);
             } else {
@@ -105,14 +113,13 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
             if (designation.equals("task")) {
 
-
                 String taskName = taskModel.getValueAt(clickedRow, 0).toString();
                 String taskStartTime = taskModel.getValueAt(clickedRow, 1).toString();
-                String taskDueDateTime = taskModel.getValueAt(clickedRow, 2).toString(); // Back to Index 1 shifted
-                String taskGroup = taskModel.getValueAt(clickedRow, 3).toString(); // Back to Index 2 shifted
-                String taskStatusText = taskModel.getValueAt(clickedRow, 4).toString(); // Back to Index 3 shifted
-                String taskPriority = taskModel.getValueAt(clickedRow, 5).toString(); // Back to Index 4 shifted
-                String taskDescription = taskModel.getValueAt(clickedRow, 6).toString(); // Back to Index 5 shifted
+                String taskDueDateTime = taskModel.getValueAt(clickedRow, 2).toString();
+                String taskGroup = taskModel.getValueAt(clickedRow, 3).toString();
+                String taskStatusText = taskModel.getValueAt(clickedRow, 4).toString();
+                String taskPriority = taskModel.getValueAt(clickedRow, 5).toString();
+                String taskDescription = taskModel.getValueAt(clickedRow, 6).toString();
 
                 boolean taskStatus;
                 if (taskStatusText.equals("Complete")){
@@ -180,6 +187,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             }
         }
     }
+
     private String[] extendColumns(String[] originalCols, String newColName) {
         String[] newCols = new String[originalCols.length + 1];
         System.arraycopy(originalCols, 0, newCols, 0, originalCols.length);
@@ -232,6 +240,8 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         final JPanel TablePanel = new JPanel();
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        buttonPanel.setBackground(BACKGROUND_COLOR);
+        buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         this.exitButton = new JButton("Exit");
         this.refreshButton = new JButton("Refresh");
@@ -239,6 +249,13 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         this.deleteTaskButton = new JButton("Delete Task");
         this.createHabitButton = new JButton("Create Habit");
         this.deleteHabitButton = new JButton("Delete Habit");
+
+        styleActionButton(this.createTaskButton);
+        styleActionButton(this.deleteTaskButton);
+        styleActionButton(this.createHabitButton);
+        styleActionButton(this.deleteHabitButton);
+        styleActionButton(this.refreshButton);
+        styleActionButton(this.exitButton);
 
         buttonPanel.add(this.createTaskButton);
         buttonPanel.add(this.deleteTaskButton);
@@ -248,16 +265,35 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         buttonPanel.add(this.exitButton);
 
         final JLabel TableLabel = new JLabel("Tasks and Habits");
+        TableLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        TableLabel.setForeground(PRIMARY_COLOR.darker());
+        TableLabel.setBorder(new EmptyBorder(12, 16, 12, 16));
 
         setLayout(new BorderLayout());
+        setBackground(BACKGROUND_COLOR);
 
         taskTable = new JTable(this.taskModel);
         taskTable.setFillsViewportHeight(true);
+        taskTable.setRowHeight(26);
+        taskTable.setGridColor(TABLE_GRID_COLOR);
+        taskTable.setShowVerticalLines(false);
+        taskTable.setSelectionBackground(TABLE_SELECTION_COLOR);
         JScrollPane taskScrollPane = new JScrollPane(taskTable);
+        taskScrollPane.getViewport().setBackground(Color.WHITE);
+        styleTableHeader(taskTable);
 
         habitTable = new JTable(this.habitModel);
         habitTable.setFillsViewportHeight(true);
+        habitTable.setRowHeight(26);
+        habitTable.setGridColor(TABLE_GRID_COLOR);
+        habitTable.setShowVerticalLines(false);
+        habitTable.setSelectionBackground(TABLE_SELECTION_COLOR);
         JScrollPane habitScrollPane = new JScrollPane(habitTable);
+        habitScrollPane.getViewport().setBackground(Color.WHITE);
+        styleTableHeader(habitTable);
+
+        styleTableStriping(taskTable);
+        styleTableStriping(habitTable);
 
         int taskButtonColumnIndex = taskTable.getColumnCount() - 1;
         ButtonHandler taskButtonHandler = new ButtonHandler("Modify Task", "task");
@@ -269,6 +305,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         habitTable.getColumnModel().getColumn(habitButtonColumnIndex).setCellRenderer(habitButtonHandler);
         habitTable.getColumnModel().getColumn(habitButtonColumnIndex).setCellEditor(habitButtonHandler);
 
+        TablePanel.setBackground(BACKGROUND_COLOR);
 
         add(TablePanel, BorderLayout.SOUTH);
         add(TableLabel, BorderLayout.NORTH);
@@ -278,6 +315,7 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         tabbedPane.setPreferredSize(new Dimension(1200, 500));
         tabbedPane.addTab("Tasks", taskScrollPane);
         tabbedPane.addTab("Habits", habitScrollPane);
+        tabbedPane.setBackground(BACKGROUND_COLOR);
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -326,27 +364,61 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
             viewManagerModel.firePropertyChanged();
         });
 
-
         if (this.viewTasksAndHabitsController != null && this.loggedInViewModel != null) {
             this.viewTasksAndHabitsController.getFormattedTasksAndHabits();
         }
 
     }
 
-    /**
-     * Required method for ActionListener, though typically handled via anonymous
-     * classes now.
-     *
-     * @param evt the ActionEvent to react to
-     */
+    private void styleActionButton(JButton button) {
+        button.setBackground(PRIMARY_COLOR);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(PRIMARY_COLOR.darker(), 1),
+                new EmptyBorder(6, 12, 6, 12)
+        ));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
+    }
+
+    private void styleTableHeader(JTable table) {
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(PRIMARY_COLOR);
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("SansSerif", Font.BOLD, 13));
+        header.setReorderingAllowed(false);
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, CARD_BORDER_COLOR));
+    }
+
+    private void styleTableStriping(JTable table) {
+        DefaultTableCellRenderer baseRenderer = new DefaultTableCellRenderer();
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable t, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = baseRenderer.getTableCellRendererComponent(t, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    c.setBackground(TABLE_SELECTION_COLOR);
+                } else {
+                    if (row % 2 == 0) {
+                        c.setBackground(Color.WHITE);
+                    } else {
+                        c.setBackground(TABLE_ALT_ROW_COLOR);
+                    }
+                }
+                if (c instanceof JLabel) {
+                    ((JLabel) c).setForeground(Color.DARK_GRAY);
+                }
+                return c;
+            }
+        });
+    }
+
     public void actionPerformed(ActionEvent evt) {
         // Empty
     }
 
-    /**
-     * Clears and updates the JTables with fresh data from the ViewModel.
-     * Inserts the button's text as a String placeholder into each row of the DefaultTableModel.
-     */
     public void updateTable(ArrayList<ArrayList<String>> taskList, ArrayList<ArrayList<String>> habitList) {
 
         taskModel.setRowCount(0);
@@ -359,17 +431,12 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         }
 
         for (ArrayList<String> row : habitList) {
-            // Add a String placeholder for the button column.
             row.add("Modify Habit");
             Object[] rowData = row.toArray();
             habitModel.addRow(rowData);
         }
     }
 
-    /**
-     * Setter for Dependency Injection, used by the main application builder to wire
-     * up the controller later.
-     */
     public void setViewTasksAndHabitsController(ViewTasksAndHabitsController viewTasksAndHabitsController) {
         this.viewTasksAndHabitsController = viewTasksAndHabitsController;
         if (this.loggedInViewModel != null) {
@@ -385,10 +452,6 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         this.viewManagerModel = viewManagerModel;
     }
 
-    /**
-     * Reacts to changes in the ViewModel state. This is how the table data is
-     * refreshed after a controller call.
-     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
