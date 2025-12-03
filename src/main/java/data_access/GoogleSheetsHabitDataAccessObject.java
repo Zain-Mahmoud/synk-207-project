@@ -57,7 +57,7 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
     private static final String DEFAULT_USER_ID = "user";
     private static final Duration TOKEN_VALIDITY = Duration.ofDays(30);
     private static final String TOKEN_METADATA_SUFFIX = "-sheets-auth.meta";
-    private static final String HABIT_HEADER = "username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
+    private static final String HABIT_HEADER = "uid,username,habitName,streakCount,startDateTime,frequency,habitGroup,priority,status";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final String DEFAULT_SHEET_NAME = "Sheet1";
     private static final String DEFAULT_SPREADSHEET_ID = ""; // Must be set via constructor or setter
@@ -94,7 +94,7 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
     /**
      * Creates a Google Sheets DAO with custom user ID and spreadsheet.
      *
-     * @param userId        identifier used to store OAuth tokens
+     * @param userId        identifier used to store OAuth tokens (typically username for authentication)
      * @param spreadsheetId the Google Sheet ID
      * @param sheetName     the name of the sheet tab (e.g., "Sheet1")
      * @throws IOException              if the credential file cannot be read
@@ -256,7 +256,7 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
     private List<List<Object>> readAllFromSheet(String userId) throws IOException {
         ensureSpreadsheetId();
         Sheets service = getServiceForUser(userId);
-        String range = sheetName + "!A:H"; // Read columns A through H
+        String range = sheetName + "!A:I"; // Read columns A through I (added uid column)
         ValueRange response = service.spreadsheets().values()
                 .get(spreadsheetId, range)
                 .execute();
@@ -294,6 +294,7 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
 
     /**
      * Converts a list of rows from Google Sheets to internal data structure.
+     * Supports both old format (without uid) and new format (with uid).
      */
     private Map<String, ArrayList<Habit>> parseRowsToHabits(List<List<Object>> rows) {
         Map<String, ArrayList<Habit>> userHabits = new HashMap<>();
@@ -309,14 +310,17 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             }
 
             try {
-                String username = safeString(row.get(0));
-                String habitName = safeString(row.get(1));
-                int streakCount = safeInt(row.get(2), 0);
-                String startDateTimeRaw = safeString(row.get(3));
-                int frequency = safeInt(row.get(4), 0);
-                String habitGroup = safeString(row.get(5));
-                int priority = safeInt(row.get(6), 0);
-                boolean status = safeBoolean(row.get(7), false);
+                // Support both old format (8 columns) and new format (9 columns with uid)
+                int offset = row.size() >= 9 ? 1 : 0; // If 9 columns, skip uid column
+                // uid is stored but not currently used in parsing (reserved for future user tracking)
+                String username = safeString(row.get(0 + offset));
+                String habitName = safeString(row.get(1 + offset));
+                int streakCount = safeInt(row.get(2 + offset), 0);
+                String startDateTimeRaw = safeString(row.get(3 + offset));
+                int frequency = safeInt(row.get(4 + offset), 0);
+                String habitGroup = safeString(row.get(5 + offset));
+                int priority = safeInt(row.get(6 + offset), 0);
+                boolean status = safeBoolean(row.get(7 + offset), false);
 
                 LocalDateTime startDateTime = null;
                 if (!startDateTimeRaw.isBlank()) {
@@ -348,18 +352,21 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
 
     /**
      * Converts internal data structure to rows for Google Sheets.
+     * Stores both uid and username for better user tracking.
      */
-    private List<List<Object>> habitsToRows(Map<String, ArrayList<Habit>> userHabits) {
+    private List<List<Object>> habitsToRows(Map<String, ArrayList<Habit>> userHabits, Map<String, String> uidMap) {
         List<List<Object>> rows = new ArrayList<>();
         // Add header
         rows.add(Arrays.asList((Object[]) HABIT_HEADER.split(",")));
 
         for (Map.Entry<String, ArrayList<Habit>> entry : userHabits.entrySet()) {
             String username = entry.getKey();
+            String uid = uidMap.getOrDefault(username, ""); // Get uid if available, empty string otherwise
             for (Habit habit : entry.getValue()) {
                 String startDateTime = habit.getStartTime() == null ? ""
                         : DATE_FORMATTER.format(habit.getStartTime());
                 List<Object> row = Arrays.asList(
+                        uid, // uid column
                         username,
                         safe(habit.getName()),
                         Integer.toString(habit.getStreakCount()),
@@ -373,6 +380,13 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             }
         }
         return rows;
+    }
+
+    /**
+     * Overloaded method for backward compatibility (without uid mapping).
+     */
+    private List<List<Object>> habitsToRows(Map<String, ArrayList<Habit>> userHabits) {
+        return habitsToRows(userHabits, new HashMap<>());
     }
 
     private String safeString(Object value) {
@@ -421,7 +435,9 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             ArrayList<Habit> habitsForUser = userHabits.computeIfAbsent(userId, key -> new ArrayList<>());
             habitsForUser.add(habit);
 
-            List<List<Object>> updatedRows = habitsToRows(userHabits);
+            // Preserve uid mapping when writing
+            Map<String, String> uidMap = extractUidMapping(rows);
+            List<List<Object>> updatedRows = habitsToRows(userHabits, uidMap);
             writeAllToSheet(userId, updatedRows);
             return "Habit Added Successfully";
         } catch (Exception e) {
@@ -495,14 +511,28 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             List<List<Object>> rows = readAllFromSheet(userId);
             Map<String, ArrayList<Habit>> userHabits = parseRowsToHabits(rows);
 
+            // Use username + habitName for reliable deletion instead of object equality
+            // This is safer because objects are rebuilt from the sheet and may not match by reference
             ArrayList<Habit> habits = userHabits.get(userId);
             if (habits == null) {
                 return false;
             }
 
-            boolean removed = habits.remove(habit);
+            // Find and remove by habitName (more reliable than object equality)
+            boolean removed = false;
+            String targetHabitName = habit.getName();
+            for (int i = habits.size() - 1; i >= 0; i--) {
+                if (habits.get(i).getName().equals(targetHabitName)) {
+                    habits.remove(i);
+                    removed = true;
+                    break; // Remove only the first match
+                }
+            }
+
             if (removed) {
-                List<List<Object>> updatedRows = habitsToRows(userHabits);
+                // Rebuild uid mapping from existing rows for persistence
+                Map<String, String> uidMap = extractUidMapping(rows);
+                List<List<Object>> updatedRows = habitsToRows(userHabits, uidMap);
                 writeAllToSheet(userId, updatedRows);
             }
             return removed;
@@ -510,6 +540,34 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Extracts uid to username mapping from existing sheet rows.
+     */
+    private Map<String, String> extractUidMapping(List<List<Object>> rows) {
+        Map<String, String> uidMap = new HashMap<>();
+        if (rows.isEmpty()) {
+            return uidMap;
+        }
+
+        // Check if header has uid column (new format)
+        List<Object> header = rows.get(0);
+        boolean hasUidColumn = header.size() >= 9 && "uid".equals(safeString(header.get(0)));
+
+        if (hasUidColumn) {
+            for (int i = 1; i < rows.size(); i++) {
+                List<Object> row = rows.get(i);
+                if (row.size() >= 9) {
+                    String uid = safeString(row.get(0));
+                    String username = safeString(row.get(1));
+                    if (!uid.isEmpty() && !username.isEmpty()) {
+                        uidMap.put(username, uid);
+                    }
+                }
+            }
+        }
+        return uidMap;
     }
 }
 
