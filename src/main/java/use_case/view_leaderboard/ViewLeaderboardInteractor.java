@@ -1,29 +1,32 @@
 package use_case.view_leaderboard;
 
 import entities.Habit;
-import use_case.gateways.HabitGateway;
+import use_case.gateways.LeaderboardGateway;
 
 import java.util.*;
 
 /**
  * The Interactor for the View Leaderboard Use Case.
  * Calculates each user's maximum streak count and sorts them for display.
+ * 
+ * Uses LeaderboardGateway to access online data (e.g., Google Sheets)
+ * while other features continue using local CSV storage.
  */
 public class ViewLeaderboardInteractor implements ViewLeaderboardInputBoundary {
-    private final HabitGateway userDataAccess;
+    private final LeaderboardGateway leaderboardDataAccess;
     private final ViewLeaderboardOutputBoundary presenter;
 
-    public ViewLeaderboardInteractor(HabitGateway userDataAccess,
+    public ViewLeaderboardInteractor(LeaderboardGateway leaderboardDataAccess,
                                      ViewLeaderboardOutputBoundary presenter) {
-        this.userDataAccess = userDataAccess;
+        this.leaderboardDataAccess = leaderboardDataAccess;
         this.presenter = presenter;
     }
 
     @Override
     public void execute(ViewLeaderboardInputData inputData) {
         try {
-            // Get all users with their habits
-            Map<String, List<Habit>> allUsersWithHabits = userDataAccess.getAllUsersWithHabits();
+            // Get all users with their habits from leaderboard data source
+            Map<String, List<Habit>> allUsersWithHabits = leaderboardDataAccess.getAllUsersWithHabits();
 
             // Calculate maximum streak for each user
             List<Map<String, Object>> leaderboardEntries = new ArrayList<>();
