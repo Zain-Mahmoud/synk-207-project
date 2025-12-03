@@ -10,7 +10,7 @@ import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
 import data_access.GoogleCalendarDataAccessObject;
-import data_access.GoogleSheetsLeaderboardDataAccessObject;
+import data_access.GoogleDriveLeaderboardDataAccessObject;
 import data_access.HabitDataAccessObject;
 import data_access.LocalLeaderboardDataAccessObject;
 import data_access.TaskDataAccessObject;
@@ -464,40 +464,33 @@ public class AppBuilder {
 
 
     /**
-     * Configures the application to use Google Sheets for leaderboard data.
-     * This enables online multi-user leaderboard functionality.
+     * Configures the application to use Google Drive for leaderboard data.
+     * This enables online multi-user leaderboard functionality by reading habits.csv from Drive.
      * 
-     * Note: This only affects the leaderboard view. All other features (create, modify, delete habits)
-     * continue using local CSV storage (habits.csv).
+     * Note: This ONLY affects the leaderboard view (read-only).
+     * All other features (create, modify, delete habits) continue using local CSV storage (habits.csv).
      *
-     * @param spreadsheetId the Google Sheet ID (extracted from the Sheet URL)
-     *                      Example: from https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
-     * @param sheetName     the name of the sheet tab (default: "Sheet1")
+     * @param driveFileIdOrUrl the Google Drive file ID or full URL of the habits.csv file
+     *                         Can be:
+     *                         - File ID: "1abc123def456..."
+     *                         - Full URL: "https://drive.google.com/file/d/1abc123def456.../view"
+     *                         - Shared link: "https://drive.google.com/open?id=1abc123def456..."
      * @return this AppBuilder instance for method chaining
-     * @throws IOException              if Google Sheets API setup fails
+     * @throws IOException              if Google Drive API setup fails
      * @throws GeneralSecurityException if security setup fails
      */
-    public AppBuilder useGoogleSheetsForLeaderboard(String spreadsheetId, String sheetName)
+    public AppBuilder useGoogleDriveForLeaderboard(String driveFileIdOrUrl)
             throws IOException, GeneralSecurityException {
-        GoogleSheetsLeaderboardDataAccessObject sheetsDao = new GoogleSheetsLeaderboardDataAccessObject(
-                "user", spreadsheetId, sheetName);
-        this.leaderboardDataAccessObject = sheetsDao;
+        // Extract file ID from URL if needed
+        String fileId = GoogleDriveLeaderboardDataAccessObject.extractFileIdFromUrl(driveFileIdOrUrl);
+        if (fileId == null) {
+            throw new IllegalArgumentException("Invalid Google Drive file ID or URL: " + driveFileIdOrUrl);
+        }
+        
+        GoogleDriveLeaderboardDataAccessObject driveDao = new GoogleDriveLeaderboardDataAccessObject(fileId);
+        this.leaderboardDataAccessObject = driveDao;
+        
         return this;
-    }
-
-    /**
-     * Configures the application to use Google Sheets for leaderboard data with default sheet name.
-     * 
-     * Note: This only affects the leaderboard view. All other features continue using local CSV.
-     *
-     * @param spreadsheetId the Google Sheet ID
-     * @return this AppBuilder instance for method chaining
-     * @throws IOException              if Google Sheets API setup fails
-     * @throws GeneralSecurityException if security setup fails
-     */
-    public AppBuilder useGoogleSheetsForLeaderboard(String spreadsheetId)
-            throws IOException, GeneralSecurityException {
-        return useGoogleSheetsForLeaderboard(spreadsheetId, "Sheet1");
     }
 
     public JFrame build() {
