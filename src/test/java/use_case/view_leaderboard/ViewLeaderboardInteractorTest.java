@@ -1,10 +1,12 @@
 package use_case.view_leaderboard;
 
 import data_access.InMemoryHabitDataAccessObject;
+import data_access.LocalLeaderboardDataAccessObject;
 import entities.Habit;
 import entities.HabitBuilder;
 import org.junit.jupiter.api.Test;
 import use_case.gateways.HabitGateway;
+import use_case.gateways.LeaderboardGateway;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,8 +46,9 @@ class ViewLeaderboardInteractorTest {
     void execute_successfullyCalculatesLeaderboardWithMultipleUsers() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         // User alice with max streak 15
         Habit habit1 = new HabitBuilder()
@@ -109,8 +112,9 @@ class ViewLeaderboardInteractorTest {
     void execute_handlesEmptyDataGracefully() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         // Act
         interactor.execute(new ViewLeaderboardInputData());
@@ -125,8 +129,9 @@ class ViewLeaderboardInteractorTest {
     void execute_handlesSingleUser() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         HabitBuilder habitBuilder = new HabitBuilder();
         Habit habit = habitBuilder
@@ -161,8 +166,9 @@ class ViewLeaderboardInteractorTest {
     void execute_calculatesMaxStreakFromMultipleHabits() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         // User with multiple habits: max streak should be 25
         Habit habit1 = new HabitBuilder()
@@ -218,8 +224,9 @@ class ViewLeaderboardInteractorTest {
     void execute_handlesUsersWithZeroStreak() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         Habit habit1 = new HabitBuilder()
                 .setHabitName("Exercise")
@@ -268,8 +275,9 @@ class ViewLeaderboardInteractorTest {
     void execute_handlesUsersWithSameMaxStreak() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         Habit habit1 = new HabitBuilder()
                 .setHabitName("Exercise")
@@ -314,35 +322,10 @@ class ViewLeaderboardInteractorTest {
     @Test
     void execute_handlesDataAccessException() {
         // Arrange
-        HabitGateway throwingGateway = new HabitGateway() {
-            @Override
-            public String addHabit(String userId, Habit habit) {
-                return "Habit Added Successfully";
-            }
-
-            @Override
-            public java.util.ArrayList<Habit> fetchHabits(String userId) {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public boolean deleteHabit(String userId, Habit habit) {
-                return false;
-            }
-
+        LeaderboardGateway throwingGateway = new LeaderboardGateway() {
             @Override
             public java.util.Map<String, java.util.List<Habit>> getAllUsersWithHabits() {
                 throw new RuntimeException("Database connection failed");
-            }
-
-            @Override
-            public java.util.List<String> getAllUsernames() {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public java.util.List<Habit> getHabitsForUser(String username) {
-                return new java.util.ArrayList<>();
             }
         };
 
@@ -363,8 +346,9 @@ class ViewLeaderboardInteractorTest {
     void execute_ranksEntriesCorrectlyInDescendingOrder() {
         // Arrange
         HabitGateway habitGateway = new InMemoryHabitDataAccessObject();
+        LeaderboardGateway leaderboardGateway = new LocalLeaderboardDataAccessObject(habitGateway);
         TestPresenter presenter = new TestPresenter();
-        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(habitGateway, presenter);
+        ViewLeaderboardInteractor interactor = new ViewLeaderboardInteractor(leaderboardGateway, presenter);
 
         // Create users with streaks: 5, 20, 10, 30, 15
         habitGateway.addHabit("user1", new HabitBuilder()
@@ -445,43 +429,12 @@ class ViewLeaderboardInteractorTest {
     @Test
     void execute_handlesUserWithEmptyHabitsList() {
         // Arrange - Test the branch when habits list is empty
-
-        // Add a user with an empty habits list (simulated by not adding any habits)
-        // The getAllUsersWithHabits should return empty list for this user
-        // Actually, we need to add a user entry with empty list
-        // Since InMemoryHabitDataAccessObject doesn't support this directly,
-        // we'll test the case where getAllUsersWithHabits returns a user with empty list
-        HabitGateway customGateway = new HabitGateway() {
-            @Override
-            public String addHabit(String userId, Habit habit) {
-                return "Habit Added Successfully";
-            }
-
-            @Override
-            public java.util.ArrayList<Habit> fetchHabits(String userId) {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public boolean deleteHabit(String userId, Habit habit) {
-                return false;
-            }
-
+        LeaderboardGateway customGateway = new LeaderboardGateway() {
             @Override
             public java.util.Map<String, java.util.List<Habit>> getAllUsersWithHabits() {
                 java.util.Map<String, java.util.List<Habit>> result = new java.util.HashMap<>();
                 result.put("emptyUser", new java.util.ArrayList<>());
                 return result;
-            }
-
-            @Override
-            public java.util.List<String> getAllUsernames() {
-                return new java.util.ArrayList<>();
-            }
-
-            @Override
-            public java.util.List<Habit> getHabitsForUser(String username) {
-                return new java.util.ArrayList<>();
             }
         };
 
