@@ -35,6 +35,7 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     private final ViewLeaderboardViewModel viewLeaderboardViewModel;
     private ViewLeaderboardController viewLeaderboardController;
     private ViewManagerModel viewManagerModel;
+    private PropertyChangeListener viewManagerListener; // Store listener reference to prevent memory leaks
 
     private final JLabel title = new JLabel(ViewLeaderboardViewModel.TITLE_LABEL, SwingConstants.CENTER);
     private JTable leaderboardTable;
@@ -132,13 +133,25 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
                 c.setForeground(Color.BLACK);
 
                 if (column == 0) {
-                    Integer rank = (Integer) value;
+                    // Safe type conversion for rank
+                    Integer rank = null;
+                    if (value instanceof Integer) {
+                        rank = (Integer) value;
+                    } else if (value instanceof Number) {
+                        rank = ((Number) value).intValue();
+                    }
                     if (rank != null && rank <= 3) {
                         c.setForeground(PRIMARY_COLOR.darker());
                         c.setFont(new Font("SansSerif", Font.BOLD, 14));
                     }
                 } else if (column == 2) {
-                    Integer streak = (Integer) value;
+                    // Safe type conversion for streak
+                    Integer streak = null;
+                    if (value instanceof Integer) {
+                        streak = (Integer) value;
+                    } else if (value instanceof Number) {
+                        streak = ((Number) value).intValue();
+                    }
                     if (streak != null && streak > 0) {
                         c.setForeground(ACCENT_COLOR.darker());
                         c.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -220,7 +233,13 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        ViewLeaderboardState state = (ViewLeaderboardState) evt.getNewValue();
+        // Safe type check before casting
+        Object newValue = evt.getNewValue();
+        if (!(newValue instanceof ViewLeaderboardState)) {
+            return;
+        }
+        
+        ViewLeaderboardState state = (ViewLeaderboardState) newValue;
         
         if (state.getErrorMessage() != null) {
             errorLabel.setText(state.getErrorMessage());
@@ -270,16 +289,26 @@ public class LeaderboardView extends JPanel implements ActionListener, PropertyC
     }
 
     public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        // Remove old listener to prevent memory leaks
+        if (this.viewManagerModel != null && viewManagerListener != null) {
+            this.viewManagerModel.removePropertyChangeListener(viewManagerListener);
+        }
+        
         this.viewManagerModel = viewManagerModel;
         if (viewManagerModel != null) {
-            viewManagerModel.addPropertyChangeListener(evt -> {
+            // Create and store listener reference
+            viewManagerListener = evt -> {
                 if ("state".equals(evt.getPropertyName())) {
-                    String currentView = (String) evt.getNewValue();
-                    if (viewName.equals(currentView) && viewLeaderboardController != null) {
-                        viewLeaderboardController.execute();
+                    Object newValue = evt.getNewValue();
+                    if (newValue instanceof String) {
+                        String currentView = (String) newValue;
+                        if (viewName.equals(currentView) && viewLeaderboardController != null) {
+                            viewLeaderboardController.execute();
+                        }
                     }
                 }
-            });
+            };
+            viewManagerModel.addPropertyChangeListener(viewManagerListener);
         }
     }
 }

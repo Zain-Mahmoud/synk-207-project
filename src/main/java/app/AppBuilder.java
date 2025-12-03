@@ -10,7 +10,9 @@ import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
 import data_access.GoogleCalendarDataAccessObject;
+import data_access.GoogleDriveLeaderboardDataAccessObject;
 import data_access.HabitDataAccessObject;
+import data_access.LocalLeaderboardDataAccessObject;
 import data_access.TaskDataAccessObject;
 import entities.UserFactory;
 import interface_adapter.ViewManagerModel;
@@ -67,6 +69,8 @@ import use_case.delete_task.DeleteTaskInputBoundary;
 import use_case.delete_task.DeleteTaskInteractor;
 import use_case.delete_task.DeleteTaskOutputBoundary;
 import use_case.gateways.CalendarGateway;
+import use_case.gateways.HabitGateway;
+import use_case.gateways.LeaderboardGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -120,8 +124,9 @@ public class AppBuilder {
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
-    final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
+    HabitGateway habitDataAccessObject = new HabitDataAccessObject(); // Always use local CSV for habit CRUD operations
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
+    private use_case.gateways.LeaderboardGateway leaderboardDataAccessObject; // Separate data source for leaderboard (currently null, uses local CSV via LocalLeaderboardDataAccessObject)
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -293,8 +298,14 @@ public class AppBuilder {
     public AppBuilder addViewLeaderboardUseCase() {
         final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(
                 viewLeaderboardViewModel);
+        
+        // Use leaderboard-specific data source if configured, otherwise fall back to local CSV
+        LeaderboardGateway leaderboardGateway = leaderboardDataAccessObject != null 
+                ? leaderboardDataAccessObject 
+                : new LocalLeaderboardDataAccessObject(habitDataAccessObject);
+        
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
-                habitDataAccessObject, viewLeaderboardOutputBoundary);
+                leaderboardGateway, viewLeaderboardOutputBoundary);
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
@@ -451,6 +462,39 @@ public class AppBuilder {
         return this;
     }
 
+
+    /**
+     * Configures the application to use Google Drive for leaderboard data.
+     * This enables online multi-user leaderboard functionality by reading habits.csv from Drive.
+     * 
+     * Note: This ONLY affects the leaderboard view (read-only).
+     * All other features (create, modify, delete habits) continue using local CSV storage (habits.csv).
+     * 
+     * ⚠️ TEMPORARILY DISABLED: This feature is currently disabled in Main.java.
+     * The code is preserved for future use. Leaderboard currently uses local habits.csv.
+     *
+     * @param driveFileIdOrUrl the Google Drive file ID or full URL of the habits.csv file
+     *                         Can be:
+     *                         - File ID: "1abc123def456..."
+     *                         - Full URL: "https://drive.google.com/file/d/1abc123def456.../view"
+     *                         - Shared link: "https://drive.google.com/open?id=1abc123def456..."
+     * @return this AppBuilder instance for method chaining
+     * @throws IOException              if Google Drive API setup fails
+     * @throws GeneralSecurityException if security setup fails
+     */
+    public AppBuilder useGoogleDriveForLeaderboard(String driveFileIdOrUrl)
+            throws IOException, GeneralSecurityException {
+        // Extract file ID from URL if needed
+        String fileId = GoogleDriveLeaderboardDataAccessObject.extractFileIdFromUrl(driveFileIdOrUrl);
+        if (fileId == null) {
+            throw new IllegalArgumentException("Invalid Google Drive file ID or URL: " + driveFileIdOrUrl);
+        }
+        
+        GoogleDriveLeaderboardDataAccessObject driveDao = new GoogleDriveLeaderboardDataAccessObject(fileId);
+        this.leaderboardDataAccessObject = driveDao;
+        
+        return this;
+    }
 
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
