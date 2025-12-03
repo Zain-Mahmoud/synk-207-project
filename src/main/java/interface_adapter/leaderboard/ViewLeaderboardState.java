@@ -15,8 +15,9 @@ public class ViewLeaderboardState {
     }
 
     public ViewLeaderboardState(ViewLeaderboardState copy) {
-        leaderboardEntries = copy.leaderboardEntries;
-        errorMessage = copy.errorMessage;
+        // Create a new ArrayList to avoid shared reference
+        this.leaderboardEntries = new ArrayList<>(copy.leaderboardEntries);
+        this.errorMessage = copy.errorMessage; // String is immutable, so direct assignment is safe
     }
 
     public List<Map<String, Object>> getLeaderboardEntries() {
