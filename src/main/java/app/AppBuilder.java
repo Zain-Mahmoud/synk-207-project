@@ -10,11 +10,11 @@ import javax.swing.WindowConstants;
 
 import data_access.FileUserDataAccessObject;
 import data_access.GoogleCalendarDataAccessObject;
-import data_access.GoogleSheetsHabitDataAccessObject;
+import data_access.GoogleSheetsLeaderboardDataAccessObject;
 import data_access.HabitDataAccessObject;
+import data_access.LocalLeaderboardDataAccessObject;
 import data_access.TaskDataAccessObject;
 import entities.UserFactory;
-import use_case.gateways.HabitGateway;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_habit.CreateHabitController;
 import interface_adapter.create_habit.CreateHabitPresenter;
@@ -69,6 +69,8 @@ import use_case.delete_task.DeleteTaskInputBoundary;
 import use_case.delete_task.DeleteTaskInteractor;
 import use_case.delete_task.DeleteTaskOutputBoundary;
 import use_case.gateways.CalendarGateway;
+import use_case.gateways.HabitGateway;
+import use_case.gateways.LeaderboardGateway;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -122,8 +124,9 @@ public class AppBuilder {
     // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
-    HabitGateway habitDataAccessObject = new HabitDataAccessObject(); // Use interface to allow switching implementations
+    HabitGateway habitDataAccessObject = new HabitDataAccessObject(); // Always use local CSV for habit CRUD operations
     private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
+    private use_case.gateways.LeaderboardGateway leaderboardDataAccessObject; // Separate data source for leaderboard (can be Google Sheets)
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -295,8 +298,14 @@ public class AppBuilder {
     public AppBuilder addViewLeaderboardUseCase() {
         final ViewLeaderboardOutputBoundary viewLeaderboardOutputBoundary = new ViewLeaderboardPresenter(
                 viewLeaderboardViewModel);
+        
+        // Use leaderboard-specific data source if configured, otherwise fall back to local CSV
+        LeaderboardGateway leaderboardGateway = leaderboardDataAccessObject != null 
+                ? leaderboardDataAccessObject 
+                : new LocalLeaderboardDataAccessObject(habitDataAccessObject);
+        
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
-                habitDataAccessObject, viewLeaderboardOutputBoundary);
+                leaderboardGateway, viewLeaderboardOutputBoundary);
 
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
@@ -455,8 +464,11 @@ public class AppBuilder {
 
 
     /**
-     * Configures the application to use Google Sheets for habit storage.
+     * Configures the application to use Google Sheets for leaderboard data.
      * This enables online multi-user leaderboard functionality.
+     * 
+     * Note: This only affects the leaderboard view. All other features (create, modify, delete habits)
+     * continue using local CSV storage (habits.csv).
      *
      * @param spreadsheetId the Google Sheet ID (extracted from the Sheet URL)
      *                      Example: from https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
@@ -465,25 +477,27 @@ public class AppBuilder {
      * @throws IOException              if Google Sheets API setup fails
      * @throws GeneralSecurityException if security setup fails
      */
-    public AppBuilder useGoogleSheetsForHabits(String spreadsheetId, String sheetName)
+    public AppBuilder useGoogleSheetsForLeaderboard(String spreadsheetId, String sheetName)
             throws IOException, GeneralSecurityException {
-        GoogleSheetsHabitDataAccessObject sheetsDao = new GoogleSheetsHabitDataAccessObject(
+        GoogleSheetsLeaderboardDataAccessObject sheetsDao = new GoogleSheetsLeaderboardDataAccessObject(
                 "user", spreadsheetId, sheetName);
-        this.habitDataAccessObject = sheetsDao;
+        this.leaderboardDataAccessObject = sheetsDao;
         return this;
     }
 
     /**
-     * Configures the application to use Google Sheets for habit storage with default sheet name.
+     * Configures the application to use Google Sheets for leaderboard data with default sheet name.
+     * 
+     * Note: This only affects the leaderboard view. All other features continue using local CSV.
      *
      * @param spreadsheetId the Google Sheet ID
      * @return this AppBuilder instance for method chaining
      * @throws IOException              if Google Sheets API setup fails
      * @throws GeneralSecurityException if security setup fails
      */
-    public AppBuilder useGoogleSheetsForHabits(String spreadsheetId)
+    public AppBuilder useGoogleSheetsForLeaderboard(String spreadsheetId)
             throws IOException, GeneralSecurityException {
-        return useGoogleSheetsForHabits(spreadsheetId, "Sheet1");
+        return useGoogleSheetsForLeaderboard(spreadsheetId, "Sheet1");
     }
 
     public JFrame build() {
