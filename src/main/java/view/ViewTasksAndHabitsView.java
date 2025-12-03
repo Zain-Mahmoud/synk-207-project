@@ -90,7 +90,9 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
         final JPanel tablePanel = new JPanel();
         final JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        buttonPanel.setLayout(new GridLayout(viewTasksAndHabitsViewModel.BUTTONPANELROWNUM,
+                viewTasksAndHabitsViewModel.BUTTONPANELCOLNUM, viewTasksAndHabitsViewModel.BUTTONPANELHGAPNUM,
+                viewTasksAndHabitsViewModel.BUTTONPANELVGAPNUM));
 
         this.exitButton = new JButton("Exit");
         this.refreshButton = new JButton("Refresh");
@@ -133,7 +135,8 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
         add(buttonPanel, BorderLayout.EAST);
 
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(1200, 500));
+        tabbedPane.setPreferredSize(new Dimension(viewTasksAndHabitsViewModel.WINDOWWIDTH,
+                ViewTasksAndHabitsViewModel.WINDOWHEIGHT));
         tabbedPane.addTab("Tasks", taskScrollPane);
         tabbedPane.addTab("Habits", habitScrollPane);
 
@@ -336,13 +339,20 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
             if (designation.equals("task")) {
 
-                final String taskName = taskModel.getValueAt(clickedRow, 0).toString();
-                final String taskStartTime = taskModel.getValueAt(clickedRow, 1).toString();
-                final String taskDueDateTime = taskModel.getValueAt(clickedRow, 2).toString();
-                final String taskGroup = taskModel.getValueAt(clickedRow, 3).toString();
-                final String taskStatusText = taskModel.getValueAt(clickedRow, 4).toString();
-                final String taskPriority = taskModel.getValueAt(clickedRow, 5).toString();
-                final String taskDescription = taskModel.getValueAt(clickedRow, 6).toString();
+                final String taskName = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKNAMECOLNUM).toString();
+                final String taskStartTime = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKSTARTTIMECOLNUM).toString();
+                final String taskDueDateTime = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKDUETIMECOLNUM).toString();
+                final String taskGroup = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKGROUPCOLNUM).toString();
+                final String taskStatusText = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKSTATUSCOLNUM).toString();
+                final String taskPriority = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKPRIORITYCOLNUM).toString();
+                final String taskDescription = taskModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.TASKDESCRIPTIONCOLNUM).toString();
 
                 final boolean taskStatus;
                 if (taskStatusText.equals("Complete")) {
@@ -376,13 +386,20 @@ public class ViewTasksAndHabitsView extends JPanel implements ActionListener, Pr
 
             }
             else if (designation.equals("habit")) {
-                final String habitName = habitModel.getValueAt(clickedRow, 0).toString();
-                final String startTime = habitModel.getValueAt(clickedRow, 1).toString();
-                final String habitFrequency = habitModel.getValueAt(clickedRow, 2).toString();
-                final String habitGroup = habitModel.getValueAt(clickedRow, 3).toString();
-                final String habitStreakCount = habitModel.getValueAt(clickedRow, 4).toString();
-                final String habitPriority = habitModel.getValueAt(clickedRow, 5).toString();
-                final String habitStatusText = habitModel.getValueAt(clickedRow, 6).toString();
+                final String habitName = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITNAMECOLNUM).toString();
+                final String startTime = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITSTARTTIMECOLNUM).toString();
+                final String habitFrequency = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITFREQCOLNUM).toString();
+                final String habitGroup = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITGROUPCOLNUM).toString();
+                final String habitStreakCount = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITSTREAKCOUNTCOLNUM).toString();
+                final String habitPriority = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITPRIORITYCOLNUM).toString();
+                final String habitStatusText = habitModel.getValueAt(clickedRow,
+                        ViewTasksAndHabitsViewModel.HABITDESCRIPTIONCOLNUM).toString();
                 final boolean habitStatus;
                 if (habitStatusText.equals("Complete")) {
                     habitStatus = true;
