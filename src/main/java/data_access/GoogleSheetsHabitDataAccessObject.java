@@ -282,13 +282,28 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
 
     /**
      * Initializes the sheet with header row if it doesn't exist.
+     * Also migrates old format header to new format if needed.
      */
     private void initializeSheetIfNeeded(String userId) throws IOException {
         List<List<Object>> existingData = readAllFromSheet(userId);
         if (existingData.isEmpty()) {
+            // Empty sheet, write new format header
             List<Object> headerRow = Arrays.asList((Object[]) HABIT_HEADER.split(","));
             List<List<Object>> header = Collections.singletonList(headerRow);
             writeAllToSheet(userId, header);
+        } else {
+            // Check if header needs migration from old format to new format
+            List<Object> headerRow = existingData.get(0);
+            boolean hasUidColumn = headerRow.size() >= 9 && "uid".equals(safeString(headerRow.get(0)));
+            
+            if (!hasUidColumn && headerRow.size() >= 8) {
+                // Old format detected, migrate to new format
+                // Read all data, then rewrite with new header
+                Map<String, ArrayList<Habit>> userHabits = parseRowsToHabits(existingData);
+                Map<String, String> uidMap = new HashMap<>(); // Empty UID map for migration
+                List<List<Object>> migratedRows = habitsToRows(userHabits, uidMap);
+                writeAllToSheet(userId, migratedRows);
+            }
         }
     }
 
@@ -302,17 +317,51 @@ public class GoogleSheetsHabitDataAccessObject implements HabitGateway {
             return userHabits;
         }
 
-        // Skip header row
+        // Check header to determine format
+        List<Object> headerRow = rows.get(0);
+        boolean hasUidColumn = headerRow.size() >= 9 && "uid".equals(safeString(headerRow.get(0)));
+
+        // Parse data rows (skip header row)
         for (int i = 1; i < rows.size(); i++) {
             List<Object> row = rows.get(i);
+            
+            // Determine offset based on row size
+            // Minimum required: 8 columns (old format) or 9 columns (new format)
+            int offset = 0;
             if (row.size() < 8) {
+                // Row too short, skip it
                 continue;
+            } else if (row.size() >= 9 && hasUidColumn) {
+                // New format: has uid column, skip it
+                offset = 1;
+            } else if (row.size() >= 8 && !hasUidColumn) {
+                // Old format: no uid column
+                offset = 0;
+            } else if (row.size() >= 9 && !hasUidColumn) {
+                // Mixed: header is old format but row has 9 columns
+                // Check if first column looks like a uid (UUID format) or username
+                String firstCol = safeString(row.get(0));
+                if (firstCol.length() > 20 || firstCol.contains("-")) {
+                    // Likely a uid, skip it
+                    offset = 1;
+                } else {
+                    // Likely a username, don't skip
+                    offset = 0;
+                }
+            } else if (row.size() == 8 && hasUidColumn) {
+                // Mixed: header is new format but row is old format (missing uid)
+                offset = 0; // Treat as old format row
+            } else {
+                // Unclear format, try old format first
+                offset = 0;
             }
 
             try {
-                // Support both old format (8 columns) and new format (9 columns with uid)
-                int offset = row.size() >= 9 ? 1 : 0; // If 9 columns, skip uid column
-                // uid is stored but not currently used in parsing (reserved for future user tracking)
+                // Ensure we have enough columns
+                if (row.size() < (8 + offset)) {
+                    continue;
+                }
+
                 String username = safeString(row.get(0 + offset));
                 String habitName = safeString(row.get(1 + offset));
                 int streakCount = safeInt(row.get(2 + offset), 0);
