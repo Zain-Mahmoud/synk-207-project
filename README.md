@@ -25,7 +25,7 @@
 *   **GUI Framework**: Java Swing
 *   **Build Tool**: Maven
 *   **APIs**: Google Calendar API, Google OAuth Client
-*   **Testing**: JUnit 5, TestNG
+*   **Testing**: JUnit 5
 *   **Libraries**: org.json, JDatePicker, OkHttp
 
 ## Architecture & Design
@@ -43,7 +43,7 @@ This project serves as a practical implementation of **Clean Architecture** (Rob
 *   **Dependency Injection**: To decouple components and facilitate testing.
 *   **Observer Pattern**: For reactive UI updates.
 
-## Credentails Note 
+### Credentails Note 
 
   **Configure Credentials**
     *   Obtain **OAuth 2.0 Client Credentials** (`credentials.json`) from the [Google Cloud Console](https://console.cloud.google.com/).
@@ -52,8 +52,6 @@ This project serves as a practical implementation of **Clean Architecture** (Rob
 
 
 ## Skills & Competencies Demonstrated
-
-This project highlights proficiency in:
 
 *   **Advanced Java Development**: Utilization of modern Java features and strong OOP principles.
 *   **Architectural Design**: Strict adherence to **Clean Architecture** and **SOLID** principles for scalable software.
@@ -64,4 +62,4 @@ This project highlights proficiency in:
 
 ---
 
-*This project was developed as part of a rigorous software design curriculum (CSC207 at UofT).*
+*This project was developed as part of the collaborative software design curriculum (CSC207 at UofT).*
