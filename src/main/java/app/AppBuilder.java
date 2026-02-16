@@ -1,12 +1,10 @@
 package app;
 
-import java.awt.CardLayout;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 
 import data_access.FileUserDataAccessObject;
 import data_access.GoogleCalendarDataAccessObject;
@@ -110,18 +108,15 @@ import view.ViewManager;
 import view.ViewTasksAndHabitsView;
 
 public class AppBuilder {
-    private final JPanel cardPanel = new JPanel();
-    private final CardLayout cardLayout = new CardLayout();
+    private final StackPane rootPane = new StackPane();
     final UserFactory userFactory = new UserFactory();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
+    ViewManager viewManager = new ViewManager(rootPane, viewManagerModel);
 
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
     final TaskDataAccessObject taskDataAccessObject = new TaskDataAccessObject();
     final HabitDataAccessObject habitDataAccessObject = new HabitDataAccessObject();
-    private final CalendarGateway calendarGateway; // Calendar gateway used for syncing to Google Calendar
+    private final CalendarGateway calendarGateway;
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -134,8 +129,8 @@ public class AppBuilder {
     private LoginView loginView;
     private LeaderboardView leaderboardView;
     private ViewLeaderboardViewModel viewLeaderboardViewModel;
-    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel; // View model carrying sync status updates
-    private SyncToGoogleCalendarController syncToGoogleCalendarController; // Controller to kick off sync flow
+    private SyncToGoogleCalendarViewModel syncToGoogleCalendarViewModel;
+    private SyncToGoogleCalendarController syncToGoogleCalendarController;
     private ModifyTaskViewModel modifyTaskViewModel;
     private ModifyTaskView modifyTaskView;
     private ModifyTaskController modifyTaskController;
@@ -155,23 +150,21 @@ public class AppBuilder {
     private UpdateProfileViewModel updateProfileViewModel;
     private UpdateProfileView updateProfileView;
 
-
-    public AppBuilder() throws IOException, GeneralSecurityException { // Constructor now accounts for calendar gateway setup
-        cardPanel.setLayout(cardLayout);
-        calendarGateway = new GoogleCalendarDataAccessObject(); // Initialize Google Calendar gateway implementation
+    public AppBuilder() throws IOException, GeneralSecurityException {
+        calendarGateway = new GoogleCalendarDataAccessObject();
     }
 
     public AppBuilder addSignupView() {
         signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
-        cardPanel.add(signupView, signupView.getViewName());
+        viewManager.addView(signupView.getViewName(), signupView);
         return this;
     }
 
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
-        cardPanel.add(loginView, loginView.getViewName());
+        viewManager.addView(loginView.getViewName(), loginView);
         return this;
     }
 
@@ -179,7 +172,7 @@ public class AppBuilder {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
         loggedInView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(loggedInView, loggedInView.getViewName());
+        viewManager.addView(loggedInView.getViewName(), loggedInView);
         return this;
     }
 
@@ -188,7 +181,7 @@ public class AppBuilder {
         viewtasksAndHabitsView = new ViewTasksAndHabitsView(viewTasksAndHabitsViewModel, viewManagerModel,
                 loggedInViewModel, modifyHabitViewModel, modifyTaskViewModel);
         viewtasksAndHabitsView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(viewtasksAndHabitsView, viewtasksAndHabitsView.getViewName());
+        viewManager.addView(viewtasksAndHabitsView.getViewName(), viewtasksAndHabitsView);
         return this;
     }
 
@@ -196,15 +189,15 @@ public class AppBuilder {
         viewLeaderboardViewModel = new ViewLeaderboardViewModel();
         leaderboardView = new LeaderboardView(viewLeaderboardViewModel);
         leaderboardView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(leaderboardView, leaderboardView.getViewName());
+        viewManager.addView(leaderboardView.getViewName(), leaderboardView);
         return this;
     }
 
     public AppBuilder addUpdateProfileView() {
-        updateProfileViewModel = new  UpdateProfileViewModel();
-        updateProfileView = new  UpdateProfileView(updateProfileViewModel);
+        updateProfileViewModel = new UpdateProfileViewModel();
+        updateProfileView = new UpdateProfileView(updateProfileViewModel);
         updateProfileView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(updateProfileView, updateProfileView.getViewName());
+        viewManager.addView(updateProfileView.getViewName(), updateProfileView);
         return this;
     }
 
@@ -212,31 +205,31 @@ public class AppBuilder {
         modifyTaskViewModel = new ModifyTaskViewModel();
         modifyTaskView = new ModifyTaskView(modifyTaskViewModel);
         modifyTaskView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(modifyTaskView, modifyTaskView.getViewName());
+        viewManager.addView(modifyTaskView.getViewName(), modifyTaskView);
         return this;
     }
 
-    public AppBuilder addModifyHabitView(){
+    public AppBuilder addModifyHabitView() {
         modifyHabitViewModel = new ModifyHabitViewModel();
         modifyHabitView = new ModifyHabitView(modifyHabitViewModel);
         modifyHabitView.setViewManagerModel(viewManagerModel);
-        cardPanel.add(modifyHabitView, modifyHabitView.getViewName());
+        viewManager.addView(modifyHabitView.getViewName(), modifyHabitView);
         return this;
     }
 
-    public AppBuilder addStatsView(){
+    public AppBuilder addStatsView() {
         viewStatsViewModel = new ViewStatsViewModel();
         statsView = new StatsView(viewStatsViewModel, viewManagerModel);
-        statsView.setViewManager(viewManagerModel);
-        cardPanel.add(statsView, statsView.getViewName());
+        viewManager.addView(statsView.getViewName(), statsView);
         return this;
     }
+
     public AppBuilder addCreateTaskView() {
         if (createTaskViewModel == null) {
             createTaskViewModel = new CreateTaskViewModel("create task");
         }
         createTaskView = new CreateTaskView(createTaskViewModel, viewManagerModel, loggedInViewModel);
-        cardPanel.add(createTaskView, createTaskView.getViewName());
+        viewManager.addView(createTaskView.getViewName(), createTaskView);
         return this;
     }
 
@@ -245,7 +238,7 @@ public class AppBuilder {
             createHabitViewModel = new CreateHabitViewModel("create habit");
         }
         createHabitView = new CreateHabitView(createHabitViewModel, viewManagerModel, loggedInViewModel);
-        cardPanel.add(createHabitView, createHabitView.getViewName());
+        viewManager.addView(createHabitView.getViewName(), createHabitView);
         return this;
     }
 
@@ -254,7 +247,7 @@ public class AppBuilder {
             deleteTaskViewModel = new DeleteTaskViewModel("delete task");
         }
         deleteTaskView = new DeleteTaskView(deleteTaskViewModel, viewManagerModel, loggedInViewModel);
-        cardPanel.add(deleteTaskView, deleteTaskView.getViewName());
+        viewManager.addView(deleteTaskView.getViewName(), deleteTaskView);
         return this;
     }
 
@@ -263,17 +256,17 @@ public class AppBuilder {
             deleteHabitViewModel = new DeleteHabitViewModel("delete habit");
         }
         deleteHabitView = new DeleteHabitView(deleteHabitViewModel, viewManagerModel, loggedInViewModel);
-        cardPanel.add(deleteHabitView, deleteHabitView.getViewName());
+        viewManager.addView(deleteHabitView.getViewName(), deleteHabitView);
         return this;
     }
 
+    // ── Use Case wiring (unchanged from original) ──
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
                 signupViewModel, loginViewModel);
         final SignupInputBoundary userSignupInteractor = new SignupInteractor(
                 userDataAccessObject, signupOutputBoundary, userFactory);
-
         SignupController controller = new SignupController(userSignupInteractor);
         signupView.setSignupController(controller);
         return this;
@@ -284,9 +277,13 @@ public class AppBuilder {
                 loggedInViewModel, loginViewModel, updateProfileViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(
                 userDataAccessObject, loginOutputBoundary);
-
         LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
+        // Wire "Don't have an account? Sign up" navigation
+        loginView.getToSignupButton().setOnAction(evt -> {
+            viewManagerModel.setState("sign up");
+            viewManagerModel.firePropertyChanged();
+        });
         return this;
     }
 
@@ -295,7 +292,6 @@ public class AppBuilder {
                 viewLeaderboardViewModel);
         final ViewLeaderboardInputBoundary viewLeaderboardInteractor = new ViewLeaderboardInteractor(
                 habitDataAccessObject, viewLeaderboardOutputBoundary);
-
         ViewLeaderboardController viewLeaderboardController = new ViewLeaderboardController(viewLeaderboardInteractor);
         leaderboardView.setViewLeaderboardController(viewLeaderboardController);
         return this;
@@ -304,29 +300,24 @@ public class AppBuilder {
     public AppBuilder addUpdateProfileUseCase() {
         final UpdateProfileOutputBoundary updateProfileOutputBoundary =
                 new UpdateProfilePresenter(viewManagerModel, updateProfileViewModel, loggedInViewModel);
-
         final UpdateProfileBoundary updateProfileInteractor =
                 new UpdateProfileInteractor(userDataAccessObject, updateProfileOutputBoundary);
-
         UpdateProfileController updateProfileController = new UpdateProfileController(updateProfileInteractor);
         updateProfileView.setUpdateProfileController(updateProfileController);
         return this;
     }
 
-    public AppBuilder addSyncToGoogleCalendarUseCase() { // Wire sync-to-calendar use case components together
+    public AppBuilder addSyncToGoogleCalendarUseCase() {
         if (syncToGoogleCalendarViewModel == null) {
             syncToGoogleCalendarViewModel = new SyncToGoogleCalendarViewModel();
         }
         SyncToGoogleCalendarOutputBoundary syncOutputBoundary = new SyncToGoogleCalendarPresenter(
-                syncToGoogleCalendarViewModel); // Presenter connecting sync interactor to UI
+                syncToGoogleCalendarViewModel);
         SyncToGoogleCalendarInputBoundary syncInteractor = new SyncToGoogleCalendarInteractor(taskDataAccessObject,
-                calendarGateway, syncOutputBoundary); // Interactor to sync tasks to calendar
-        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor); // Controller invoked by
-                                                                                             // logged-in view
-        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController); // Inject controller into
-                                                                                        // logged-in view
-        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel); // Provide sync view model for UI
-                                                                                      // updates
+                calendarGateway, syncOutputBoundary);
+        syncToGoogleCalendarController = new SyncToGoogleCalendarController(syncInteractor);
+        loggedInView.setSyncToGoogleCalendarController(syncToGoogleCalendarController);
+        loggedInView.setSyncToGoogleCalendarViewModel(syncToGoogleCalendarViewModel);
         return this;
     }
 
@@ -335,18 +326,16 @@ public class AppBuilder {
                 modifyTaskViewModel, viewTasksAndHabitsViewModel);
         final ModifyTaskInputBoundary modifyTaskInteractor = new ModifyTaskInteractor(modifyTaskOutputBoundary,
                 taskDataAccessObject);
-
         modifyTaskController = new ModifyTaskController(modifyTaskInteractor, loggedInViewModel);
         modifyTaskView.setModifyTaskController(modifyTaskController);
         return this;
     }
 
-    public AppBuilder addModifyHabitUseCase(){
+    public AppBuilder addModifyHabitUseCase() {
         final ModifyHabitOutputBoundary modifyHabitOutputBoundary = new ModifyHabitPresenter(viewManagerModel,
                 modifyHabitViewModel, viewTasksAndHabitsViewModel);
         final ModifyHabitInputBoundary modifyHabitInteractor = new ModifyHabitInteractor(modifyHabitOutputBoundary,
                 habitDataAccessObject);
-
         modifyHabitController = new ModifyHabitController(modifyHabitInteractor, loggedInViewModel);
         modifyHabitView.setModifyHabitController(modifyHabitController);
         return this;
@@ -357,10 +346,8 @@ public class AppBuilder {
                 viewManagerModel, viewTasksAndHabitsViewModel);
         final ViewTasksAndHabitsInputBoundary viewTasksAndHabitsInteractor = new ViewTasksAndHabitsInteractor(
                 taskDataAccessObject, habitDataAccessObject, viewTasksAndHabitsOutputBoundary);
-
         this.viewTasksAndHabitsController =
                 new ViewTasksAndHabitsController(viewTasksAndHabitsInteractor, loggedInViewModel);
-
         loggedInView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         viewtasksAndHabitsView.setViewTasksAndHabitsController(viewTasksAndHabitsController);
         return this;
@@ -371,10 +358,8 @@ public class AppBuilder {
                 viewManagerModel);
         final ViewStatsInputBoundary viewStatsInteractor = new ViewStatsInteractor(habitDataAccessObject,
                 taskDataAccessObject, viewStatsOutputBoundary);
-
         ViewStatsController viewStatsController = new ViewStatsController(viewStatsInteractor, loggedInViewModel);
         loggedInView.setViewStatsController(viewStatsController);
-
         return this;
     }
 
@@ -395,25 +380,15 @@ public class AppBuilder {
         if (deleteTaskViewModel == null) {
             deleteTaskViewModel = new DeleteTaskViewModel("delete task");
         }
-
         final DeleteTaskOutputBoundary deleteTaskOutputBoundary =
-                new DeleteTaskPresenter(
-                        deleteTaskViewModel,
-                        viewManagerModel,
-                        loggedInViewModel,
-                        viewTasksAndHabitsController
-                );
-
+                new DeleteTaskPresenter(deleteTaskViewModel, viewManagerModel, loggedInViewModel,
+                        viewTasksAndHabitsController);
         final DeleteTaskInputBoundary deleteTaskInteractor =
                 new DeleteTaskInteractor(deleteTaskOutputBoundary, taskDataAccessObject);
-
-        final DeleteTaskController deleteTaskController =
-                new DeleteTaskController(deleteTaskInteractor);
-
+        final DeleteTaskController deleteTaskController = new DeleteTaskController(deleteTaskInteractor);
         deleteTaskView.setDeleteTaskController(deleteTaskController);
         return this;
     }
-
 
     public AppBuilder addCreateHabitUseCase() {
         if (createHabitViewModel == null) {
@@ -432,35 +407,23 @@ public class AppBuilder {
         if (deleteHabitViewModel == null) {
             deleteHabitViewModel = new DeleteHabitViewModel("delete habit");
         }
-
         final DeleteHabitOutputBoundary deleteHabitOutputBoundary =
-                new DeleteHabitPresenter(
-                        deleteHabitViewModel,
-                        viewManagerModel,
-                        loggedInViewModel,
-                        viewTasksAndHabitsController
-                );
-
+                new DeleteHabitPresenter(deleteHabitViewModel, viewManagerModel, loggedInViewModel,
+                        viewTasksAndHabitsController);
         final DeleteHabitInputBoundary deleteHabitInteractor =
                 new DeleteHabitInteractor(deleteHabitOutputBoundary, habitDataAccessObject);
-
-        final DeleteHabitController deleteHabitController =
-                new DeleteHabitController(deleteHabitInteractor);
-
+        final DeleteHabitController deleteHabitController = new DeleteHabitController(deleteHabitInteractor);
         deleteHabitView.setDeleteHabitController(deleteHabitController);
         return this;
     }
 
+    public Scene build() {
+        Scene scene = new Scene(rootPane);
 
-    public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
-        application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        application.add(cardPanel);
-
+        // Show the signup view by default
         viewManagerModel.setState(signupView.getViewName());
         viewManagerModel.firePropertyChanged();
 
-        return application;
+        return scene;
     }
 }

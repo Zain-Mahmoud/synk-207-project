@@ -24,8 +24,17 @@ public class SyncToGoogleCalendarController {
      */
     // Here we construct a ID object
     public void execute(String userId) {
-        final SyncToGoogleCalendarInputData syncToGoogleCalendarInputData = new SyncToGoogleCalendarInputData(userId);
-        syncToGoogleCalendarUseCaseInteractor.execute(syncToGoogleCalendarInputData); // Trigger sync interactor with packaged input
+        // EXECUTE ASYNC to avoid blocking the JavaFX Application Thread
+        new Thread(() -> {
+            try {
+                final SyncToGoogleCalendarInputData syncToGoogleCalendarInputData =
+                        new SyncToGoogleCalendarInputData(userId);
+                syncToGoogleCalendarUseCaseInteractor.execute(syncToGoogleCalendarInputData);
+            } catch (Exception e) {
+                // If any unexpected error occurs here, ensure it doesn't crash the thread silently
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 

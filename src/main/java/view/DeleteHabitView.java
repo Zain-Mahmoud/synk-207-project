@@ -6,31 +6,34 @@ import interface_adapter.delete_habit.DeleteHabitController;
 import interface_adapter.delete_habit.DeleteHabitState;
 import interface_adapter.delete_habit.DeleteHabitViewModel;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * View for deleting a habit.
- * User only needs to enter the habit name; username is taken from
- * the LoggedInViewModel.
+ * View for deleting a habit (JavaFX).
  */
-public class DeleteHabitView extends JPanel implements ActionListener, PropertyChangeListener {
+public class DeleteHabitView extends VBox implements PropertyChangeListener {
 
     private final String viewName = "delete habit";
-
     private final DeleteHabitViewModel viewModel;
     private final ViewManagerModel viewManagerModel;
     private final LoggedInViewModel loggedInViewModel;
 
     private DeleteHabitController deleteHabitController;
 
-    private final JTextField habitNameField = new JTextField(15);
-    private final JButton deleteButton = new JButton("Delete");
-    private final JButton cancelButton = new JButton("Cancel");
+    private final TextField habitNameField = new TextField();
+    private final Button deleteButton = new Button("Delete");
+    private final Button cancelButton = new Button("Cancel");
 
     public DeleteHabitView(DeleteHabitViewModel viewModel,
                            ViewManagerModel viewManagerModel,
@@ -38,50 +41,48 @@ public class DeleteHabitView extends JPanel implements ActionListener, PropertyC
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
-
         this.viewModel.addPropertyChangeListener(this);
 
-        setLayout(new BorderLayout());
+        this.getStyleClass().add("form-container");
+        this.setAlignment(Pos.TOP_CENTER);
+        this.setPadding(new Insets(30, 50, 30, 50));
+        this.setSpacing(16);
 
-        JLabel title = new JLabel("Delete Habit", SwingConstants.CENTER);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
-        add(title, BorderLayout.NORTH);
+        Label title = new Label("Delete Habit");
+        title.getStyleClass().add("form-title");
 
-        JPanel center = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        habitNameField.getStyleClass().add("form-field");
+        habitNameField.setPromptText("Enter habit name to delete");
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        center.add(new JLabel("Habit Name:"), gbc);
-        gbc.gridx = 1;
-        center.add(habitNameField, gbc);
+        deleteButton.getStyleClass().add("form-btn-save");
+        deleteButton.setStyle("-fx-background-color: #EF4444;");
+        cancelButton.getStyleClass().add("form-btn-cancel");
 
-        add(center, BorderLayout.CENTER);
-
-        JPanel buttons = new JPanel();
-        buttons.add(deleteButton);
-        buttons.add(cancelButton);
-        add(buttons, BorderLayout.SOUTH);
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleDelete();
-            }
-        });
-
-        cancelButton.addActionListener(e -> {
+        deleteButton.setOnAction(evt -> handleDelete());
+        cancelButton.setOnAction(evt -> {
             viewManagerModel.setState("view tasks and habits");
             viewManagerModel.firePropertyChanged();
         });
+
+        HBox buttons = new HBox(12, deleteButton, cancelButton);
+        buttons.setAlignment(Pos.CENTER);
+
+        this.getChildren().addAll(title,
+                createField("Habit Name", habitNameField),
+                buttons);
+    }
+
+    private VBox createField(String labelText, TextField field) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-field-label");
+        VBox box = new VBox(4, label, field);
+        box.setMaxWidth(400);
+        return box;
     }
 
     private void handleDelete() {
         if (deleteHabitController == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Delete Habit controller not initialized.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            showError("Delete Habit controller not initialized.");
             return;
         }
 
@@ -89,9 +90,7 @@ public class DeleteHabitView extends JPanel implements ActionListener, PropertyC
         String habitName = habitNameField.getText().trim();
 
         if (habitName.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Habit name cannot be empty.",
-                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            showError("Habit name cannot be empty.");
             return;
         }
 
@@ -103,28 +102,33 @@ public class DeleteHabitView extends JPanel implements ActionListener, PropertyC
         deleteHabitController.execute(username, habitName);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // unused
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (!"state".equals(evt.getPropertyName())) {
-            return;
-        }
-        DeleteHabitState state = viewModel.getState();
-        if (state.getErrorMessage() != null) {
-            JOptionPane.showMessageDialog(this, state.getErrorMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (state.getSuccessMessage() != null) {
-            JOptionPane.showMessageDialog(this, state.getSuccessMessage(),
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
-            habitNameField.setText("");
+        Platform.runLater(() -> {
+            if (!"state".equals(evt.getPropertyName())) return;
+            DeleteHabitState state = viewModel.getState();
+            if (state.getErrorMessage() != null) {
+                showError(state.getErrorMessage());
+            } else if (state.getSuccessMessage() != null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText(state.getSuccessMessage());
+                alert.showAndWait();
 
-            viewManagerModel.setState("view tasks and habits");
-            viewManagerModel.firePropertyChanged();
-        }
+                habitNameField.setText("");
+                viewManagerModel.setState("view tasks and habits");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
     }
 
     public String getViewName() {

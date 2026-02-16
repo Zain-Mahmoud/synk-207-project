@@ -1,339 +1,155 @@
 package view;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import interface_adapter.ViewManagerModel;
-import interface_adapter.modify_habit.*;
+import interface_adapter.modify_habit.ModifyHabitController;
+import interface_adapter.modify_habit.ModifyHabitState;
+import interface_adapter.modify_habit.ModifyHabitViewModel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
 
-
-public class ModifyHabitView extends JPanel implements ActionListener, PropertyChangeListener {
+public class ModifyHabitView extends VBox implements PropertyChangeListener {
     private final String viewName = "modify habit";
     private final ModifyHabitViewModel modifyHabitViewModel;
 
-    private final JTextField newHabitName = new JTextField();
-    private final JTextField newStartDateTime = new JTextField();
-    private final JTextField newFrequency = new JTextField();
-    private final JTextField newHabitGroup = new JTextField();
-    private final JRadioButton habitCompleted = new JRadioButton("Completed");
-    private final JRadioButton habitNotCompleted = new JRadioButton("Not completed");
-    private final ButtonGroup newHabitStatus = new ButtonGroup();
-    private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
-    private final JFormattedTextField newHabitPriority = new JFormattedTextField(numberFormat);
-    private final JFormattedTextField newStreakCount = new JFormattedTextField(numberFormat);
+    private final TextField newHabitName = new TextField();
+    private final TextField newStartDateTime = new TextField();
+    private final TextField newFrequency = new TextField();
+    private final TextField newHabitGroup = new TextField();
+    private final RadioButton habitCompleted = new RadioButton("Completed");
+    private final RadioButton habitNotCompleted = new RadioButton("Not completed");
+    private final ToggleGroup habitStatusGroup = new ToggleGroup();
+    private final TextField newHabitPriority = new TextField();
+    private final TextField newStreakCount = new TextField();
 
     private ModifyHabitController modifyHabitController = null;
-
-    private final JButton save = new JButton("save");
-    private final JButton cancel = new JButton("cancel");
+    private final Button save = new Button("Save");
+    private final Button cancel = new Button("Cancel");
     private ViewManagerModel viewManagerModel;
 
     public ModifyHabitView(ModifyHabitViewModel modifyHabitViewModel) {
-
-        ModifyHabitState currState = modifyHabitViewModel.getState();
-
         this.modifyHabitViewModel = modifyHabitViewModel;
         this.modifyHabitViewModel.addPropertyChangeListener(this);
 
-        newHabitStatus.add(habitCompleted);
-        newHabitStatus.add(habitNotCompleted);
+        this.getStyleClass().add("form-container");
+        this.setAlignment(Pos.TOP_CENTER);
+        this.setPadding(new Insets(30, 50, 30, 50));
+        this.setSpacing(12);
 
-        JLabel habitNameLabel = new JLabel("Habit name");
-        JLabel startDateTimeLabel = new JLabel("Start date/time");
-        JLabel frequencyLabel = new JLabel("Frequency");
-        JLabel habitGroupLabel = new JLabel("Habit group");
-        JLabel habitStatusLabel = new JLabel("Habit status");
-        JLabel habitPriorityLabel = new JLabel("Habit priority");
-        JLabel streakCountLabel = new JLabel("Streak count");
+        Label title = new Label("Modify Habit");
+        title.getStyleClass().add("form-title");
 
+        habitCompleted.setToggleGroup(habitStatusGroup);
+        habitNotCompleted.setToggleGroup(habitStatusGroup);
 
-
-
-        if (currState.getStatus()){
-            habitCompleted.setSelected(true);
-        } else{
-            habitCompleted.setSelected(true);
+        for (TextField f : new TextField[]{newHabitName, newStartDateTime, newFrequency,
+                newHabitGroup, newHabitPriority, newStreakCount}) {
+            f.getStyleClass().add("form-field");
         }
 
-        newHabitName.getDocument().addDocumentListener(new DocumentListener() {
+        // Listeners
+        newHabitName.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setHabitName(nv));
+        newStartDateTime.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setStartDateTime(nv));
+        newFrequency.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setFrequency(nv));
+        newHabitGroup.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setHabitGroup(nv));
+        newHabitPriority.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setPriority(nv));
+        newStreakCount.textProperty().addListener((o, ov, nv) ->
+                modifyHabitViewModel.getState().setStreakCount(nv));
 
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setHabitName(newHabitName.getText());
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
+        habitCompleted.selectedProperty().addListener((o, ov, nv) -> {
+            if (nv) modifyHabitViewModel.getState().setStatus(true);
+        });
+        habitNotCompleted.selectedProperty().addListener((o, ov, nv) -> {
+            if (nv) modifyHabitViewModel.getState().setStatus(false);
         });
 
-        newStartDateTime.getDocument().addDocumentListener(new DocumentListener() {
+        save.getStyleClass().add("form-btn-save");
+        cancel.getStyleClass().add("form-btn-cancel");
 
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setStartDateTime(newStartDateTime.getText());
-            }
+        cancel.setOnAction(evt -> modifyHabitController.switchToHabitListView());
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
+        save.setOnAction(evt -> {
+            ModifyHabitState currentState = modifyHabitViewModel.getState();
+            modifyHabitController.execute(
+                    currentState.getOldHabitName(), currentState.getOldPriority(),
+                    currentState.getOldStatus(), currentState.getOldStartDateTime(),
+                    currentState.getOldStreakCount(), currentState.getOldHabitGroup(),
+                    currentState.getOldFrequency(),
+                    currentState.getHabitName(), currentState.getPriority(),
+                    currentState.getStatus(), currentState.getStartDateTime(),
+                    currentState.getStreakCount(), currentState.getHabitGroup(),
+                    currentState.getFrequency()
+            );
         });
 
-        newFrequency.getDocument().addDocumentListener(new DocumentListener() {
+        HBox statusRow = new HBox(10, new Label("Status:"), habitCompleted, habitNotCompleted);
+        statusRow.setAlignment(Pos.CENTER_LEFT);
 
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setFrequency(newFrequency.getText());
-            }
+        HBox buttons = new HBox(12, save, cancel);
+        buttons.setAlignment(Pos.CENTER);
+        buttons.setPadding(new Insets(10, 0, 0, 0));
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-        });
-
-        newHabitGroup.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setHabitGroup(newHabitGroup.getText());
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-        });
-
-        newHabitPriority.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                    currentState.setPriority(newHabitPriority.getText());
-
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-        });
-
-        newStreakCount.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void documentStateHelper() {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-
-                    currentState.setStreakCount(newStreakCount.getText());
-
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentStateHelper();
-            }
-        });
-
-        habitCompleted.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setStatus(true);
-            }
-        });
-
-        habitNotCompleted.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                final ModifyHabitState currentState = modifyHabitViewModel.getState();
-                currentState.setStatus(false);
-            }
-        });
-
-        JPanel habitStatus = new JPanel();
-        JPanel habitPriority = new JPanel();
-        JPanel habitName = new JPanel();
-        JPanel startDateTime = new JPanel();
-        JPanel frequency = new JPanel();
-        JPanel habitGroup = new JPanel();
-        JPanel streakCount = new JPanel();
-
-        habitStatus.add(habitStatusLabel);
-        habitStatus.add(habitCompleted);
-        habitStatus.add(habitNotCompleted);
-        habitStatus.setLayout(new BoxLayout(habitStatus, BoxLayout.X_AXIS));
-
-        habitName.add(habitNameLabel);
-        habitName.add(newHabitName);
-        habitName.setLayout(new BoxLayout(habitName, BoxLayout.X_AXIS));
-
-        startDateTime.add(startDateTimeLabel);
-        startDateTime.add(newStartDateTime);
-        startDateTime.setLayout(new BoxLayout(startDateTime, BoxLayout.X_AXIS));
-
-        frequency.add(frequencyLabel);
-        frequency.add(newFrequency);
-        frequency.setLayout(new BoxLayout(frequency, BoxLayout.X_AXIS));
-
-        habitGroup.add(habitGroupLabel);
-        habitGroup.add(newHabitGroup);
-        habitGroup.setLayout(new BoxLayout(habitGroup, BoxLayout.X_AXIS));
-
-        habitPriority.add(habitPriorityLabel);
-        habitPriority.add(newHabitPriority);
-        habitPriority.setLayout(new BoxLayout(habitPriority, BoxLayout.X_AXIS));
-
-        streakCount.add(streakCountLabel);
-        streakCount.add(newStreakCount);
-        streakCount.setLayout(new BoxLayout(streakCount, BoxLayout.X_AXIS));
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
-        buttons.add(save);
-        buttons.add(cancel);
-
-        this.add(habitName);
-        this.add(startDateTime);
-        this.add(frequency);
-        this.add(habitGroup);
-        this.add(habitStatus);
-        this.add(habitPriority);
-        this.add(streakCount);
-        this.add(buttons);
-
-        cancel.addActionListener(evt -> {
-            if (evt.getSource().equals(cancel)){
-                modifyHabitController.switchToHabitListView();
-            }
-        });
-
-        save.addActionListener(evt -> {
-            if (evt.getSource().equals(save)){
-                ModifyHabitState currentState = modifyHabitViewModel.getState();
-                modifyHabitController.execute(currentState.getOldHabitName(), currentState.getOldPriority(),
-                        currentState.getOldStatus(),
-                        currentState.getOldStartDateTime(),
-                        currentState.getOldStreakCount(),
-                        currentState.getOldHabitGroup(),
-                        currentState.getOldFrequency(),
-                        currentState.getHabitName(),
-                        currentState.getPriority(),
-                        currentState.getStatus(),
-                        currentState.getStartDateTime(),
-                        currentState.getStreakCount(),
-                        currentState.getHabitGroup(),
-                        currentState.getFrequency()
-                );
-            }
-        });
+        this.getChildren().addAll(title,
+                createField("Habit Name", newHabitName),
+                createField("Start Date/Time", newStartDateTime),
+                createField("Frequency", newFrequency),
+                createField("Habit Group", newHabitGroup),
+                statusRow,
+                createField("Priority", newHabitPriority),
+                createField("Streak Count", newStreakCount),
+                buttons);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
+    private VBox createField(String labelText, TextField field) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-field-label");
+        VBox box = new VBox(4, label, field);
+        box.setMaxWidth(400);
+        return box;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final ModifyHabitState currState = (ModifyHabitState) evt.getNewValue();
-        if (currState.getHabitError() != null){
-            JOptionPane.showMessageDialog(this, currState.getHabitError());
-        } else {
-            newHabitName.setText(currState.getOldHabitName());
-            newFrequency.setText(currState.getOldFrequency());
-            newHabitPriority.setText(currState.getOldPriority());
-            newStreakCount.setText(currState.getOldStreakCount());
-            newHabitGroup.setText(currState.getOldHabitGroup());
-            newStartDateTime.setText(currState.getOldStartDateTime());
-            if (currState.getOldStatus()) {
-                habitCompleted.setSelected(true);
+        Platform.runLater(() -> {
+            final ModifyHabitState currState = (ModifyHabitState) evt.getNewValue();
+            if (currState.getHabitError() != null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText(currState.getHabitError());
+                alert.showAndWait();
             } else {
-                habitCompleted.setSelected(false);
+                newHabitName.setText(currState.getOldHabitName());
+                newFrequency.setText(currState.getOldFrequency());
+                newHabitPriority.setText(currState.getOldPriority());
+                newStreakCount.setText(currState.getOldStreakCount());
+                newHabitGroup.setText(currState.getOldHabitGroup());
+                newStartDateTime.setText(currState.getOldStartDateTime());
+                habitCompleted.setSelected(currState.getOldStatus());
+                habitNotCompleted.setSelected(!currState.getOldStatus());
             }
-        }
+        });
     }
 
-    public String getViewName() {
-        return viewName;
+    public String getViewName() { return viewName; }
+
+    public void setModifyHabitController(ModifyHabitController controller) {
+        this.modifyHabitController = controller;
     }
 
-    public void setModifyHabitController(ModifyHabitController modifyHabitController) {
-        this.modifyHabitController = modifyHabitController;
-    }
-
-    public void setViewManagerModel(ViewManagerModel viewManagerModel){
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
         this.viewManagerModel = viewManagerModel;
     }
 }
