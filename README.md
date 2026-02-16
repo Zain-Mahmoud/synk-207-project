@@ -61,5 +61,22 @@ This project serves as a practical implementation of **Clean Architecture** (Rob
 *   **Test-Driven Development**: Writing unit tests with JUnit/TestNG to ensure code reliability.
 
 ---
+# App Overview 
+
+## 📸 Interface Overview
+
+| **Authentication & Navigation** | **Task & Habit Management** |
+|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/260cb7a2-0589-48fc-bdff-33e9f61d96f6" width="400" alt="SYNK Account Creation and Signup Screen"> |  <img width="600" height="634" alt="image" src="https://github.com/user-attachments/assets/cb97f912-dd2d-49f1-a351-bf9aa8339a02" /> |
+| *Seamless onboarding with a clean signup flow.* | *Manage daily tasks and recurring habits in one place.* |
+| <img src="https://github.com/user-attachments/assets/5bc6d2a9-c32c-432a-a951-7ed7b2f5c8f1" width="400" alt="SYNK Home Dashboard with Navigation Menu"> | <img src="https://github.com/user-attachments/assets/7508634d-3d6e-4175-acfc-bfcfdcf36100" width="400" alt="SYNK Productivity Statistics Dashboard showing streaks and completion rates"> |
+| *Personalized home screen for quick navigation.* | *Track your progress with real-time productivity metrics.* |
+| <img src="https://github.com/user-attachments/assets/d1e82f03-b98a-4039-99ae-5fa84437492b" width="400" alt="Google OAuth Integration for SYNK CSC207"> | <img src="https://github.com/user-attachments/assets/305a7d9d-05a9-49e3-bbc9-b7cfbe14282b" width="400" alt="SYNK Habit Streak Leaderboard showing top users"> |
+| *Secure integration with Google OAuth 2.0.* | *Stay motivated by competing on the global leaderboard.* |
+
+
+
+---
+
 
 *This project was developed as part of the collaborative software design curriculum (CSC207 at UofT).*
