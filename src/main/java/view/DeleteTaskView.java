@@ -6,19 +6,23 @@ import interface_adapter.delete_task.DeleteTaskController;
 import interface_adapter.delete_task.DeleteTaskState;
 import interface_adapter.delete_task.DeleteTaskViewModel;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * View for deleting a task.
- * User only needs to enter the task name; username is taken from
- * the LoggedInViewModel.
+ * View for deleting a task (JavaFX).
  */
-public class DeleteTaskView extends JPanel implements ActionListener, PropertyChangeListener {
+public class DeleteTaskView extends VBox implements PropertyChangeListener {
 
     private final DeleteTaskViewModel viewModel;
     private final ViewManagerModel viewManagerModel;
@@ -26,10 +30,9 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
 
     private DeleteTaskController controller;
 
-    private final JLabel messageLabel = new JLabel(" ", SwingConstants.CENTER);
-    private final JTextField taskNameField = new JTextField(15);
-    private final JButton deleteButton = new JButton("Delete");
-    private final JButton cancelButton = new JButton("Cancel");
+    private final TextField taskNameField = new TextField();
+    private final Button deleteButton = new Button("Delete");
+    private final Button cancelButton = new Button("Cancel");
 
     public DeleteTaskView(DeleteTaskViewModel viewModel,
                           ViewManagerModel viewManagerModel,
@@ -37,57 +40,48 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
-
-        setLayout(new BorderLayout());
-
-        JLabel titleLabel = new JLabel("Delete Task", SwingConstants.CENTER);
-        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 18f));
-        add(titleLabel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        centerPanel.add(new JLabel("Task Name:"), gbc);
-
-        gbc.gridx = 1;
-        centerPanel.add(taskNameField, gbc);
-
-        add(centerPanel, BorderLayout.CENTER);
-
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.add(deleteButton);
-        buttonsPanel.add(cancelButton);
-
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(buttonsPanel, BorderLayout.NORTH);
-        southPanel.add(messageLabel, BorderLayout.SOUTH);
-
-        add(southPanel, BorderLayout.SOUTH);
-
         this.viewModel.addPropertyChangeListener(this);
 
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleDelete();
-            }
-        });
+        this.getStyleClass().add("form-container");
+        this.setAlignment(Pos.TOP_CENTER);
+        this.setPadding(new Insets(30, 50, 30, 50));
+        this.setSpacing(16);
 
-        cancelButton.addActionListener(e -> {
-            clearMessages();
+        Label title = new Label("Delete Task");
+        title.getStyleClass().add("form-title");
+
+        taskNameField.getStyleClass().add("form-field");
+        taskNameField.setPromptText("Enter task name to delete");
+
+        deleteButton.getStyleClass().add("form-btn-save");
+        deleteButton.setStyle("-fx-background-color: #EF4444;");
+        cancelButton.getStyleClass().add("form-btn-cancel");
+
+        deleteButton.setOnAction(evt -> handleDelete());
+        cancelButton.setOnAction(evt -> {
             viewManagerModel.setState("view tasks and habits");
             viewManagerModel.firePropertyChanged();
         });
+
+        HBox buttons = new HBox(12, deleteButton, cancelButton);
+        buttons.setAlignment(Pos.CENTER);
+
+        this.getChildren().addAll(title,
+                createField("Task Name", taskNameField),
+                buttons);
+    }
+
+    private VBox createField(String labelText, TextField field) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-field-label");
+        VBox box = new VBox(4, label, field);
+        box.setMaxWidth(400);
+        return box;
     }
 
     private void handleDelete() {
         if (controller == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Delete Task controller not initialized.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            showError("Delete Task controller not initialized.");
             return;
         }
 
@@ -95,9 +89,7 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
         String taskName = taskNameField.getText().trim();
 
         if (taskName.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Task name cannot be empty.",
-                    "Input Error", JOptionPane.ERROR_MESSAGE);
+            showError("Task name cannot be empty.");
             return;
         }
 
@@ -109,46 +101,39 @@ public class DeleteTaskView extends JPanel implements ActionListener, PropertyCh
         controller.execute(username, taskName);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // unused
-    }
-
-    private void clearMessages() {
-        DeleteTaskState state = viewModel.getState();
-        state.setErrorMessage(null);
-        state.setSuccessMessage(null);
-        viewModel.setState(state);
-        messageLabel.setText(" ");
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (!"state".equals(evt.getPropertyName())) {
-            return;
-        }
-        DeleteTaskState state = viewModel.getState();
+        Platform.runLater(() -> {
+            if (!"state".equals(evt.getPropertyName())) return;
+            DeleteTaskState state = viewModel.getState();
 
-        if (state.getErrorMessage() != null) {
+            if (state.getErrorMessage() != null) {
+                showError(state.getErrorMessage());
+                state.setErrorMessage(null);
+                viewModel.setState(state);
+            } else if (state.getSuccessMessage() != null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText(state.getSuccessMessage());
+                alert.showAndWait();
 
-            JOptionPane.showMessageDialog(this, state.getErrorMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            messageLabel.setText(state.getErrorMessage());
+                taskNameField.setText("");
+                state.setSuccessMessage(null);
+                viewModel.setState(state);
 
-            state.setErrorMessage(null);
-            viewModel.setState(state);
-        } else if (state.getSuccessMessage() != null) {
-            JOptionPane.showMessageDialog(this, state.getSuccessMessage(),
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
-            taskNameField.setText("");
-
-            messageLabel.setText(" ");
-            state.setSuccessMessage(null);
-            viewModel.setState(state);
-
-            viewManagerModel.setState("view tasks and habits");
-            viewManagerModel.firePropertyChanged();
-        }
+                viewManagerModel.setState("view tasks and habits");
+                viewManagerModel.firePropertyChanged();
+            }
+        });
     }
 
     public String getViewName() {

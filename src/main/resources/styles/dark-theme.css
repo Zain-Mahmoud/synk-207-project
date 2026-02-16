@@ -1,0 +1,309 @@
+/* ═══════════════════════════════════════════════════════
+   SYNK — Dark Theme (overlays on AtlantaFX CupertinoDark)
+   ═══════════════════════════════════════════════════════ */
+
+/* ──── Root palette ──── */
+.root {
+    -fx-font-family: "Segoe UI", "SF Pro Display", system;
+    -synk-accent:       #6C63FF;
+    -synk-accent-hover: #5A52E0;
+    -synk-surface:      #1E1E2E;
+    -synk-surface-alt:  #2A2A3C;
+    -synk-text:         #E0E0E0;
+    -synk-text-muted:   #8888AA;
+    -synk-success:      #22C55E;
+    -synk-danger:       #EF4444;
+    -synk-border:       #3A3A4E;
+}
+
+/* ──── Auth screens (login / signup) ──── */
+.auth-container {
+    -fx-background-color: -synk-surface;
+    -fx-padding: 60 80;
+    -fx-alignment: center;
+    -fx-spacing: 20;
+    -fx-max-width: 440;
+}
+
+.auth-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -synk-accent;
+}
+
+.auth-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -synk-text-muted;
+}
+
+.auth-field {
+    -fx-background-color: -synk-surface-alt;
+    -fx-text-fill: -synk-text;
+    -fx-prompt-text-fill: -synk-text-muted;
+    -fx-border-color: -synk-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 14px;
+    -fx-pref-height: 42;
+}
+
+.auth-field:focused {
+    -fx-border-color: -synk-accent;
+    -fx-effect: dropshadow(gaussian, rgba(108,99,255,0.25), 8, 0, 0, 0);
+}
+
+.auth-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -synk-text-muted;
+    -fx-padding: 0 0 4 2;
+}
+
+.auth-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: -synk-danger;
+    -fx-padding: 2 0 0 2;
+}
+
+.auth-btn-primary {
+    -fx-background-color: -synk-accent;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 0;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-pref-width: 300;
+}
+
+.auth-btn-primary:hover {
+    -fx-background-color: -synk-accent-hover;
+    -fx-effect: dropshadow(gaussian, rgba(108,99,255,0.3), 12, 0, 0, 2);
+}
+
+.auth-btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: -synk-accent;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-underline: true;
+}
+
+.auth-btn-secondary:hover {
+    -fx-text-fill: -synk-accent-hover;
+}
+
+/* ──── Dashboard ──── */
+.dashboard-container {
+    -fx-background-color: -synk-surface;
+    -fx-padding: 40;
+    -fx-spacing: 24;
+}
+
+.dashboard-title {
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -synk-accent;
+    -fx-font-family: "Consolas", "Fira Code", monospace;
+}
+
+.dashboard-welcome {
+    -fx-font-size: 18px;
+    -fx-text-fill: -synk-text;
+}
+
+.dashboard-btn {
+    -fx-background-color: -synk-accent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 28;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-pref-width: 220;
+    -fx-pref-height: 50;
+    -fx-alignment: center;
+}
+
+.dashboard-btn:hover {
+    -fx-background-color: -synk-accent-hover;
+    -fx-effect: dropshadow(gaussian, rgba(108,99,255,0.35), 14, 0, 0, 3);
+}
+
+.dashboard-btn-danger {
+    -fx-background-color: #3A3A4E;
+    -fx-text-fill: -synk-text;
+}
+
+.dashboard-btn-danger:hover {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+}
+
+.sync-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: -synk-text-muted;
+    -fx-font-style: italic;
+}
+
+.sync-status-success {
+    -fx-text-fill: -synk-success;
+}
+
+.sync-status-error {
+    -fx-text-fill: -synk-danger;
+}
+
+/* ──── Cards ──── */
+.stat-card {
+    -fx-background-color: -synk-surface-alt;
+    -fx-border-color: -synk-border;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-spacing: 12;
+    -fx-alignment: center;
+}
+
+.stat-card-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: -synk-text-muted;
+}
+
+.stat-card-value {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -synk-accent;
+}
+
+/* ──── Form views (modify, create, delete) ──── */
+.form-container {
+    -fx-background-color: -synk-surface;
+    -fx-padding: 30 50;
+    -fx-spacing: 14;
+    -fx-alignment: top-center;
+}
+
+.form-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -synk-text;
+}
+
+.form-field-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -synk-text-muted;
+    -fx-padding: 0 0 2 2;
+}
+
+.form-field {
+    -fx-background-color: -synk-surface-alt;
+    -fx-text-fill: -synk-text;
+    -fx-border-color: -synk-border;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.form-field:focused {
+    -fx-border-color: -synk-accent;
+}
+
+.form-btn-save {
+    -fx-background-color: -synk-accent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 30;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.form-btn-save:hover {
+    -fx-background-color: -synk-accent-hover;
+}
+
+.form-btn-cancel {
+    -fx-background-color: #3A3A4E;
+    -fx-text-fill: -synk-text;
+    -fx-padding: 10 30;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.form-btn-cancel:hover {
+    -fx-background-color: #4A4A5E;
+}
+
+/* ──── Leaderboard / Tables ──── */
+.leaderboard-container {
+    -fx-background-color: -synk-surface;
+    -fx-padding: 30;
+    -fx-spacing: 16;
+}
+
+.leaderboard-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -synk-accent;
+}
+
+/* Table styling */
+.table-view {
+    -fx-background-color: -synk-surface-alt;
+    -fx-border-color: -synk-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2A2A3C;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -synk-accent;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: -synk-surface-alt;
+    -fx-border-color: transparent transparent -synk-border transparent;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: rgba(108, 99, 255, 0.2);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -synk-text;
+    -fx-font-size: 13px;
+    -fx-padding: 8;
+}
+
+/* ──── Scrollbars ──── */
+.scroll-bar .thumb {
+    -fx-background-color: rgba(108, 99, 255, 0.4);
+    -fx-background-radius: 4;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(108, 99, 255, 0.6);
+}
+
+/* ──── Back button ──── */
+.back-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -synk-accent;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 6 16;
+    -fx-border-color: -synk-accent;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.back-btn:hover {
+    -fx-background-color: rgba(108, 99, 255, 0.1);
+}

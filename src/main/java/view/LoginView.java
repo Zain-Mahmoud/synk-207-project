@@ -3,146 +3,114 @@ package view;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.signup.SignupController;
-import interface_adapter.view_stats.ViewStatsController;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * The View for when the user is logging into the program.
+ * The View for when the user is logging into the program (JavaFX).
  */
-public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
+public class LoginView extends VBox implements PropertyChangeListener {
 
     private final String viewName = "log in";
     private final LoginViewModel loginViewModel;
 
-    private final JTextField usernameInputField = new JTextField(15);
-    private final JLabel usernameErrorField = new JLabel();
+    private final TextField usernameInputField = new TextField();
+    private final Label usernameErrorField = new Label();
+    private final PasswordField passwordInputField = new PasswordField();
 
-    private final JPasswordField passwordInputField = new JPasswordField(15);
-    private final JLabel passwordErrorField = new JLabel();
-
-    private final JButton logIn;
-    private final JButton cancel;
+    private final Button logIn;
+    private final Button toSignup;
     private LoginController loginController = null;
 
     public LoginView(LoginViewModel loginViewModel) {
-
         this.loginViewModel = loginViewModel;
         this.loginViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("Login Screen");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ── Style classes ──
+        this.getStyleClass().add("auth-container");
+        this.setAlignment(Pos.CENTER);
 
-        final LabelTextPanel usernameInfo = new LabelTextPanel(
-                new JLabel("Username"), usernameInputField);
-        final LabelTextPanel passwordInfo = new LabelTextPanel(
-                new JLabel("Password"), passwordInputField);
+        // ── Title ──
+        Label title = new Label("SYNK");
+        title.getStyleClass().add("auth-title");
 
-        final JPanel buttons = new JPanel();
-        logIn = new JButton("log in");
-        buttons.add(logIn);
-        cancel = new JButton("cancel");
-        buttons.add(cancel);
+        Label subtitle = new Label("Sign in to your account");
+        subtitle.getStyleClass().add("auth-subtitle");
 
-        logIn.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(logIn)) {
-                            final LoginState currentState = loginViewModel.getState();
+        // ── Username ──
+        Label usernameLabel = new Label("Username");
+        usernameLabel.getStyleClass().add("auth-label");
+        usernameInputField.setPromptText("Enter your username");
+        usernameInputField.getStyleClass().add("auth-field");
 
-                            loginController.execute(
-                                    currentState.getUsername(),
-                                    currentState.getPassword()
-                            );
-                        }
-                    }
-                }
-        );
+        usernameErrorField.getStyleClass().add("auth-error");
 
-        cancel.addActionListener(this);
+        // ── Password ──
+        Label passwordLabel = new Label("Password");
+        passwordLabel.getStyleClass().add("auth-label");
+        passwordInputField.setPromptText("Enter your password");
+        passwordInputField.getStyleClass().add("auth-field");
 
-        usernameInputField.getDocument().addDocumentListener(new DocumentListener() {
+        // ── Buttons ──
+        logIn = new Button("Sign In");
+        logIn.getStyleClass().add("auth-btn-primary");
 
-            private void documentListenerHelper() {
-                final LoginState currentState = loginViewModel.getState();
-                currentState.setUsername(usernameInputField.getText());
-                loginViewModel.setState(currentState);
-            }
+        toSignup = new Button("Don't have an account? Sign up");
+        toSignup.getStyleClass().add("auth-btn-secondary");
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        // ── Events ──
+        logIn.setOnAction(evt -> {
+            final LoginState currentState = loginViewModel.getState();
+            loginController.execute(
+                    currentState.getUsername(),
+                    currentState.getPassword()
+            );
         });
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
-
-            private void documentListenerHelper() {
-                final LoginState currentState = loginViewModel.getState();
-                currentState.setPassword(new String(passwordInputField.getPassword()));
-                loginViewModel.setState(currentState);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
+        usernameInputField.textProperty().addListener((obs, oldVal, newVal) -> {
+            final LoginState currentState = loginViewModel.getState();
+            currentState.setUsername(newVal);
+            loginViewModel.setState(currentState);
         });
 
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(usernameErrorField);
-        this.add(passwordInfo);
-        this.add(buttons);
-    }
+        passwordInputField.textProperty().addListener((obs, oldVal, newVal) -> {
+            final LoginState currentState = loginViewModel.getState();
+            currentState.setPassword(newVal);
+            loginViewModel.setState(currentState);
+        });
 
-    /**
-     * React to a button click that results in evt.
-     * @param evt the ActionEvent to react to
-     */
-    public void actionPerformed(ActionEvent evt) {
-        System.out.println("Click " + evt.getActionCommand());
+        // ── Layout ──
+        VBox formBox = new VBox(4, usernameLabel, usernameInputField, usernameErrorField,
+                passwordLabel, passwordInputField);
+        formBox.setAlignment(Pos.CENTER_LEFT);
+        formBox.setMaxWidth(300);
+
+        this.getChildren().addAll(title, subtitle, formBox, logIn, toSignup);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final LoginState state = (LoginState) evt.getNewValue();
-        setFields(state);
-        usernameErrorField.setText(state.getLoginError());
+        Platform.runLater(() -> {
+            final LoginState state = (LoginState) evt.getNewValue();
+            setFields(state);
+            usernameErrorField.setText(
+                    state.getLoginError() != null ? state.getLoginError() : "");
+        });
     }
 
     private void setFields(LoginState state) {
-        usernameInputField.setText(state.getUsername());
+        if (!usernameInputField.getText().equals(state.getUsername())) {
+            usernameInputField.setText(state.getUsername());
+        }
     }
 
     public String getViewName() {
@@ -151,5 +119,12 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     public void setLoginController(LoginController loginController) {
         this.loginController = loginController;
+    }
+
+    /**
+     * Provide access to toSignup button so AppBuilder / SignupView can hook navigation.
+     */
+    public Button getToSignupButton() {
+        return toSignup;
     }
 }
